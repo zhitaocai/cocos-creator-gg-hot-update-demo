@@ -1,6 +1,6 @@
 # cocos-creator-gg-hot-update-demo
 
-一个 [gg-hot-update/热更新](https://store.cocos.com/app/detail/6756) 插件的Demo仓库
+一个 [gg-hot-update/热更新](https://store.cocos.com/app/detail/6756) 插件的 Demo 演示仓库
 
 ## 特别注意
 
@@ -51,7 +51,7 @@
 
 对应实际运行演示如下：
 
-
+https://github.com/user-attachments/assets/120d6b5b-3482-480c-ac43-58204081c3cd
 
 演示解读：
 
