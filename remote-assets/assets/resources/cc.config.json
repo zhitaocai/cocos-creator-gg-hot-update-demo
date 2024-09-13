@@ -1,0 +1,85 @@
+{
+    "importBase": "import",
+    "nativeBase": "native",
+    "name": "resources",
+    "deps": [],
+    "uuids": [
+        "0f5ece212",
+        "1a348c320",
+        "1a348c320@6c48a",
+        "1afe19f5-e260-4ba4-b438-ac3f9ad23350@f9941",
+        "6d7b0e33-8a32-401e-8f50-c7a3cbeb6d04",
+        "6f1ccd6c-bb1c-4a3a-8c3b-5bd6615530ab@f9941",
+        "83f74f03-0942-4214-9aa5-9181f3aba59b@f9941",
+        "95e7fccb-660b-459d-8a91-f272fbbbb5b1",
+        "bf4a0ab6-f160-4265-a53c-c86e349bc9fe",
+        "d650f12e-9089-49ac-8d18-7c53fb76a92a@f9941",
+        "fa81bfc2-deb9-4720-96d0-e95cd4841736@f9941"
+    ],
+    "paths": {
+        "95e7fccb-660b-459d-8a91-f272fbbbb5b1": [
+            "textures/common/bmfont_alibaba_puhuiti_3_75_semi_bold",
+            "cc.BitmapFont",
+            1
+        ],
+        "83f74f03-0942-4214-9aa5-9181f3aba59b@f9941": [
+            "textures/common/bmfont_alibaba_puhuiti_3_75_semi_bold/spriteFrame",
+            "cc.SpriteFrame",
+            1
+        ],
+        "bf4a0ab6-f160-4265-a53c-c86e349bc9fe": [
+            "textures/common/bmfont_alibaba_puhuiti_3_75_semi_bold_outline",
+            "cc.BitmapFont",
+            1
+        ],
+        "1afe19f5-e260-4ba4-b438-ac3f9ad23350@f9941": [
+            "textures/common/bmfont_alibaba_puhuiti_3_75_semi_bold_outline/spriteFrame",
+            "cc.SpriteFrame",
+            1
+        ],
+        "d650f12e-9089-49ac-8d18-7c53fb76a92a@f9941": [
+            "textures/common/pb_bar/spriteFrame",
+            "cc.SpriteFrame",
+            1
+        ],
+        "fa81bfc2-deb9-4720-96d0-e95cd4841736@f9941": [
+            "textures/common/pb_bg/spriteFrame",
+            "cc.SpriteFrame",
+            1
+        ],
+        "6f1ccd6c-bb1c-4a3a-8c3b-5bd6615530ab@f9941": [
+            "textures/common/rect/spriteFrame",
+            "cc.SpriteFrame",
+            1
+        ],
+        "6d7b0e33-8a32-401e-8f50-c7a3cbeb6d04": [
+            "prefabs/components/common/HotUpdateProgressComponent",
+            "cc.Prefab",
+            1
+        ]
+    },
+    "scenes": {},
+    "packs": {
+        "0f5ece212": [
+            "1a348c320",
+            "1a348c320@6c48a",
+            "1afe19f5-e260-4ba4-b438-ac3f9ad23350@f9941",
+            "6d7b0e33-8a32-401e-8f50-c7a3cbeb6d04",
+            "6f1ccd6c-bb1c-4a3a-8c3b-5bd6615530ab@f9941",
+            "83f74f03-0942-4214-9aa5-9181f3aba59b@f9941",
+            "95e7fccb-660b-459d-8a91-f272fbbbb5b1",
+            "bf4a0ab6-f160-4265-a53c-c86e349bc9fe",
+            "d650f12e-9089-49ac-8d18-7c53fb76a92a@f9941",
+            "fa81bfc2-deb9-4720-96d0-e95cd4841736@f9941"
+        ]
+    },
+    "versions": {
+        "import": [],
+        "native": []
+    },
+    "redirect": [],
+    "debug": true,
+    "extensionMap": {},
+    "hasPreloadScript": true,
+    "dependencyRelationships": {}
+}

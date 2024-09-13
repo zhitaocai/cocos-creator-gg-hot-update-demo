@@ -1,0 +1,89 @@
+{
+  "__version__": "1.3.8",
+  "bundleConfig": {
+    "custom": {
+      "default": {
+        "displayName": "i18n:builder.asset_bundle.defaultConfig",
+        "configs": {
+          "native": {
+            "preferredOptions": {
+              "isRemote": false,
+              "compressionType": "merge_all_json"
+            }
+          },
+          "web": {
+            "preferredOptions": {
+              "isRemote": false,
+              "compressionType": "merge_all_json"
+            },
+            "fallbackOptions": {
+              "compressionType": "merge_dep"
+            }
+          },
+          "miniGame": {
+            "fallbackOptions": {
+              "isRemote": false,
+              "compressionType": "merge_dep"
+            },
+            "configMode": "fallback"
+          }
+        }
+      }
+    }
+  },
+  "textureCompressConfig": {
+    "userPreset": {
+      "cfuH3x0dhCbKSk8nygX+XV": {
+        "name": "GG Opaque",
+        "options": {
+          "web": {
+            "webp": {
+              "quality": 80
+            }
+          },
+          "ios": {
+            "astc_6x6": {
+              "quality": "medium"
+            }
+          },
+          "android": {
+            "astc_6x6": {
+              "quality": "medium"
+            }
+          },
+          "miniGame": {
+            "jpg": {
+              "quality": 80
+            }
+          }
+        }
+      },
+      "86dNunrYZM2o/IUx0lxRGO": null,
+      "d7h8eHd0RPqL+93NUWjn80": {
+        "name": "GG Transparent",
+        "options": {
+          "web": {
+            "webp": {
+              "quality": 80
+            }
+          },
+          "ios": {
+            "astc_6x6": {
+              "quality": "medium"
+            }
+          },
+          "miniGame": {
+            "png": {
+              "quality": 80
+            }
+          },
+          "android": {
+            "astc_6x6": {
+              "quality": "medium"
+            }
+          }
+        }
+      }
+    }
+  }
+}

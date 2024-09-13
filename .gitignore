@@ -1,0 +1,30 @@
+
+#///////////////////////////
+# Cocos Creator 3D Project
+#///////////////////////////
+library/
+temp/
+local/
+build/
+profiles/
+native
+#//////////////////////////
+# NPM
+#//////////////////////////
+node_modules/
+
+#//////////////////////////
+# VSCode
+#//////////////////////////
+.vscode/
+
+#//////////////////////////
+# WebStorm
+#//////////////////////////
+.idea/
+
+# ignore plugin source code
+extensions/gg-hot-update/
+
+# ignore plugin output zip
+**/gg-hot-update-remote-assets.zip
