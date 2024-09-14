@@ -104,19 +104,16 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
                     instance.clearDownloadCache();
                   }
                   // 弹窗提示检查失败以及提供重试机制
-                  // panelRouter.show({
-                  //     panel: ResourcesPanelConfig.alertPanel,
-                  //     data: <AlertPanelShowData>{
-                  //         titleLabel: "Check for Updates Failed",
-                  //         msgLabel: "There seems to be a problem during the update check.\nPlease check if your network connection is active.",
-                  //         cancelBtnVisable: false,
-                  //         confirmBtnVisable: true,
-                  //         confirmBtnLabel: "Retry",
-                  //         onConfirmBtnClick: () => {
-                  //             this.checkUpdateRetryCurTimes = 0;
-                  //             instance.checkUpdate();
-                  //             panelRouter.hide({ panel: ResourcesPanelConfig.alertPanel });
-                  //         },
+                  // showAlertDialog({
+                  //     titleLabel: "Check for Updates Failed",
+                  //     msgLabel: "There seems to be a problem during the update check.\nPlease check if your network connection is active.",
+                  //     cancelBtnVisable: false,
+                  //     confirmBtnVisable: true,
+                  //     confirmBtnLabel: "Retry",
+                  //     onConfirmBtnClick: () => {
+                  //         this.checkUpdateRetryCurTimes = 0;
+                  //         instance.checkUpdate();
+                  //         hideAlertDialog();
                   //     },
                   // });
                 } else {
@@ -159,19 +156,16 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
                 if (this.hotUpdateRetryCurTimes >= this.hotUpdateRetryMaxTimes) {
                   console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
                   // 如果尝试一定次数之后，依旧失败，那么弹窗提示
-                  // panelRouter.show({
-                  //     panel: ResourcesPanelConfig.alertPanel,
-                  //     data: <AlertPanelShowData>{
-                  //         titleLabel: "Update Resources Failed",
-                  //         msgLabel: "There seems to be a problem during the resources update process.\nPlease check if your network connection is active.",
-                  //         cancelBtnVisable: false,
-                  //         confirmBtnVisable: true,
-                  //         confirmBtnLabel: "Retry",
-                  //         onConfirmBtnClick: () => {
-                  //             this.hotUpdateRetryCurTimes = 0;
-                  //             instance.hotUpdate();
-                  //             panelRouter.hide({ panel: ResourcesPanelConfig.alertPanel });
-                  //         },
+                  // showAlertDialog({
+                  //     titleLabel: "Update Resources Failed",
+                  //     msgLabel: "There seems to be a problem during the resources update process.\nPlease check if your network connection is active.",
+                  //     cancelBtnVisable: false,
+                  //     confirmBtnVisable: true,
+                  //     confirmBtnLabel: "Retry",
+                  //     onConfirmBtnClick: () => {
+                  //         this.hotUpdateRetryCurTimes = 0;
+                  //         instance.hotUpdate();
+                  //         hideAlertDialog();
                   //     },
                   // });
                 } else {
@@ -2129,7 +2123,7 @@ System.register("chunks:///_virtual/HotUpdateSystem.ts", ['cc'], function (expor
 });
 
 System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GameSceneConfig.ts', './LobbyGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, Tween, GameSceneConfig, LobbyGameListItem;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, instantiate, GameSceneConfig, LobbyGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -2140,9 +2134,7 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
-      NodePool = module.NodePool;
       instantiate = module.instantiate;
-      Tween = module.Tween;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
     }, function (module) {
@@ -2161,35 +2153,11 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
           _initializerDefineProperty(this, "scrollView", _descriptor, this);
           _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3, this);
-          // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 节点复用处理
-          this._nodePool = new NodePool();
         }
-        _getNode() {
-          const node = this._nodePool.get();
-          return node ? node : instantiate(this.itemNode);
-        }
-        _putNode(node) {
-          Tween.stopAllByTarget(node);
-          this._nodePool.put(node);
-        }
-        _recycleAllNodes() {
+        start() {
           for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this._putNode(this.itemParentNode.children[i]);
+            this.itemParentNode.children[i].destroy();
           }
-        }
-
-        // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 生命周期处理
-
-        onEnable() {
-          this._recycleAllNodes();
-          this._updateList();
-        }
-        onDisable() {
-          this._recycleAllNodes();
-        }
-        _updateList() {
           const games = [{
             gameName: "GameA",
             sceneConfig: GameSceneConfig.GameAScene
@@ -2204,7 +2172,7 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
             sceneConfig: GameSceneConfig.GameDScene
           }];
           games.forEach(data => {
-            const itemNode = this._getNode();
+            const itemNode = instantiate(this.itemNode);
             itemNode.parent = this.itemParentNode;
             itemNode.getComponent(LobbyGameListItem).bindData(data);
           });
@@ -2568,7 +2536,7 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
 });
 
 System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './SubGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, Tween, assetManager, SpriteFrame, SubGameListItem;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, assetManager, SpriteFrame, instantiate, SubGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -2579,11 +2547,9 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
-      NodePool = module.NodePool;
-      instantiate = module.instantiate;
-      Tween = module.Tween;
       assetManager = module.assetManager;
       SpriteFrame = module.SpriteFrame;
+      instantiate = module.instantiate;
     }, function (module) {
       SubGameListItem = module.SubGameListItem;
     }],
@@ -2601,35 +2567,11 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
           _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3, this);
           _initializerDefineProperty(this, "bundleName", _descriptor4, this);
-          // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 节点复用处理
-          this._nodePool = new NodePool();
         }
-        _getNode() {
-          const node = this._nodePool.get();
-          return node ? node : instantiate(this.itemNode);
-        }
-        _putNode(node) {
-          Tween.stopAllByTarget(node);
-          this._nodePool.put(node);
-        }
-        _recycleAllNodes() {
+        start() {
           for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this._putNode(this.itemParentNode.children[i]);
+            this.itemParentNode.children[i].destroy();
           }
-        }
-
-        // ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 生命周期处理
-
-        onEnable() {
-          this._recycleAllNodes();
-          this._updateList();
-        }
-        onDisable() {
-          this._recycleAllNodes();
-        }
-        _updateList() {
           assetManager.loadBundle(this.bundleName, (error, bundle) => {
             if (error) {
               console.error(`load bundle failed: ${this.bundleName}`);
@@ -2645,7 +2587,7 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
               assets.sort((a, b) => {
                 return parseInt(a.name) - parseInt(b.name);
               }).forEach(asset => {
-                const itemNode = this._getNode();
+                const itemNode = instantiate(this.itemNode);
                 itemNode.parent = this.itemParentNode;
                 itemNode.getComponent(SubGameListItem).setSpriteFrame(asset);
               });
