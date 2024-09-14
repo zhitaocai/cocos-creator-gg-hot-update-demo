@@ -30,15 +30,17 @@ class DefaultSceneRouter {
                     if (error) {
                         console.error(`load bundle failed: ${sceneConfig.bundleName}`);
                         console.error(error);
+                        reject(error);
                         return;
                     }
                     bundle.loadScene(sceneConfig.sceneName, (error: Error | null, asset: SceneAsset) => {
                         if (error) {
                             console.error(`load bundle ${sceneConfig.bundleName} scene ${sceneConfig.sceneName} failed`);
                             console.error(error);
+                            reject(error);
                             return;
                         }
-                        director.runScene(asset);
+                        resolve(asset);
                     });
                 });
             });

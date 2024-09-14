@@ -1,4 +1,4 @@
-import { _decorator, AssetManager, assetManager, Component, instantiate, Node, ScrollView, SpriteFrame } from "cc";
+import { _decorator, AssetManager, assetManager, Component, instantiate, Node, NodePool, ScrollView, SpriteFrame } from "cc";
 import { SubGameListItem } from "./SubGameListItem";
 const { ccclass, property } = _decorator;
 
@@ -16,11 +16,32 @@ export class SubGameListCtrl extends Component {
     @property
     bundleName: string = "";
 
-    protected start(): void {
-        for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this.itemParentNode.children[i].destroy();
-        }
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 节点复用处理
 
+    private _nodePool: NodePool = new NodePool();
+    private _getNode(): Node {
+        const node = this._nodePool.get();
+        return node ? node : instantiate(this.itemNode);
+    }
+    private _putNode(node: Node) {
+        this._nodePool.put(node);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 生命周期处理
+
+    protected onLoad(): void {
+        for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
+            this._putNode(this.itemParentNode.children[i]);
+        }
+    }
+
+    protected onDestroy(): void {
+        this._nodePool.clear();
+    }
+
+    protected start(): void {
         assetManager.loadBundle(this.bundleName, (error: Error | null, bundle: AssetManager.Bundle) => {
             if (error) {
                 console.error(`load bundle failed: ${this.bundleName}`);

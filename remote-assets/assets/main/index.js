@@ -2123,7 +2123,7 @@ System.register("chunks:///_virtual/HotUpdateSystem.ts", ['cc'], function (expor
 });
 
 System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GameSceneConfig.ts', './LobbyGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, instantiate, GameSceneConfig, LobbyGameListItem;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, GameSceneConfig, LobbyGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -2134,6 +2134,7 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
+      NodePool = module.NodePool;
       instantiate = module.instantiate;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
@@ -2153,11 +2154,30 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
           _initializerDefineProperty(this, "scrollView", _descriptor, this);
           _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3, this);
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 节点复用处理
+          this._nodePool = new NodePool();
+        }
+        _getNode() {
+          const node = this._nodePool.get();
+          return node ? node : instantiate(this.itemNode);
+        }
+        _putNode(node) {
+          this._nodePool.put(node);
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 生命周期处理
+
+        onLoad() {
+          for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
+            this._putNode(this.itemParentNode.children[i]);
+          }
+        }
+        onDestroy() {
+          this._nodePool.clear();
         }
         start() {
-          for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this.itemParentNode.children[i].destroy();
-          }
           const games = [{
             gameName: "GameA",
             sceneConfig: GameSceneConfig.GameAScene
@@ -2172,8 +2192,8 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
             sceneConfig: GameSceneConfig.GameDScene
           }];
           games.forEach(data => {
-            const itemNode = instantiate(this.itemNode);
-            itemNode.parent = this.itemParentNode;
+            const itemNode = this._getNode();
+            itemNode.setParent(this.itemParentNode);
             itemNode.getComponent(LobbyGameListItem).bindData(data);
           });
         }
@@ -2308,15 +2328,17 @@ System.register("chunks:///_virtual/SceneRouter.ts", ['cc'], function (exports) 
                 if (error) {
                   console.error(`load bundle failed: ${sceneConfig.bundleName}`);
                   console.error(error);
+                  reject(error);
                   return;
                 }
                 bundle.loadScene(sceneConfig.sceneName, (error, asset) => {
                   if (error) {
                     console.error(`load bundle ${sceneConfig.bundleName} scene ${sceneConfig.sceneName} failed`);
                     console.error(error);
+                    reject(error);
                     return;
                   }
-                  director.runScene(asset);
+                  resolve(asset);
                 });
               });
             });
@@ -2536,7 +2558,7 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
 });
 
 System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './SubGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, assetManager, SpriteFrame, instantiate, SubGameListItem;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, assetManager, SpriteFrame, SubGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -2547,9 +2569,10 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
+      NodePool = module.NodePool;
+      instantiate = module.instantiate;
       assetManager = module.assetManager;
       SpriteFrame = module.SpriteFrame;
-      instantiate = module.instantiate;
     }, function (module) {
       SubGameListItem = module.SubGameListItem;
     }],
@@ -2567,11 +2590,30 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
           _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3, this);
           _initializerDefineProperty(this, "bundleName", _descriptor4, this);
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 节点复用处理
+          this._nodePool = new NodePool();
+        }
+        _getNode() {
+          const node = this._nodePool.get();
+          return node ? node : instantiate(this.itemNode);
+        }
+        _putNode(node) {
+          this._nodePool.put(node);
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 生命周期处理
+
+        onLoad() {
+          for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
+            this._putNode(this.itemParentNode.children[i]);
+          }
+        }
+        onDestroy() {
+          this._nodePool.clear();
         }
         start() {
-          for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this.itemParentNode.children[i].destroy();
-          }
           assetManager.loadBundle(this.bundleName, (error, bundle) => {
             if (error) {
               console.error(`load bundle failed: ${this.bundleName}`);

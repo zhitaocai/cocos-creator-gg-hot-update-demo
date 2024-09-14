@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, ScrollView } from "cc";
+import { _decorator, Component, instantiate, Node, NodePool, ScrollView } from "cc";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { LobbyGameListItem, LobbyGameListItemModel } from "./LobbyGameListItem";
 const { ccclass, property } = _decorator;
@@ -14,11 +14,32 @@ export class LobbyGameListCtrl extends Component {
     @property(Node)
     itemNode: Node = null!;
 
-    protected start(): void {
-        for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
-            this.itemParentNode.children[i].destroy();
-        }
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 节点复用处理
 
+    private _nodePool: NodePool = new NodePool();
+    private _getNode(): Node {
+        const node = this._nodePool.get();
+        return node ? node : instantiate(this.itemNode);
+    }
+    private _putNode(node: Node) {
+        this._nodePool.put(node);
+    }
+
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 生命周期处理
+
+    protected onLoad(): void {
+        for (let i = this.itemParentNode.children.length - 1; i >= 0; --i) {
+            this._putNode(this.itemParentNode.children[i]);
+        }
+    }
+
+    protected onDestroy(): void {
+        this._nodePool.clear();
+    }
+
+    protected start(): void {
         const games: LobbyGameListItemModel[] = [
             { gameName: "GameA", sceneConfig: GameSceneConfig.GameAScene },
             { gameName: "GameB", sceneConfig: GameSceneConfig.GameBScene },
@@ -26,8 +47,8 @@ export class LobbyGameListCtrl extends Component {
             { gameName: "GameD", sceneConfig: GameSceneConfig.GameDScene },
         ];
         games.forEach((data) => {
-            const itemNode = instantiate(this.itemNode);
-            itemNode.parent = this.itemParentNode;
+            const itemNode = this._getNode();
+            itemNode.setParent(this.itemParentNode);
             itemNode.getComponent(LobbyGameListItem)!.bindData(data);
         });
     }
