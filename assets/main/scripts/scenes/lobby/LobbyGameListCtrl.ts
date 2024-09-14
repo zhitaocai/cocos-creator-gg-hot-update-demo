@@ -48,8 +48,8 @@ export class LobbyGameListCtrl extends Component {
         ];
         games.forEach((data) => {
             const itemNode = this._getNode();
-            itemNode.setParent(this.itemParentNode);
             itemNode.getComponent(LobbyGameListItem)!.bindData(data);
+            itemNode.setParent(this.itemParentNode);
         });
     }
 }

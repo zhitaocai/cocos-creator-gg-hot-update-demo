@@ -49,6 +49,9 @@
           "android": {
             "astc_6x6": {
               "quality": "medium"
+            },
+            "etc2_rgb": {
+              "quality": "fast"
             }
           },
           "miniGame": {
@@ -80,6 +83,9 @@
           "android": {
             "astc_6x6": {
               "quality": "medium"
+            },
+            "etc2_rgba": {
+              "quality": "fast"
             }
           }
         }

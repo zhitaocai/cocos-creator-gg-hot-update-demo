@@ -2007,18 +2007,25 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
           _initializerDefineProperty(this, "bundleNameLabel", _descriptor, this);
           _initializerDefineProperty(this, "hpProgressComp", _descriptor2, this);
         }
+        onBackBtnClick() {
+          sceneRouter.runSceneAsync(GameSceneConfig.LobbyScene);
+        }
+
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 组件生命周期处理
+
         onEnable() {
-          this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig.bundleName;
-
-          // 显示 loading
-          this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
-
-          // 检查更新
           const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName);
-          instance.register(this);
-          instance.checkUpdate();
+
+          // 如果已经是最新版本或者热更新成功了，直接接入游戏场景，否则再次检查
+          if (instance.state == GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate || instance.state == GGHotUpdateInstanceState.HotUpdateSuc) {
+            sceneRouter.runSceneAsync(hotUpdateSystem.pendingSceneConfig);
+          } else {
+            this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig.bundleName;
+            this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
+            instance.register(this);
+            instance.checkUpdate();
+          }
         }
         onDisable() {
           const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName);
@@ -2051,7 +2058,7 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
               break;
             case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
               // 检查更新成功：当前已经是最新版本，直接进入游戏场景
-              this._enterGameScene();
+              sceneRouter.runSceneAsync(hotUpdateSystem.pendingSceneConfig);
               break;
             case GGHotUpdateInstanceState.HotUpdateInProgress:
               // 热更新：进行中
@@ -2059,7 +2066,7 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
               break;
             case GGHotUpdateInstanceState.HotUpdateSuc:
               // 热更新：成功，进入游戏
-              this._enterGameScene();
+              sceneRouter.runSceneAsync(hotUpdateSystem.pendingSceneConfig);
               break;
             case GGHotUpdateInstanceState.HotUpdateFailed:
               // 热更新：失败，返回大厅
@@ -2068,16 +2075,6 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
               }, 2);
               break;
           }
-        }
-
-        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 业务逻辑处理
-
-        _enterGameScene() {
-          sceneRouter.runSceneAsync(hotUpdateSystem.pendingSceneConfig);
-        }
-        onBackBtnClick() {
-          sceneRouter.runSceneAsync(GameSceneConfig.LobbyScene);
         }
       }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "bundleNameLabel", [_dec], {
         configurable: true,
@@ -2192,8 +2189,8 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
           }];
           games.forEach(data => {
             const itemNode = this._getNode();
-            itemNode.setParent(this.itemParentNode);
             itemNode.getComponent(LobbyGameListItem).bindData(data);
+            itemNode.setParent(this.itemParentNode);
           });
         }
       }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "scrollView", [_dec], {
@@ -2246,16 +2243,17 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
       hotUpdateSystem = module.hotUpdateSystem;
     }],
     execute: function () {
-      var _dec, _class, _class2, _descriptor;
+      var _dec, _dec2, _class, _class2, _descriptor, _descriptor2;
       cclegacy._RF.push({}, "2b5e2t73URPAKcyvYx9lwmk", "LobbyGameListItem", undefined);
       const {
         ccclass,
         property
       } = _decorator;
-      let LobbyGameListItem = exports('LobbyGameListItem', (_dec = property(Label), ccclass(_class = (_class2 = class LobbyGameListItem extends Component {
+      let LobbyGameListItem = exports('LobbyGameListItem', (_dec = property(Label), _dec2 = property(Label), ccclass(_class = (_class2 = class LobbyGameListItem extends Component {
         constructor(...args) {
           super(...args);
           _initializerDefineProperty(this, "gameName", _descriptor, this);
+          _initializerDefineProperty(this, "progressLabel", _descriptor2, this);
           this._data = null;
         }
         bindData(data) {
@@ -2276,14 +2274,74 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
             sceneRouter.runSceneAsync(this._data.sceneConfig);
           }
         }
-      }, _descriptor = _applyDecoratedDescriptor(_class2.prototype, "gameName", [_dec], {
+        onEnable() {
+          if (ggHotUpdateManager.isHotUpdateBundle(this._data.sceneConfig.bundleName)) {
+            const instance = ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName);
+            instance.register(this);
+            // 如果还没有检查过更新，就自动检查一遍更新
+            if (instance.state == GGHotUpdateInstanceState.Idle) {
+              instance.checkUpdate();
+            }
+          } else {
+            this.progressLabel.string = "";
+          }
+        }
+        onDisable() {
+          if (ggHotUpdateManager.isHotUpdateBundle(this._data.sceneConfig.bundleName)) {
+            ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).unregister(this);
+          }
+        }
+        onGGHotUpdateInstanceCallBack(instance) {
+          switch (instance.state) {
+            case GGHotUpdateInstanceState.Idle:
+              this.progressLabel.string = "Idle";
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateInProgress:
+              this.progressLabel.string = "Checking for Updates";
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
+              this.progressLabel.string = "Check for Updates Failed";
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound:
+              this.progressLabel.string = "New version found";
+              instance.hotUpdate();
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
+              this.progressLabel.string = "Already up to date";
+              break;
+            case GGHotUpdateInstanceState.HotUpdateInProgress:
+              let percent = 0;
+              if (instance.totalBytes > 0) {
+                percent = instance.downloadedBytes / instance.totalBytes;
+              }
+              this.progressLabel.string = `Updating Resources: ${(percent * 100).toFixed(2)}%`;
+              break;
+            case GGHotUpdateInstanceState.HotUpdateSuc:
+              this.progressLabel.string = "Resources update successful";
+              break;
+            case GGHotUpdateInstanceState.HotUpdateFailed:
+              this.progressLabel.string = "Resources update failed";
+              break;
+          }
+        }
+      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "gameName", [_dec], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _class2)) || _class));
+      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "progressLabel", [_dec2], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      })), _class2)) || _class));
       cclegacy._RF.pop();
     }
   };
