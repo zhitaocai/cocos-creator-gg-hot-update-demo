@@ -648,7 +648,7 @@ System.register("chunks:///_virtual/GGHotUpdateCompareUtil.ts", ['cc'], function
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "993b6porYNFdZPLedR3aZJO", "GGHotUpdateCompareUtil", undefined);
+      cclegacy._RF.push({}, "f3dbedWFKhDb5GpirRzOTPx", "GGHotUpdateCompareUtil", undefined);
       /**
        * 比较工具
        *
@@ -724,7 +724,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "b7629vG3NpELI+ptZjwIi+e", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "33835kXA3pDarFQZ6hT/5Ky", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -946,12 +946,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
          * 重置下载信息
          */
         _resetDownloadInfo() {
+          // 移除还没有开始的下载任务
           if (this._downloadTasks.length > 0) {
-            // 放弃进行中的下载任务
-            this._downloadTasks.forEach(task => {
-              this._downloader.abort(task);
-            });
-            // 移除还没有开始的下载任务
             this._downloadTasks.length = 0;
           }
 
@@ -1000,6 +996,12 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
           // 重置状态信息
           this._state = GGHotUpdateInstanceState.Idle;
 
+          // 放弃进行中的下载任务
+          if (this._downloadTasks.length > 0) {
+            this._downloadTasks.forEach(task => {
+              this._downloader.abort(task);
+            });
+          }
           // 重置下载信息
           this._resetDownloadInfo();
         }
@@ -1244,6 +1246,12 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
           }
           this._debug(`热更新：开始`);
 
+          // 开始下载之前，重置下载信息
+          this._curConcurrentTaskCount = 0;
+          this._downloadSpeed = 0;
+          this._downloadRemainTimeInSecond = -1;
+          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+
           // 如果之前已经下载过，但存在下载未完成或者下载失败的文件，那么我们将失败的任务再次加入下载任务队列
           if (this.downloadFailedFiles.length > 0) {
             this._debug(`热更新：发现 ${this.downloadFailedFiles.length} 个下载失败任务，将重新加入队列进行下载`);
@@ -1260,7 +1268,12 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
           }
           this._debug(`热更新：当前共计 ${this._downloadTasks.length} 个下载任务`);
 
-          // 启动下载
+          // 上次计算下载速度时，累计下载字节数(Bytes)
+          let lastDownloadedBytes = 0;
+          // 上次计算下载速度时，时间戳(ms)
+          let lastSpeedUpdateTimeInMs = 0;
+          // 上次外部下载进度回调的时间戳(ms)
+          let lastCallBackUpdateTimeInMs = Date.now();
           this._downloader.onProgress = (task, bytesReceived, totalBytesReceived, totalBytesExpected) => {
             // 更新下载进度
             this._downloadedBytes += bytesReceived;
@@ -1324,21 +1337,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             // 处理结果
             this._handleDownloadResult();
           };
-
-          // 上次计算下载速度时，累计下载字节数(Bytes)
-          let lastDownloadedBytes = 0;
-          // 上次计算下载速度时，时间戳(ms)
-          let lastSpeedUpdateTimeInMs = 0;
-          // 上次外部下载进度回调的时间戳(ms)
-          let lastCallBackUpdateTimeInMs = Date.now();
-
-          // 重置下载信息并广播一次进度回调
-          this._downloadSpeed = 0;
-          this._downloadRemainTimeInSecond = -1;
-          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
-
-          // 开始下载之前，重置并行任务数
-          this._curConcurrentTaskCount = 0;
+          // 启动下载
           this._nextDownload();
         }
         _handleDownloadResult() {
@@ -1477,7 +1476,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "23e04US4xNDYqOOEUGj3cjq", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "5b0528ydXtL3qTyfc0PyY7e", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1637,7 +1636,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "2321c7uOydIjqw9h5R+TTu/", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "17275xlm35EJ7bUTL7MPXPp", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1689,7 +1688,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "b128bWCTr5McL2dtuylM5xW", "GGLogger", undefined);
+      cclegacy._RF.push({}, "c7b3aW9hPtKULc8WNE9y3Bq", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1758,7 +1757,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "faf89Gi3F9P8571ItGyLQDR", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "039e1Ee9TRLUrPkLbl1K6eR", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
