@@ -92,19 +92,16 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                         instance.clearDownloadCache();
                     }
                     // 弹窗提示检查失败以及提供重试机制
-                    // panelRouter.show({
-                    //     panel: ResourcesPanelConfig.alertPanel,
-                    //     data: <AlertPanelShowData>{
-                    //         titleLabel: "Check for Updates Failed",
-                    //         msgLabel: "There seems to be a problem during the update check.\nPlease check if your network connection is active.",
-                    //         cancelBtnVisable: false,
-                    //         confirmBtnVisable: true,
-                    //         confirmBtnLabel: "Retry",
-                    //         onConfirmBtnClick: () => {
-                    //             this.checkUpdateRetryCurTimes = 0;
-                    //             instance.checkUpdate();
-                    //             panelRouter.hide({ panel: ResourcesPanelConfig.alertPanel });
-                    //         },
+                    // showAlertDialog({
+                    //     titleLabel: "Check for Updates Failed",
+                    //     msgLabel: "There seems to be a problem during the update check.\nPlease check if your network connection is active.",
+                    //     cancelBtnVisable: false,
+                    //     confirmBtnVisable: true,
+                    //     confirmBtnLabel: "Retry",
+                    //     onConfirmBtnClick: () => {
+                    //         this.checkUpdateRetryCurTimes = 0;
+                    //         instance.checkUpdate();
+                    //         hideAlertDialog();
                     //     },
                     // });
                 } else {
@@ -146,19 +143,16 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                 if (this.hotUpdateRetryCurTimes >= this.hotUpdateRetryMaxTimes) {
                     console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
                     // 如果尝试一定次数之后，依旧失败，那么弹窗提示
-                    // panelRouter.show({
-                    //     panel: ResourcesPanelConfig.alertPanel,
-                    //     data: <AlertPanelShowData>{
-                    //         titleLabel: "Update Resources Failed",
-                    //         msgLabel: "There seems to be a problem during the resources update process.\nPlease check if your network connection is active.",
-                    //         cancelBtnVisable: false,
-                    //         confirmBtnVisable: true,
-                    //         confirmBtnLabel: "Retry",
-                    //         onConfirmBtnClick: () => {
-                    //             this.hotUpdateRetryCurTimes = 0;
-                    //             instance.hotUpdate();
-                    //             panelRouter.hide({ panel: ResourcesPanelConfig.alertPanel });
-                    //         },
+                    // showAlertDialog({
+                    //     titleLabel: "Update Resources Failed",
+                    //     msgLabel: "There seems to be a problem during the resources update process.\nPlease check if your network connection is active.",
+                    //     cancelBtnVisable: false,
+                    //     confirmBtnVisable: true,
+                    //     confirmBtnLabel: "Retry",
+                    //     onConfirmBtnClick: () => {
+                    //         this.hotUpdateRetryCurTimes = 0;
+                    //         instance.hotUpdate();
+                    //         hideAlertDialog();
                     //     },
                     // });
                 } else {
