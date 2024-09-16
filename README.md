@@ -1,5 +1,9 @@
 # cocos-creator-gg-hot-update-demo
 
+> * 查阅 [插件论坛讨论地址](https://forum.cocos.org/t/topic/161655)
+> * 查阅 [插件官方文档](https://www.yuque.com/dhunterstudio/mydoid/qshphh)
+> * 查阅 [插件官方demo](https://store.cocos.com/app/detail/6756)
+
 一个 [gg-hot-update/热更新](https://store.cocos.com/app/detail/6756) 插件的 Demo 演示仓库
 
 ## 特别注意
