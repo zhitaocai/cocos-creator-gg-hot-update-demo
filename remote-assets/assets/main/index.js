@@ -641,79 +641,14 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
   };
 });
 
-System.register("chunks:///_virtual/GGHotUpdateCompareUtil.ts", ['cc'], function (exports) {
-  var cclegacy;
-  return {
-    setters: [function (module) {
-      cclegacy = module.cclegacy;
-    }],
-    execute: function () {
-      cclegacy._RF.push({}, "f3dbedWFKhDb5GpirRzOTPx", "GGHotUpdateCompareUtil", undefined);
-      /**
-       * 比较工具
-       *
-       * @author caizhitao
-       * @created 2024-08-27 15:15:57
-       */
-      class GGHotUpdateCompareUtil {
-        /**
-         * 第一个版本名是否比第二个版本名大
-         *
-         * @param firstVersionName 第一个版本名
-         * @param secondVersionName 第二个版本名
-         * @returns
-         */
-        static isFirstVersionBigger(firstVersionName, secondVersionName) {
-          return this.versionCompare(firstVersionName, secondVersionName) > 0;
-        }
-
-        /**
-         * 版本名比较
-         *
-         * @param firstVersionName 第一个版本名
-         * @param secondVersionName 第二个版本名
-         * @returns
-         *  ```
-         *      >0: 第一个版本大于第二个版本
-         *      =0: 第一个版本等于第二个版本
-         *      <0: 第一个版本小于第二个版本
-         *  ```
-         */
-        static versionCompare(firstVersionName, secondVersionName) {
-          let firstVersionCodes = firstVersionName.split(".");
-          let secondVersionCodes = secondVersionName.split(".");
-          for (let i = 0; i < firstVersionCodes.length; ++i) {
-            let firstVersionCode = parseInt(firstVersionCodes[i]);
-            let secondVersionCode = parseInt(secondVersionCodes[i] || "0");
-            if (firstVersionCode === secondVersionCode) {
-              continue;
-            } else {
-              return firstVersionCode - secondVersionCode;
-            }
-          }
-          if (secondVersionCodes.length > firstVersionCodes.length) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }
-      }
-      exports('GGHotUpdateCompareUtil', GGHotUpdateCompareUtil);
-      cclegacy._RF.pop();
-    }
-  };
-});
-
-System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpdateCompareUtil.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
-  var cclegacy, path, native, sys, GGHotUpdateCompareUtil, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
+System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
+  var cclegacy, path, native, sys, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
       path = module.path;
       native = module.native;
       sys = module.sys;
-    }, function (module) {
-      GGHotUpdateCompareUtil = module.GGHotUpdateCompareUtil;
     }, function (module) {
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
       GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
@@ -724,7 +659,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "33835kXA3pDarFQZ6hT/5Ky", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "dd383z9d0pBn6FB/zR64PCC", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -1099,11 +1034,11 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
 
             // 本地版本和远程版本比较
-            const isNewVersionFound = GGHotUpdateCompareUtil.isFirstVersionBigger(remoteVersion, localVersion);
+            const isNewVersionFound = remoteVersion != localVersion;
 
             // 未发现新版本
             if (!isNewVersionFound) {
-              this._debug(`检查更新：成功，未发现新版本`);
+              this._debug(`检查更新：成功，当前已经是最新版本`);
               // 释放文件json内存
               this._localProjectManifest = null;
               this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
@@ -1213,16 +1148,24 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
                 }
               });
               if (this._downloadTasks.length > 0) {
+                // 如果版本不一致，且存在差异文件需要下载，那么返回发现现版本
                 native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), task.storagePath);
+                let info = `检查更新：成功，发现新版本。`;
+                info += ` 总字节数：${this._totalBytes}`;
+                info += ` 已下载字节数: ${this._downloadedBytes}`;
+                info += ` 总下载文件数：${this._totalFiles}`;
+                info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+                info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
+                this._debug(info);
+                this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
+              } else {
+                // 如果版本不一致，且不存在差异文件需要下载，那么返回已经更新到最新版本
+                this._debug(`检查更新：成功，发现不同远端版本，但和当前本地版本没有文件差异，因此当前已经是最新版本`);
+
+                // 释放文件json内存
+                this._localProjectManifest = null;
+                this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
               }
-              let info = `检查更新：成功，发现新版本。`;
-              info += ` 总字节数：${this._totalBytes}`;
-              info += ` 已下载字节数: ${this._downloadedBytes}`;
-              info += ` 总下载文件数：${this._totalFiles}`;
-              info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-              info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-              this._debug(info);
-              this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
             };
             this._downloader.createDownloadTask(this._projectManifesetRemoteUrl, this._projectManifestDownloadPath);
           }).catch(error => {
@@ -1476,7 +1419,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "5b0528ydXtL3qTyfc0PyY7e", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "99ca3Tfqt9PZ7OasX+kdJCF", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1636,7 +1579,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "17275xlm35EJ7bUTL7MPXPp", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "b93fddr2IlBs67v+0DCpwl+", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1688,7 +1631,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "c7b3aW9hPtKULc8WNE9y3Bq", "GGLogger", undefined);
+      cclegacy._RF.push({}, "64839vW5VhIQ54hNM0IOkPe", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1757,7 +1700,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "039e1Ee9TRLUrPkLbl1K6eR", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "2c73ctOsjRCIZKF8ftDW233", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
@@ -2289,9 +2232,9 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
   };
 });
 
-System.register("chunks:///_virtual/main", ['./debug-view-runtime-control.ts', './GameVersionComponent.ts', './HotUpdateProgressComponent.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateCompareUtil.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
+System.register("chunks:///_virtual/main", ['./debug-view-runtime-control.ts', './GameVersionComponent.ts', './HotUpdateProgressComponent.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
   return {
-    setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
     execute: function () {}
   };
 });

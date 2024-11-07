@@ -25,6 +25,3 @@ node_modules/
 
 # ignore plugin source code
 extensions/gg-hot-update/
-
-# ignore plugin output zip
-**/gg-hot-update-remote-assets.zip
