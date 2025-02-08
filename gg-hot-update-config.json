@@ -1,25 +1,20 @@
 {
     "local_bundles": {
         "build-in": {
-            "version": "0.0.0",
             "files": ["src/", "jsb-adapter/", "assets/internal/", "assets/main/", "assets/resources/"]
         }
     },
     "remote_bundles": {
         "build-in": {
-            "version": "1.0.0",
             "files": ["src/", "jsb-adapter/", "assets/internal/", "assets/main/", "assets/resources/", "assets/bundle-game-a/"]
         },
         "bundle-game-b": {
-            "version": "1.0.0",
             "files": ["assets/bundle-game-b/"]
         },
         "bundle-game-c": {
-            "version": "1.0.0",
             "files": ["assets/bundle-game-c/"]
         },
         "bundle-game-d": {
-            "version": "1.0.0",
             "files": ["assets/bundle-game-d/"]
         }
     }

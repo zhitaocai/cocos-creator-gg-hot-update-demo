@@ -525,7 +525,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 501,
+      "width": 329.25,
       "height": 48
     },
     "_anchorPoint": {
@@ -555,7 +555,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "gg-hot-update-demo",
+    "_string": "Sub Game List",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 48,

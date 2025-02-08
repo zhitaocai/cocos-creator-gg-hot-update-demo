@@ -50,29 +50,29 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
     // 监听 GG 热更新回调
 
     /**
-     * 检查更新失败后，重试间隔(秒)
-     */
-    private checkUpdateRetryIntervalInSecond = 2;
-    /**
      * 检查更新失败后，最大重试次数
      */
-    private checkUpdateRetryMaxTimes = 1;
+    private _checkUpdateRetryMaxTimes = 3;
     /**
      * 检查更新失败后，累计重试次数
      */
-    private checkUpdateRetryCurTimes = 0;
+    private _checkUpdateRetryCurTimes = 0;
     /**
-     * 热更新失败后，重试间隔(秒)
+     * 检查更新失败后，重试间隔(秒)
      */
-    private hotUpdateRetryIntervalInSecond = 2;
+    private _checkUpdateRetryIntervalInSecond = 5;
     /**
      * 热更新失败后，最大重试次数
      */
-    private hotUpdateRetryMaxTimes = 1;
+    private _hotUpdateRetryMaxTimes = 3;
     /**
      * 热更新失败后，累计重试次数
      */
-    private hotUpdateRetryCurTimes = 0;
+    private _hotUpdateRetryCurTimes = 0;
+    /**
+     * 热更新失败后，重试间隔(秒)
+     */
+    private _hotUpdateRetryIntervalInSecond = 5;
 
     onGGHotUpdateInstanceCallBack(instance: GGHotUpdateInstance): void {
         this.hpProgressComp.updateState(instance.state);
@@ -86,9 +86,9 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
             case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
             case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError: {
                 // 检查更新失败
-                if (this.checkUpdateRetryCurTimes >= this.checkUpdateRetryMaxTimes) {
+                if (this._checkUpdateRetryCurTimes >= this._checkUpdateRetryMaxTimes) {
                     console.log(
-                        `检查更新失败：${instance.state}，当前累计重试次数：${this.checkUpdateRetryCurTimes}，最大重试次数：${this.checkUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`
+                        `检查更新失败：${instance.state}，当前累计重试次数：${this._checkUpdateRetryCurTimes}，最大重试次数：${this._checkUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`
                     );
                     // 如果是解析本地信息失败导致的检查更新失败，那么可以考虑清除本地的下载缓存目录，以清空所有缓存，提高下次能正确更新的概率
                     if (instance.state == GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError) {
@@ -109,12 +109,12 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                     // });
                 } else {
                     console.log(
-                        `检查更新失败：${instance.state}，当前累计重试次数：${this.checkUpdateRetryCurTimes}，最大重试次数：${this.checkUpdateRetryMaxTimes}，还没达到最大重试次数，将在${this.checkUpdateRetryIntervalInSecond}s后重试`
+                        `检查更新失败：${instance.state}，当前累计重试次数：${this._checkUpdateRetryCurTimes}，最大重试次数：${this._checkUpdateRetryMaxTimes}，还没达到最大重试次数，将在${this._checkUpdateRetryIntervalInSecond}s后重试`
                     );
                     this.scheduleOnce(() => {
-                        this.checkUpdateRetryCurTimes++;
+                        this._checkUpdateRetryCurTimes++;
                         instance.checkUpdate();
-                    }, this.checkUpdateRetryIntervalInSecond);
+                    }, this._checkUpdateRetryIntervalInSecond);
                 }
                 break;
             }
@@ -143,8 +143,8 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
             }
             case GGHotUpdateInstanceState.HotUpdateFailed: {
                 // 热更新：失败，尝试进行一定次数的重试
-                if (this.hotUpdateRetryCurTimes >= this.hotUpdateRetryMaxTimes) {
-                    console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
+                if (this._hotUpdateRetryCurTimes >= this._hotUpdateRetryMaxTimes) {
+                    console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this._hotUpdateRetryCurTimes}，最大重试次数：${this._hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
                     // 如果尝试一定次数之后，依旧失败，那么弹窗提示
                     // showAlertDialog({
                     //     titleLabel: "Update Resources Failed",
@@ -160,12 +160,12 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                     // });
                 } else {
                     console.log(
-                        `热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，还没有达到最大重试次数，将在${this.hotUpdateRetryIntervalInSecond}s后重试`
+                        `热更新过程中出现下载失败的文件，当前累计重试次数：${this._hotUpdateRetryCurTimes}，最大重试次数：${this._hotUpdateRetryMaxTimes}，还没有达到最大重试次数，将在${this._hotUpdateRetryIntervalInSecond}s后重试`
                     );
                     this.scheduleOnce(() => {
-                        this.hotUpdateRetryCurTimes++;
+                        this._hotUpdateRetryCurTimes++;
                         instance.hotUpdate();
-                    }, this.hotUpdateRetryIntervalInSecond);
+                    }, this._hotUpdateRetryIntervalInSecond);
                 }
                 break;
             }
