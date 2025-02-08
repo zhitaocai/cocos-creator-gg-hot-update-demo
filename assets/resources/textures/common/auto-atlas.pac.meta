@@ -24,7 +24,7 @@
     "removeImageInBundle": true,
     "removeSpriteAtlasInBundle": true,
     "compressSettings": {
-      "useCompressTexture": true,
+      "useCompressTexture": false,
       "presetId": "d7h8eHd0RPqL+93NUWjn80"
     },
     "textureSetting": {
