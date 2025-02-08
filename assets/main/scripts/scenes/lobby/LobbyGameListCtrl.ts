@@ -5,9 +5,6 @@ const { ccclass, property } = _decorator;
 
 @ccclass
 export class LobbyGameListCtrl extends Component {
-    @property(ScrollView)
-    scrollView: ScrollView = null;
-
     @property(Node)
     itemParentNode: Node = null!;
 
@@ -48,8 +45,9 @@ export class LobbyGameListCtrl extends Component {
         ];
         games.forEach((data) => {
             const itemNode = this._getNode();
-            itemNode.setParent(this.itemParentNode);
-            itemNode.getComponent(LobbyGameListItem)!.bindData(data);
+            itemNode.parent = this.itemParentNode;
+            const itemComp = itemNode.getComponent(LobbyGameListItem)!;
+            itemComp.bindData(data);
         });
     }
 }

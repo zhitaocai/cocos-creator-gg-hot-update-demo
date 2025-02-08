@@ -10,7 +10,7 @@ const { ccclass, property } = _decorator;
  * @created 2024-09-04 10:43:52
  */
 @ccclass
-export class HotUpdateProgressComponent extends Component {
+export class UIHotUpdateProgress extends Component {
     @property(Label)
     messageLabel: Label = null!;
 
@@ -95,8 +95,8 @@ export class HotUpdateProgressComponent extends Component {
         }
         this.progressBar.progress = percent;
         this.progressLabel.string = (percent * 100).toFixed(2) + "%";
-        this.downloadSpeedLabel.string = `Speed: ${this._byte2MB(byteSpeedInSecond).toFixed(2)}MB/s`;
         this.downloadSizeLabel.string = `Size: ${this._byte2MB(downloadedBytes).toFixed(2)}MB/${this._byte2MB(totalBytes).toFixed(2)}MB`;
+        this.downloadSpeedLabel.string = `Speed: ${this._byte2MB(byteSpeedInSecond).toFixed(2)}MB/s`;
         if (remainTimeInScond >= 0) {
             this.downloadRemainTimeLabel.string = `Remaining Time: ${remainTimeInScond}s`;
         } else {

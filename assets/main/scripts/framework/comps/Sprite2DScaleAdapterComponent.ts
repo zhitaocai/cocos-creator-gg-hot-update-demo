@@ -95,13 +95,13 @@ export default class Sprite2DScaleAdapterComponent extends Component {
 
     protected onEnable(): void {
         this.updateSprite();
-        screen.on("window-resize", this.updateSprite.bind(this));
-        screen.on("orientation-change", this.updateSprite.bind(this));
+        // screen.on("window-resize", this.updateSprite.bind(this));
+        // screen.on("orientation-change", this.updateSprite.bind(this));
     }
 
     protected onDisable(): void {
-        screen.off("window-resize", this.updateSprite.bind(this));
-        screen.off("orientation-change", this.updateSprite.bind(this));
+        // screen.off("window-resize", this.updateSprite.bind(this));
+        // screen.off("orientation-change", this.updateSprite.bind(this));
     }
 
     updateSprite(scaleType?: SpriteScaleType, alignType?: SpriteAlignType) {

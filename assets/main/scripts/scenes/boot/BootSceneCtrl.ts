@@ -3,15 +3,18 @@ import { DEBUG, JSB } from "cc/env";
 import { GGHotUpdateInstance, GGHotUpdateInstanceObserver } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateInstance";
 import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateManager";
 import { GGHotUpdateInstanceEnum, GGHotUpdateInstanceState } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
-import { HotUpdateProgressComponent } from "../../../../main/scripts/components/HotUpdateProgressComponent";
+import { UIHotUpdateProgress } from "../../components/UIHotUpdateProgress";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { sceneRouter } from "../../framework/scene/SceneRouter";
 const { ccclass, property } = _decorator;
 
 @ccclass
 export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObserver {
-    @property({ type: HotUpdateProgressComponent, tooltip: "热更新进度组件" })
-    hpProgressComp: HotUpdateProgressComponent | null = null;
+    @property({ type: UIHotUpdateProgress, tooltip: "热更新进度组件" })
+    hpProgressComp: UIHotUpdateProgress | null = null;
+
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 生命周期处理
 
     protected onLoad(): void {
         if (JSB) {

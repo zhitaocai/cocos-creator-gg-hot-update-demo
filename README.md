@@ -3,11 +3,11 @@
 [![](https://img.shields.io/badge/更新日志/CHANGELOG-orange.svg)](./CHANGELOG.md)
 [![](https://img.shields.io/badge/Cocos%20Creator-3.8.5-green.svg)](http://www.cocos.com/creator)
 
-> -   查阅 [插件论坛讨论地址](https://forum.cocos.org/t/topic/161655)
+> -   查阅 [插件商店地址](https://store.cocos.com/app/detail/6756)
 > -   查阅 [插件官方文档](https://www.yuque.com/dhunterstudio/mydoid/qshphh)
-> -   查阅 [插件官方 demo](https://store.cocos.com/app/detail/6756)
+> -   查阅 [插件论坛地址](https://forum.cocos.org/t/topic/161655)
 
-一个 [gg-hot-update/热更新插件](https://store.cocos.com/app/detail/6756) 的 Demo 演示仓库
+[gg-hot-update/热更新插件](https://store.cocos.com/app/detail/6756) 的官方示例项目，当前示例项目对应的插件版本为 **v3** 版本。
 
 ## 一、特别注意
 
