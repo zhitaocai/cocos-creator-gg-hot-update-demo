@@ -1,5 +1,5 @@
-System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './env', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './HotUpdateProgressComponent.ts', './GameSceneConfig.ts', './SceneRouter.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, _decorator, Component, DEBUG, ggHotUpdateManager, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, HotUpdateProgressComponent, GameSceneConfig, sceneRouter;
+System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './env', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './UIHotUpdateProgress.ts', './GameSceneConfig.ts', './SceneRouter.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, _decorator, Component, DEBUG, ggHotUpdateManager, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, UIHotUpdateProgress, GameSceneConfig, sceneRouter;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -16,7 +16,7 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
       GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
     }, function (module) {
-      HotUpdateProgressComponent = module.HotUpdateProgressComponent;
+      UIHotUpdateProgress = module.UIHotUpdateProgress;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
     }, function (module) {
@@ -30,7 +30,7 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
         property
       } = _decorator;
       let BootSceneCtrl = exports('BootSceneCtrl', (_dec = property({
-        type: HotUpdateProgressComponent,
+        type: UIHotUpdateProgress,
         tooltip: "热更新进度组件"
       }), ccclass(_class = (_class2 = class BootSceneCtrl extends Component {
         constructor(...args) {
@@ -39,30 +39,32 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
           // 监听 GG 热更新回调
           /**
-           * 检查更新失败后，重试间隔(秒)
-           */
-          this.checkUpdateRetryIntervalInSecond = 2;
-          /**
            * 检查更新失败后，最大重试次数
            */
-          this.checkUpdateRetryMaxTimes = 1;
+          this._checkUpdateRetryMaxTimes = 3;
           /**
            * 检查更新失败后，累计重试次数
            */
-          this.checkUpdateRetryCurTimes = 0;
+          this._checkUpdateRetryCurTimes = 0;
           /**
-           * 热更新失败后，重试间隔(秒)
+           * 检查更新失败后，重试间隔(秒)
            */
-          this.hotUpdateRetryIntervalInSecond = 2;
+          this._checkUpdateRetryIntervalInSecond = 5;
           /**
            * 热更新失败后，最大重试次数
            */
-          this.hotUpdateRetryMaxTimes = 1;
+          this._hotUpdateRetryMaxTimes = 3;
           /**
            * 热更新失败后，累计重试次数
            */
-          this.hotUpdateRetryCurTimes = 0;
+          this._hotUpdateRetryCurTimes = 0;
+          /**
+           * 热更新失败后，重试间隔(秒)
+           */
+          this._hotUpdateRetryIntervalInSecond = 5;
         }
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 生命周期处理
         onLoad() {
           {
             this.hpProgressComp.node.active = true;
@@ -97,8 +99,8 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
             case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
               {
                 // 检查更新失败
-                if (this.checkUpdateRetryCurTimes >= this.checkUpdateRetryMaxTimes) {
-                  console.log(`检查更新失败：${instance.state}，当前累计重试次数：${this.checkUpdateRetryCurTimes}，最大重试次数：${this.checkUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
+                if (this._checkUpdateRetryCurTimes >= this._checkUpdateRetryMaxTimes) {
+                  console.log(`检查更新失败：${instance.state}，当前累计重试次数：${this._checkUpdateRetryCurTimes}，最大重试次数：${this._checkUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
                   // 如果是解析本地信息失败导致的检查更新失败，那么可以考虑清除本地的下载缓存目录，以清空所有缓存，提高下次能正确更新的概率
                   if (instance.state == GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError) {
                     instance.clearDownloadCache();
@@ -117,11 +119,11 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
                   //     },
                   // });
                 } else {
-                  console.log(`检查更新失败：${instance.state}，当前累计重试次数：${this.checkUpdateRetryCurTimes}，最大重试次数：${this.checkUpdateRetryMaxTimes}，还没达到最大重试次数，将在${this.checkUpdateRetryIntervalInSecond}s后重试`);
+                  console.log(`检查更新失败：${instance.state}，当前累计重试次数：${this._checkUpdateRetryCurTimes}，最大重试次数：${this._checkUpdateRetryMaxTimes}，还没达到最大重试次数，将在${this._checkUpdateRetryIntervalInSecond}s后重试`);
                   this.scheduleOnce(() => {
-                    this.checkUpdateRetryCurTimes++;
+                    this._checkUpdateRetryCurTimes++;
                     instance.checkUpdate();
-                  }, this.checkUpdateRetryIntervalInSecond);
+                  }, this._checkUpdateRetryIntervalInSecond);
                 }
                 break;
               }
@@ -153,8 +155,8 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
             case GGHotUpdateInstanceState.HotUpdateFailed:
               {
                 // 热更新：失败，尝试进行一定次数的重试
-                if (this.hotUpdateRetryCurTimes >= this.hotUpdateRetryMaxTimes) {
-                  console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
+                if (this._hotUpdateRetryCurTimes >= this._hotUpdateRetryMaxTimes) {
+                  console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this._hotUpdateRetryCurTimes}，最大重试次数：${this._hotUpdateRetryMaxTimes}，已达到最大重试次数，将弹出重试弹窗`);
                   // 如果尝试一定次数之后，依旧失败，那么弹窗提示
                   // showAlertDialog({
                   //     titleLabel: "Update Resources Failed",
@@ -169,11 +171,11 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
                   //     },
                   // });
                 } else {
-                  console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this.hotUpdateRetryCurTimes}，最大重试次数：${this.hotUpdateRetryMaxTimes}，还没有达到最大重试次数，将在${this.hotUpdateRetryIntervalInSecond}s后重试`);
+                  console.log(`热更新过程中出现下载失败的文件，当前累计重试次数：${this._hotUpdateRetryCurTimes}，最大重试次数：${this._hotUpdateRetryMaxTimes}，还没有达到最大重试次数，将在${this._hotUpdateRetryIntervalInSecond}s后重试`);
                   this.scheduleOnce(() => {
-                    this.hotUpdateRetryCurTimes++;
+                    this._hotUpdateRetryCurTimes++;
                     instance.hotUpdate();
-                  }, this.hotUpdateRetryIntervalInSecond);
+                  }, this._hotUpdateRetryIntervalInSecond);
                 }
                 break;
               }
@@ -190,270 +192,6 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
           return null;
         }
       }), _class2)) || _class));
-      cclegacy._RF.pop();
-    }
-  };
-});
-
-System.register("chunks:///_virtual/debug-view-runtime-control.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Node, _decorator, Component, Color, Canvas, UITransform, instantiate, Label, RichText, Toggle, Button, director;
-  return {
-    setters: [function (module) {
-      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
-      _initializerDefineProperty = module.initializerDefineProperty;
-    }, function (module) {
-      cclegacy = module.cclegacy;
-      Node = module.Node;
-      _decorator = module._decorator;
-      Component = module.Component;
-      Color = module.Color;
-      Canvas = module.Canvas;
-      UITransform = module.UITransform;
-      instantiate = module.instantiate;
-      Label = module.Label;
-      RichText = module.RichText;
-      Toggle = module.Toggle;
-      Button = module.Button;
-      director = module.director;
-    }],
-    execute: function () {
-      var _dec, _dec2, _dec3, _dec4, _class, _class2, _descriptor, _descriptor2, _descriptor3;
-      cclegacy._RF.push({}, "b2bd1+njXxJxaFY3ymm06WU", "debug-view-runtime-control", undefined);
-      const {
-        ccclass,
-        property
-      } = _decorator;
-      let DebugViewRuntimeControl = exports('DebugViewRuntimeControl', (_dec = ccclass('internal.DebugViewRuntimeControl'), _dec2 = property(Node), _dec3 = property(Node), _dec4 = property(Node), _dec(_class = (_class2 = class DebugViewRuntimeControl extends Component {
-        constructor(...args) {
-          super(...args);
-          _initializerDefineProperty(this, "compositeModeToggle", _descriptor, this);
-          _initializerDefineProperty(this, "singleModeToggle", _descriptor2, this);
-          _initializerDefineProperty(this, "EnableAllCompositeModeButton", _descriptor3, this);
-          this._single = 0;
-          this.strSingle = ['No Single Debug', 'Vertex Color', 'Vertex Normal', 'Vertex Tangent', 'World Position', 'Vertex Mirror', 'Face Side', 'UV0', 'UV1', 'UV Lightmap', 'Project Depth', 'Linear Depth', 'Fragment Normal', 'Fragment Tangent', 'Fragment Binormal', 'Base Color', 'Diffuse Color', 'Specular Color', 'Transparency', 'Metallic', 'Roughness', 'Specular Intensity', 'IOR', 'Direct Diffuse', 'Direct Specular', 'Direct All', 'Env Diffuse', 'Env Specular', 'Env All', 'Emissive', 'Light Map', 'Shadow', 'AO', 'Fresnel', 'Direct Transmit Diffuse', 'Direct Transmit Specular', 'Env Transmit Diffuse', 'Env Transmit Specular', 'Transmit All', 'Direct Internal Specular', 'Env Internal Specular', 'Internal All', 'Fog'];
-          this.strComposite = ['Direct Diffuse', 'Direct Specular', 'Env Diffuse', 'Env Specular', 'Emissive', 'Light Map', 'Shadow', 'AO', 'Normal Map', 'Fog', 'Tone Mapping', 'Gamma Correction', 'Fresnel', 'Transmit Diffuse', 'Transmit Specular', 'Internal Specular', 'TT'];
-          this.strMisc = ['CSM Layer Coloration', 'Lighting With Albedo'];
-          this.compositeModeToggleList = [];
-          this.singleModeToggleList = [];
-          this.miscModeToggleList = [];
-          this.textComponentList = [];
-          this.labelComponentList = [];
-          this.textContentList = [];
-          this.hideButtonLabel = void 0;
-          this._currentColorIndex = 0;
-          this.strColor = ['<color=#ffffff>', '<color=#000000>', '<color=#ff0000>', '<color=#00ff00>', '<color=#0000ff>'];
-          this.color = [Color.WHITE, Color.BLACK, Color.RED, Color.GREEN, Color.BLUE];
-        }
-        start() {
-          // get canvas resolution
-          const canvas = this.node.parent.getComponent(Canvas);
-          if (!canvas) {
-            console.error('debug-view-runtime-control should be child of Canvas');
-            return;
-          }
-          const uiTransform = this.node.parent.getComponent(UITransform);
-          const halfScreenWidth = uiTransform.width * 0.5;
-          const halfScreenHeight = uiTransform.height * 0.5;
-          let x = -halfScreenWidth + halfScreenWidth * 0.1,
-            y = halfScreenHeight - halfScreenHeight * 0.1;
-          const width = 200,
-            height = 20;
-
-          // new nodes
-          const miscNode = this.node.getChildByName('MiscMode');
-          const buttonNode = instantiate(miscNode);
-          buttonNode.parent = this.node;
-          buttonNode.name = 'Buttons';
-          const titleNode = instantiate(miscNode);
-          titleNode.parent = this.node;
-          titleNode.name = 'Titles';
-
-          // title
-          for (let i = 0; i < 2; i++) {
-            const newLabel = instantiate(this.EnableAllCompositeModeButton.getChildByName('Label'));
-            newLabel.setPosition(x + (i > 0 ? 50 + width * 2 : 150), y, 0.0);
-            newLabel.setScale(0.75, 0.75, 0.75);
-            newLabel.parent = titleNode;
-            const labelComponent = newLabel.getComponent(Label);
-            labelComponent.string = i ? '----------Composite Mode----------' : '----------Single Mode----------';
-            labelComponent.color = Color.WHITE;
-            labelComponent.overflow = 0;
-            this.labelComponentList[this.labelComponentList.length] = labelComponent;
-          }
-          y -= height;
-          // single
-          let currentRow = 0;
-          for (let i = 0; i < this.strSingle.length; i++, currentRow++) {
-            if (i === this.strSingle.length >> 1) {
-              x += width;
-              currentRow = 0;
-            }
-            const newNode = i ? instantiate(this.singleModeToggle) : this.singleModeToggle;
-            newNode.setPosition(x, y - height * currentRow, 0.0);
-            newNode.setScale(0.5, 0.5, 0.5);
-            newNode.parent = this.singleModeToggle.parent;
-            const textComponent = newNode.getComponentInChildren(RichText);
-            textComponent.string = this.strSingle[i];
-            this.textComponentList[this.textComponentList.length] = textComponent;
-            this.textContentList[this.textContentList.length] = textComponent.string;
-            newNode.on(Toggle.EventType.TOGGLE, this.toggleSingleMode, this);
-            this.singleModeToggleList[i] = newNode;
-          }
-          x += width;
-          // buttons
-          this.EnableAllCompositeModeButton.setPosition(x + 15, y, 0.0);
-          this.EnableAllCompositeModeButton.setScale(0.5, 0.5, 0.5);
-          this.EnableAllCompositeModeButton.on(Button.EventType.CLICK, this.enableAllCompositeMode, this);
-          this.EnableAllCompositeModeButton.parent = buttonNode;
-          let labelComponent = this.EnableAllCompositeModeButton.getComponentInChildren(Label);
-          this.labelComponentList[this.labelComponentList.length] = labelComponent;
-          const changeColorButton = instantiate(this.EnableAllCompositeModeButton);
-          changeColorButton.setPosition(x + 90, y, 0.0);
-          changeColorButton.setScale(0.5, 0.5, 0.5);
-          changeColorButton.on(Button.EventType.CLICK, this.changeTextColor, this);
-          changeColorButton.parent = buttonNode;
-          labelComponent = changeColorButton.getComponentInChildren(Label);
-          labelComponent.string = 'TextColor';
-          this.labelComponentList[this.labelComponentList.length] = labelComponent;
-          const HideButton = instantiate(this.EnableAllCompositeModeButton);
-          HideButton.setPosition(x + 200, y, 0.0);
-          HideButton.setScale(0.5, 0.5, 0.5);
-          HideButton.on(Button.EventType.CLICK, this.hideUI, this);
-          HideButton.parent = this.node.parent;
-          labelComponent = HideButton.getComponentInChildren(Label);
-          labelComponent.string = 'Hide UI';
-          this.labelComponentList[this.labelComponentList.length] = labelComponent;
-          this.hideButtonLabel = labelComponent;
-
-          // misc
-          y -= 40;
-          for (let i = 0; i < this.strMisc.length; i++) {
-            const newNode = instantiate(this.compositeModeToggle);
-            newNode.setPosition(x, y - height * i, 0.0);
-            newNode.setScale(0.5, 0.5, 0.5);
-            newNode.parent = miscNode;
-            const textComponent = newNode.getComponentInChildren(RichText);
-            textComponent.string = this.strMisc[i];
-            this.textComponentList[this.textComponentList.length] = textComponent;
-            this.textContentList[this.textContentList.length] = textComponent.string;
-            const toggleComponent = newNode.getComponent(Toggle);
-            toggleComponent.isChecked = i ? true : false;
-            newNode.on(Toggle.EventType.TOGGLE, i ? this.toggleLightingWithAlbedo : this.toggleCSMColoration, this);
-            this.miscModeToggleList[i] = newNode;
-          }
-
-          // composite
-          y -= 150;
-          for (let i = 0; i < this.strComposite.length; i++) {
-            const newNode = i ? instantiate(this.compositeModeToggle) : this.compositeModeToggle;
-            newNode.setPosition(x, y - height * i, 0.0);
-            newNode.setScale(0.5, 0.5, 0.5);
-            newNode.parent = this.compositeModeToggle.parent;
-            const textComponent = newNode.getComponentInChildren(RichText);
-            textComponent.string = this.strComposite[i];
-            this.textComponentList[this.textComponentList.length] = textComponent;
-            this.textContentList[this.textContentList.length] = textComponent.string;
-            newNode.on(Toggle.EventType.TOGGLE, this.toggleCompositeMode, this);
-            this.compositeModeToggleList[i] = newNode;
-          }
-        }
-        isTextMatched(textUI, textDescription) {
-          let tempText = new String(textUI);
-          const findIndex = tempText.search('>');
-          if (findIndex === -1) {
-            return textUI === textDescription;
-          } else {
-            tempText = tempText.substr(findIndex + 1);
-            tempText = tempText.substr(0, tempText.search('<'));
-            return tempText === textDescription;
-          }
-        }
-        toggleSingleMode(toggle) {
-          const debugView = director.root.debugView;
-          const textComponent = toggle.getComponentInChildren(RichText);
-          for (let i = 0; i < this.strSingle.length; i++) {
-            if (this.isTextMatched(textComponent.string, this.strSingle[i])) {
-              debugView.singleMode = i;
-            }
-          }
-        }
-        toggleCompositeMode(toggle) {
-          const debugView = director.root.debugView;
-          const textComponent = toggle.getComponentInChildren(RichText);
-          for (let i = 0; i < this.strComposite.length; i++) {
-            if (this.isTextMatched(textComponent.string, this.strComposite[i])) {
-              debugView.enableCompositeMode(i, toggle.isChecked);
-            }
-          }
-        }
-        toggleLightingWithAlbedo(toggle) {
-          const debugView = director.root.debugView;
-          debugView.lightingWithAlbedo = toggle.isChecked;
-        }
-        toggleCSMColoration(toggle) {
-          const debugView = director.root.debugView;
-          debugView.csmLayerColoration = toggle.isChecked;
-        }
-        enableAllCompositeMode(button) {
-          const debugView = director.root.debugView;
-          debugView.enableAllCompositeMode(true);
-          for (let i = 0; i < this.compositeModeToggleList.length; i++) {
-            const toggleComponent = this.compositeModeToggleList[i].getComponent(Toggle);
-            toggleComponent.isChecked = true;
-          }
-          let toggleComponent = this.miscModeToggleList[0].getComponent(Toggle);
-          toggleComponent.isChecked = false;
-          debugView.csmLayerColoration = false;
-          toggleComponent = this.miscModeToggleList[1].getComponent(Toggle);
-          toggleComponent.isChecked = true;
-          debugView.lightingWithAlbedo = true;
-        }
-        hideUI(button) {
-          const titleNode = this.node.getChildByName('Titles');
-          const activeValue = !titleNode.active;
-          this.singleModeToggleList[0].parent.active = activeValue;
-          this.miscModeToggleList[0].parent.active = activeValue;
-          this.compositeModeToggleList[0].parent.active = activeValue;
-          this.EnableAllCompositeModeButton.parent.active = activeValue;
-          titleNode.active = activeValue;
-          this.hideButtonLabel.string = activeValue ? 'Hide UI' : 'Show UI';
-        }
-        changeTextColor(button) {
-          this._currentColorIndex++;
-          if (this._currentColorIndex >= this.strColor.length) {
-            this._currentColorIndex = 0;
-          }
-          for (let i = 0; i < this.textComponentList.length; i++) {
-            this.textComponentList[i].string = this.strColor[this._currentColorIndex] + this.textContentList[i] + '</color>';
-          }
-          for (let i = 0; i < this.labelComponentList.length; i++) {
-            this.labelComponentList[i].color = this.color[this._currentColorIndex];
-          }
-        }
-        onLoad() {}
-        update(deltaTime) {}
-      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "compositeModeToggle", [_dec2], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "singleModeToggle", [_dec3], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "EnableAllCompositeModeButton", [_dec4], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      })), _class2)) || _class));
       cclegacy._RF.pop();
     }
   };
@@ -634,21 +372,23 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
         /**
          * 游戏版本名（每次发布都要更新）
          */
-        gameVersionName: "1.0.0"
+        gameVersionName: "3.0.0"
       });
       cclegacy._RF.pop();
     }
   };
 });
 
-System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
-  var cclegacy, path, native, sys, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
+System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
+  var cclegacy, path, native, sys, DEBUG, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
       path = module.path;
       native = module.native;
       sys = module.sys;
+    }, function (module) {
+      DEBUG = module.DEBUG;
     }, function (module) {
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
       GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
@@ -659,7 +399,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "dd383z9d0pBn6FB/zR64PCC", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "60cafqlu/RMSbYDF602AVb2", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -905,7 +645,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
         _updateState(state) {
           this._state = state;
           this.observers.forEach(observer => {
-            observer.onGGHotUpdateInstanceCallBack?.(this);
+            observer.onGGHotUpdateInstanceCallBack == null || observer.onGGHotUpdateInstanceCallBack(this);
           });
         }
 
@@ -1000,11 +740,13 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             if (localProjectManifestJsonText) {
               try {
                 this._localProjectManifest = JSON.parse(localProjectManifestJsonText);
-                this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：成功`);
+                DEBUG && this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：成功`);
               } catch (error) {
-                this._error(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：失败，文件内容解析失败`);
-                this._error(error);
-                this._error(`检查更新：失败，解析本地 project.manifest 失败`);
+                {
+                  this._error(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：失败，文件内容解析失败`);
+                  this._error(error);
+                  this._error(`检查更新：失败，解析本地 project.manifest 失败`);
+                }
                 this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError);
                 return;
               }
@@ -1024,12 +766,13 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
           this._debug(`检查更新：解析本地 project.manifest：成功`);
 
           // fetch 获取远程包的 version.manifest 内容，然后和本地的 project.manifest 做版本比较
+          this._debug(`检查更新：请求远程 version.manifest 版本信息：开始。请求地址: ${this._versionManifesetRemoteUrl}`);
           fetch(this._versionManifesetRemoteUrl).then(resp => {
             return resp.json();
           }).then(versionJson => {
             const localVersion = this._localProjectManifest.version;
-            const remoteVersion = versionJson?.version ?? "";
-            this._debug(`检查更新：获取远程 version.manifest 内容成功，内容：${JSON.stringify(versionJson)}`);
+            const remoteVersion = (versionJson == null ? void 0 : versionJson.version) ?? "";
+            this._debug(`检查更新：请求远程 version.manifest 版本信息：成功。版本信息: ${JSON.stringify(versionJson)}`);
             this._debug(`检查更新：当前本地版本: ${localVersion}`);
             this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
 
@@ -1049,74 +792,36 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             // 如果本地已经下载好新版本的远程 project.manifest ，那么解析文件，并获取差异文件记录
             try {
               if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-                this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(this._projectManifestDownloadPath));
-                if (this._remoteProjectManifest) {
-                  this._resetDownloadInfo();
-                  Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
-                    const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
-                    const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
-                    const need2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
-                    if (need2Update && remoteAssetInfo.state != null) {
-                      // 更新需要下载的文件信息
-                      this._totalFiles++;
-                      this._totalBytes += remoteAssetInfo.size;
-
-                      // 恢复下载任务
-                      const downloadTask = {
-                        identifier: assetPath,
-                        requestURL: `${this._remoteRootUrl}/${assetPath}`,
-                        storagePath: path.join(this._downloadRootDirPath, assetPath)
-                      };
-                      if (remoteAssetInfo.state == ProjectManifestAssetUpdateState.Suc) {
-                        // 更新累计下载字节数
-                        this._downloadedBytes += remoteAssetInfo.size;
-                        // 下载成功的任务加入到成功列表
-                        this.downloadSucFiles.push(downloadTask);
-                      } else {
-                        // 更新累计下载字节数
-                        // 如果之前已经有相当一部分文件未下载完成，那么这里的读取可能会比较耗时
-                        const downloadTempFilePath = downloadTask.storagePath + ".tmp";
-                        if (native.fileUtils.isFileExist(downloadTempFilePath)) {
-                          let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
-                          if (downloadFileSize > 0) {
-                            this._downloadedBytes += remoteAssetInfo.size;
-                          }
-                        }
-                        // 下载失败的任务加入到失败列表
-                        this.downloadFailedFiles.push(downloadTask);
-                      }
-                    }
-                  });
-                  let info = `检查更新：成功，发现新版本。发现之前还没有完成的更新，将读取之前的更新进度`;
-                  info += ` 总字节数：${this._totalBytes}`;
-                  info += ` 已下载字节数: ${this._downloadedBytes}`;
-                  info += ` 总下载文件数：${this._totalFiles}`;
-                  info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-                  info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-                  this._debug(info);
+                this._reCalculateDownloadInfo();
+                // 如果还有文件未下载，那么返回新版本
+                if (this._totalFiles != this.downloadSucFiles.length) {
                   this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
                   return;
                 }
               }
             } catch (error) {
-              this._error(error);
-              this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+              {
+                this._error(error);
+                this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+              }
             }
 
-            // 到这里表示本地没有 project.manifest 文件，或者解析出错
-            // 此时我们先删除本地可能存在的 project.manifest 文件，然后重新下载，重新初始化
+            // 到这里表示本地没有 project.manifest 文件，或者解析出错，总之不对劲了，此时删除这个文件，重新走一躺下载处理
             if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
               native.fileUtils.removeFile(this._projectManifestDownloadPath);
             }
+            this._debug(`检查更新：下载远程 project.manifest：开始，下载地址：${this._projectManifesetRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
             this._downloader.onError = (task, errorCode, errorCodeInternal, errorStr) => {
               // 处理下载失败
-              this._resetDownloadInfo();
-              this._error(`检查更新：失败，下载远程 project.manifest 失败。地址：${task.requestURL} 错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
+              this._error(`检查更新：下载远程 project.manifest：失败`);
+              this._error(`检查更新：失败`);
               this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError);
             };
             this._downloader.onSuccess = task => {
               // 处理下载成功
-              this._resetDownloadInfo();
+              this._debug(`检查更新：下载远程 project.manifest：成功`);
+
+              // 解析已经下载下来的 project.manifest
               try {
                 if (native.fileUtils.isFileExist(task.storagePath)) {
                   this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(task.storagePath));
@@ -1125,41 +830,38 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
                 this._error(error);
               }
               if (this._remoteProjectManifest == null) {
-                this._error(`检查更新：失败，解析远程 project.manifest 失败。下载地址： ${task.requestURL} 本地存储地址：${task.storagePath}`);
+                this._error(`检查更新：解析远程 project.manifest 失败。下载地址： ${task.requestURL} 本地存储地址：${task.storagePath}`);
+                this._error(`检查更新：失败`);
                 this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError);
                 return;
               }
 
-              // 对比本地最新 project.manifest 和远程 project.manifest，生产差异文件，并将需要更新的文件记录下来
+              // 对比本地最新 project.manifest 和远程 project.manifest，将需要下载的文件标记一下，并保存到本地（以方便后面断点续传）
+              let hasDiff = false;
               Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
                 const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
                 const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
-                const need2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
-                if (need2Update) {
-                  // 标记文件需要下载并加入到下载任务队列中
+                const assetNeed2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
+                if (assetNeed2Update) {
+                  // 标记此文件需要下载
                   remoteAssetInfo.state = ProjectManifestAssetUpdateState.Idle;
-                  this._downloadTasks.push({
-                    identifier: assetPath,
-                    requestURL: `${this._remoteRootUrl}/${assetPath}`,
-                    storagePath: path.join(this._downloadRootDirPath, assetPath)
-                  });
-                  this._totalFiles++;
-                  this._totalBytes += remoteAssetInfo.size;
+                  hasDiff = true;
                 }
               });
-              if (this._downloadTasks.length > 0) {
-                // 如果版本不一致，且存在差异文件需要下载，那么返回发现现版本
+              if (hasDiff) {
+                // 如果比较后，存在差异文件需要下载，那么
+                this._debug(`检查更新：成功，发现新版本`);
+
+                // 1. 将有待下载文件的信息写回到本地，方便后面恢复下载
                 native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), task.storagePath);
-                let info = `检查更新：成功，发现新版本。`;
-                info += ` 总字节数：${this._totalBytes}`;
-                info += ` 已下载字节数: ${this._downloadedBytes}`;
-                info += ` 总下载文件数：${this._totalFiles}`;
-                info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-                info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-                this._debug(info);
+
+                // 2. 重新计算下载信息
+                this._reCalculateDownloadInfo();
+
+                // 3. 返回新版本
                 this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
               } else {
-                // 如果版本不一致，且不存在差异文件需要下载，那么返回已经更新到最新版本
+                // 如果比较后，没有差异文件需要下载，那么返回已经更新到最新
                 this._debug(`检查更新：成功，发现不同远端版本，但和当前本地版本没有文件差异，因此当前已经是最新版本`);
 
                 // 释放文件json内存
@@ -1169,10 +871,82 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             };
             this._downloader.createDownloadTask(this._projectManifesetRemoteUrl, this._projectManifestDownloadPath);
           }).catch(error => {
-            this._error(`检查更新：失败，解析远程 version.manifest 失败。地址: ${this._versionManifesetRemoteUrl}`);
-            this._error(error);
+            {
+              this._error(`检查更新：解析远程 version.manifest 版本信息失败。`);
+              this._error(`检查更新：失败`);
+              this._error(error);
+            }
             this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
           });
+        }
+
+        /**
+         * 重新计算下载信息
+         */
+        _reCalculateDownloadInfo() {
+          // 重置所有下载信息
+          this._resetDownloadInfo();
+
+          // 读取本地已经下载好的远程 project.manifest
+          try {
+            if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+              this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(this._projectManifestDownloadPath));
+            }
+          } catch (error) {
+            {
+              this._error(error);
+            }
+          }
+          if (!this._remoteProjectManifest) {
+            this._error(`解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+            return;
+          }
+
+          // 计算下载信息
+          Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
+            const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
+            const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
+            const need2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
+            if (need2Update && remoteAssetInfo.state != null) {
+              // 更新需要下载的文件信息
+              this._totalFiles++;
+              this._totalBytes += remoteAssetInfo.size;
+
+              // 恢复下载任务
+              const downloadTask = {
+                identifier: assetPath,
+                requestURL: `${this._remoteRootUrl}/${assetPath}`,
+                storagePath: path.join(this._downloadRootDirPath, assetPath)
+              };
+              if (remoteAssetInfo.state == ProjectManifestAssetUpdateState.Suc) {
+                // 更新累计下载字节数
+                this._downloadedBytes += remoteAssetInfo.size;
+                // 下载成功的任务加入到成功列表
+                this.downloadSucFiles.push(downloadTask);
+              } else {
+                // 更新累计下载字节数
+                // 如果之前已经有相当一部分文件未下载完成，那么这里的读取可能会比较耗时
+                const downloadTempFilePath = downloadTask.storagePath + ".tmp";
+                if (native.fileUtils.isFileExist(downloadTempFilePath)) {
+                  let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
+                  if (downloadFileSize > 0) {
+                    this._downloadedBytes += remoteAssetInfo.size;
+                  }
+                }
+                // 未下载或下载失败的任务加入到失败列表
+                this.downloadFailedFiles.push(downloadTask);
+              }
+            }
+          });
+          {
+            let info = `待下载信息：`;
+            info += ` 总字节数：${this._totalBytes}`;
+            info += ` 已下载字节数: ${this._downloadedBytes}`;
+            info += ` 总下载文件数：${this._totalFiles}`;
+            info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+            info += ` 未下载或下载失败文件数：${this.downloadFailedFiles.length}`;
+            this._debug(info);
+          }
         }
 
         /**
@@ -1188,16 +962,14 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             return;
           }
           this._debug(`热更新：开始`);
+          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
 
           // 开始下载之前，重置下载信息
-          this._curConcurrentTaskCount = 0;
-          this._downloadSpeed = 0;
-          this._downloadRemainTimeInSecond = -1;
-          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+          this._reCalculateDownloadInfo();
 
           // 如果之前已经下载过，但存在下载未完成或者下载失败的文件，那么我们将失败的任务再次加入下载任务队列
           if (this.downloadFailedFiles.length > 0) {
-            this._debug(`热更新：发现 ${this.downloadFailedFiles.length} 个下载失败任务，将重新加入队列进行下载`);
+            this._debug(`热更新：发现 ${this.downloadFailedFiles.length} 个未下载或下载失败任务，将重新加入队列进行下载`);
             this._downloadTasks.push(...this.downloadFailedFiles);
             this.downloadFailedFiles.length = 0;
           }
@@ -1240,16 +1012,18 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             // 外部下载进度回调（间隔一段时间之后在回调）
             if (curTime - lastCallBackUpdateTimeInMs >= this._option.downloadProgressCallBackIntervalInMs) {
               lastCallBackUpdateTimeInMs = curTime;
-              let info = "热更新：下载中";
-              info += ` 总字节数：${this._totalBytes}`;
-              info += ` 已下载字节数: ${this._downloadedBytes}`;
-              info += ` 总下载文件数：${this._totalFiles}`;
-              info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-              info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-              info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
-              info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
-              info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
-              this._debug(info);
+              {
+                let info = "热更新：下载中";
+                info += ` 总字节数：${this._totalBytes}`;
+                info += ` 已下载字节数: ${this._downloadedBytes}`;
+                info += ` 总下载文件数：${this._totalFiles}`;
+                info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+                info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
+                info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
+                info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
+                info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
+                this._debug(info);
+              }
               this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
             }
           };
@@ -1292,21 +1066,22 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
             this._downloadSpeed = 0;
             this._downloadRemainTimeInSecond = -1;
             const suc = this._totalFiles == this.downloadSucFiles.length;
-            let info = suc ? "热更新：成功，" : "热更新：失败，";
-            info += ` 总字节数：${this._totalBytes}`;
-            info += ` 已下载字节数: ${this._downloadedBytes}`;
-            info += ` 总下载文件数：${this._totalFiles}`;
-            info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-            info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-            info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
-            info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
-            info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
+            {
+              let info = suc ? "热更新：成功，" : "热更新：失败，";
+              info += ` 总字节数：${this._totalBytes}`;
+              info += ` 已下载字节数: ${this._downloadedBytes}`;
+              info += ` 总下载文件数：${this._totalFiles}`;
+              info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+              info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
+              info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
+              info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
+              info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
+              suc ? this._debug(info) : this._error(info);
+            }
             if (suc) {
-              this._debug(info);
               this._updateSearchPath();
               this._updateState(GGHotUpdateInstanceState.HotUpdateSuc);
             } else {
-              this._error(info);
               this._updateState(GGHotUpdateInstanceState.HotUpdateFailed);
             }
             return;
@@ -1336,8 +1111,10 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
 
           // 待插入的搜索路径（注意结尾要加 /)
           const newSearchPath = this._searchRootDirPath + "/";
-          this._debug(`当前搜索路径顺序：${JSON.stringify(searchPaths)}`);
-          this._debug(`待插入的搜索路径：${newSearchPath}`);
+          {
+            this._debug(`当前搜索路径顺序：${JSON.stringify(searchPaths)}`);
+            this._debug(`待插入的搜索路径：${newSearchPath}`);
+          }
 
           // 插入新的搜索路径到当前搜索路径的最前面（如果当前搜索路径数组已经包含新的待插入搜索路径，那么只需要将其提到数组最前面即可）
           let isNewPathExist = false;
@@ -1378,6 +1155,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
                   native.fileUtils.renameFile(srcPath, dstPath);
                 }
               });
+            }
+            if (native.fileUtils.isDirectoryExist(downloadDirPath)) {
               native.fileUtils.removeDirectory(downloadDirPath);
             }
           }
@@ -1403,8 +1182,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './GGHotUpda
   };
 });
 
-System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdateInstance.ts', './GGHotUpdateType.ts', './GGLogger.ts'], function (exports) {
-  var cclegacy, path, native, game, GGHotUpdateInstance, GGHotUpdateInstanceEnum, ggLogger;
+System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './GGHotUpdateInstance.ts', './GGLogger.ts'], function (exports) {
+  var cclegacy, path, native, game, DEBUG, GGHotUpdateInstance, ggLogger;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
@@ -1412,14 +1191,14 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       native = module.native;
       game = module.game;
     }, function (module) {
-      GGHotUpdateInstance = module.GGHotUpdateInstance;
+      DEBUG = module.DEBUG;
     }, function (module) {
-      GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
+      GGHotUpdateInstance = module.GGHotUpdateInstance;
     }, function (module) {
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "99ca3Tfqt9PZ7OasX+kdJCF", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "0e940noKu5K+JnDCp7SLSm7", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1429,20 +1208,14 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
        */
       class GGHotUpdateManager {
         constructor() {
-          this._instances = null;
+          /**
+           * 热更新实例
+           */
+          this._instanceMap = null;
           this._enableLog = false;
           this._remoteRootUrl = "";
           this._localRootDirPath = "";
           this._hotUpdateConfig = null;
-        }
-        /**
-         * 热更新实例
-         */
-        get instances() {
-          if (this._instances == null) {
-            this._instances = new Map();
-          }
-          return this._instances;
         }
         /**
          * 是否打印调试日志
@@ -1501,10 +1274,12 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
             if (bundleJsonText) {
               try {
                 this._hotUpdateConfig = JSON.parse(bundleJsonText);
-                ggLogger.debug(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：成功`);
+                DEBUG && ggLogger.debug(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：成功`);
               } catch (error) {
-                ggLogger.error(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：失败，文件内容解析失败`);
-                ggLogger.error(error);
+                {
+                  ggLogger.error(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：失败，文件内容解析失败`);
+                  ggLogger.error(error);
+                }
               }
             }
             if (this._hotUpdateConfig) {
@@ -1515,10 +1290,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
           if (!this._hotUpdateConfig) {
             ggLogger.warn(`初始化：没法解析到本地从文件中读取当前热更包 Bundle 配置信息，将初始化一个默认配置`);
             this._hotUpdateConfig = {
-              bundles: {}
-            };
-            this._hotUpdateConfig.bundles[GGHotUpdateInstanceEnum.BuildIn] = {
-              version: "0"
+              remote_bundles: []
             };
           }
           ggLogger.debug(`初始化：当前热更包 Bundle 配置信息：${this._hotUpdateConfig ? JSON.stringify(this._hotUpdateConfig) : ""}`);
@@ -1531,14 +1303,17 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
          * @param option 热更新实例配置
          */
         getInstance(bundleName, option) {
-          let instance = this.instances.get(bundleName);
+          if (!this._instanceMap) {
+            this._instanceMap = new Map();
+          }
+          let instance = this._instanceMap.get(bundleName);
           if (!instance) {
             instance = new GGHotUpdateInstance(bundleName, this._remoteRootUrl, this._localRootDirPath, option ? option : {
               downloadMaxConcurrentTask: 24,
               downloadProgressCallBackIntervalInMs: 16,
               downloadSpeedCalculationIntervalInMs: 1000
             });
-            this.instances.set(bundleName, instance);
+            this._instanceMap.set(bundleName, instance);
           }
           return instance;
         }
@@ -1548,9 +1323,11 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
          */
         restartGame() {
           // 销毁所有热更新实例
-          this.instances.forEach(instance => {
-            instance.destroy();
-          });
+          if (this._instanceMap) {
+            this._instanceMap.forEach(instance => {
+              instance.destroy();
+            });
+          }
           // 重启游戏
           game.restart();
         }
@@ -1559,7 +1336,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
          * 判断某个Bundle是否「为需要热更新的Bundle」
          */
         isHotUpdateBundle(bundleName) {
-          return this._hotUpdateConfig?.bundles[bundleName] != null;
+          return this._hotUpdateConfig != null && this._hotUpdateConfig.remote_bundles != null && this._hotUpdateConfig.remote_bundles.includes(bundleName);
         }
       }
 
@@ -1579,7 +1356,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "b93fddr2IlBs67v+0DCpwl+", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "d9a76Lu9d1A6r+rPZXS9iiN", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1631,7 +1408,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "64839vW5VhIQ54hNM0IOkPe", "GGLogger", undefined);
+      cclegacy._RF.push({}, "8b867TT2UNCIa+QIacr9nRB", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1678,9 +1455,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
                 }
               }
             } catch (err) {
-              {
-                error("打印日志异常，可以忽略，也可以排查");
-              }
+              error("打印日志异常，可以忽略，也可以排查");
             }
           }
           args.unshift("gg-hot-update");
@@ -1700,7 +1475,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "2c73ctOsjRCIZKF8ftDW233", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "709fcozolhHnrDIHKJ4BGnn", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
@@ -1746,172 +1521,8 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
   };
 });
 
-System.register("chunks:///_virtual/HotUpdateProgressComponent.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateType.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, ProgressBar, _decorator, Component, GGHotUpdateInstanceState;
-  return {
-    setters: [function (module) {
-      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
-      _initializerDefineProperty = module.initializerDefineProperty;
-    }, function (module) {
-      cclegacy = module.cclegacy;
-      Label = module.Label;
-      ProgressBar = module.ProgressBar;
-      _decorator = module._decorator;
-      Component = module.Component;
-    }, function (module) {
-      GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
-    }],
-    execute: function () {
-      var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6;
-      cclegacy._RF.push({}, "b3353974bdAT6Ov0eFqEdVI", "HotUpdateProgressComponent", undefined);
-      const {
-        ccclass,
-        property
-      } = _decorator;
-
-      /**
-       * 热更新进度组件
-       *
-       * @author caizhitao
-       * @created 2024-09-04 10:43:52
-       */
-      let HotUpdateProgressComponent = exports('HotUpdateProgressComponent', (_dec = property(Label), _dec2 = property(ProgressBar), _dec3 = property(Label), _dec4 = property(Label), _dec5 = property(Label), _dec6 = property(Label), ccclass(_class = (_class2 = class HotUpdateProgressComponent extends Component {
-        constructor(...args) {
-          super(...args);
-          _initializerDefineProperty(this, "messageLabel", _descriptor, this);
-          _initializerDefineProperty(this, "progressBar", _descriptor2, this);
-          _initializerDefineProperty(this, "progressLabel", _descriptor3, this);
-          _initializerDefineProperty(this, "downloadSpeedLabel", _descriptor4, this);
-          _initializerDefineProperty(this, "downloadSizeLabel", _descriptor5, this);
-          _initializerDefineProperty(this, "downloadRemainTimeLabel", _descriptor6, this);
-        }
-        /**
-         * 设置下载进度可见性
-         */
-        _setUpdateProgressVisability(visable) {
-          this.progressBar.node.active = visable;
-          this.progressLabel.node.active = visable;
-          this.downloadSpeedLabel.node.active = visable;
-          this.downloadSizeLabel.node.active = visable;
-          this.downloadRemainTimeLabel.node.active = visable;
-        }
-
-        /**
-         * 根据不同状态，更新UI
-         *
-         * @param state 状态
-         */
-        updateState(state) {
-          switch (state) {
-            case GGHotUpdateInstanceState.Idle:
-              this.messageLabel.string = "";
-              this._setUpdateProgressVisability(false);
-              break;
-            case GGHotUpdateInstanceState.CheckUpdateInProgress:
-              this.messageLabel.string = "Checking for Updates";
-              this._setUpdateProgressVisability(false);
-              break;
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
-              this.messageLabel.string = "Check for Updates Failed";
-              break;
-            case GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound:
-              this.messageLabel.string = "New version found";
-              break;
-            case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
-              this.messageLabel.string = "Already up to date";
-              break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
-              this.messageLabel.string = "Updating Resources";
-              this._setUpdateProgressVisability(true);
-              break;
-            case GGHotUpdateInstanceState.HotUpdateSuc:
-              this.messageLabel.string = "Resources update successful";
-              break;
-            case GGHotUpdateInstanceState.HotUpdateFailed:
-              this.messageLabel.string = "Resources update failed";
-              break;
-          }
-        }
-
-        /**
-         * 更新下载进度
-         *
-         * @param totalBytes 总下载字节数
-         * @param downloadedBytes 已下载字节数
-         * @param byteSpeedInSecond 下载速度（Bytes/s)
-         * @param remainTimeInScond 下载剩余时间(s)
-         */
-        updateProgress(totalBytes, downloadedBytes, byteSpeedInSecond, remainTimeInScond) {
-          let percent = 0;
-          if (totalBytes > 0) {
-            percent = downloadedBytes / totalBytes;
-          }
-          this.progressBar.progress = percent;
-          this.progressLabel.string = (percent * 100).toFixed(2) + "%";
-          this.downloadSpeedLabel.string = `Speed: ${this._byte2MB(byteSpeedInSecond).toFixed(2)}MB/s`;
-          this.downloadSizeLabel.string = `Size: ${this._byte2MB(downloadedBytes).toFixed(2)}MB/${this._byte2MB(totalBytes).toFixed(2)}MB`;
-          if (remainTimeInScond >= 0) {
-            this.downloadRemainTimeLabel.string = `Remaining Time: ${remainTimeInScond}s`;
-          } else {
-            this.downloadRemainTimeLabel.string = `Remaining Time: -- s`;
-          }
-        }
-        _byte2MB(bytes) {
-          return bytes / 1024 / 1024;
-        }
-      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "messageLabel", [_dec], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "progressBar", [_dec2], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "progressLabel", [_dec3], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "downloadSpeedLabel", [_dec4], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, "downloadSizeLabel", [_dec5], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor6 = _applyDecoratedDescriptor(_class2.prototype, "downloadRemainTimeLabel", [_dec6], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      })), _class2)) || _class));
-      cclegacy._RF.pop();
-    }
-  };
-});
-
-System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './HotUpdateProgressComponent.ts', './GameSceneConfig.ts', './SceneRouter.ts', './HotUpdateSystem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, _decorator, Component, ggHotUpdateManager, GGHotUpdateInstanceState, HotUpdateProgressComponent, GameSceneConfig, sceneRouter, hotUpdateSystem;
+System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './UIHotUpdateProgress.ts', './GameSceneConfig.ts', './SceneRouter.ts', './HotUpdateSystem.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, _decorator, Component, ggHotUpdateManager, GGHotUpdateInstanceState, UIHotUpdateProgress, GameSceneConfig, sceneRouter, hotUpdateSystem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -1926,7 +1537,7 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
     }, function (module) {
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
     }, function (module) {
-      HotUpdateProgressComponent = module.HotUpdateProgressComponent;
+      UIHotUpdateProgress = module.UIHotUpdateProgress;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
     }, function (module) {
@@ -1942,7 +1553,7 @@ System.register("chunks:///_virtual/HotUpdateSceneCtrl.ts", ['./rollupPluginModL
         property
       } = _decorator;
       let HotUpdateSceneCtrl = exports('HotUpdateSceneCtrl', (_dec = property(Label), _dec2 = property({
-        type: HotUpdateProgressComponent,
+        type: UIHotUpdateProgress,
         tooltip: "热更新进度组件"
       }), ccclass(_class = (_class2 = class HotUpdateSceneCtrl extends Component {
         constructor(...args) {
@@ -2065,14 +1676,13 @@ System.register("chunks:///_virtual/HotUpdateSystem.ts", ['cc'], function (expor
 });
 
 System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GameSceneConfig.ts', './LobbyGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, GameSceneConfig, LobbyGameListItem;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Node, _decorator, Component, NodePool, instantiate, GameSceneConfig, LobbyGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
       _initializerDefineProperty = module.initializerDefineProperty;
     }, function (module) {
       cclegacy = module.cclegacy;
-      ScrollView = module.ScrollView;
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
@@ -2084,18 +1694,17 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
       LobbyGameListItem = module.LobbyGameListItem;
     }],
     execute: function () {
-      var _dec, _dec2, _dec3, _class, _class2, _descriptor, _descriptor2, _descriptor3;
+      var _dec, _dec2, _class, _class2, _descriptor, _descriptor2;
       cclegacy._RF.push({}, "71774IsIUxDsaiupc0uyOdp", "LobbyGameListCtrl", undefined);
       const {
         ccclass,
         property
       } = _decorator;
-      let LobbyGameListCtrl = exports('LobbyGameListCtrl', (_dec = property(ScrollView), _dec2 = property(Node), _dec3 = property(Node), ccclass(_class = (_class2 = class LobbyGameListCtrl extends Component {
+      let LobbyGameListCtrl = exports('LobbyGameListCtrl', (_dec = property(Node), _dec2 = property(Node), ccclass(_class = (_class2 = class LobbyGameListCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "scrollView", _descriptor, this);
-          _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
-          _initializerDefineProperty(this, "itemNode", _descriptor3, this);
+          _initializerDefineProperty(this, "itemParentNode", _descriptor, this);
+          _initializerDefineProperty(this, "itemNode", _descriptor2, this);
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////
           // 节点复用处理
           this._nodePool = new NodePool();
@@ -2135,25 +1744,19 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
           }];
           games.forEach(data => {
             const itemNode = this._getNode();
-            itemNode.setParent(this.itemParentNode);
-            itemNode.getComponent(LobbyGameListItem).bindData(data);
+            itemNode.parent = this.itemParentNode;
+            const itemComp = itemNode.getComponent(LobbyGameListItem);
+            itemComp.bindData(data);
           });
         }
-      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "scrollView", [_dec], {
+      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "itemParentNode", [_dec], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "itemParentNode", [_dec2], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "itemNode", [_dec3], {
+      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "itemNode", [_dec2], {
         configurable: true,
         enumerable: true,
         writable: true,
@@ -2232,7 +1835,7 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
   };
 });
 
-System.register("chunks:///_virtual/main", ['./debug-view-runtime-control.ts', './GameVersionComponent.ts', './HotUpdateProgressComponent.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
+System.register("chunks:///_virtual/main", ['./GameVersionComponent.ts', './UIHotUpdateProgress.ts', './UILoading.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
   return {
     setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
     execute: function () {}
@@ -2299,7 +1902,8 @@ System.register("chunks:///_virtual/SceneRouter.ts", ['cc'], function (exports) 
          * 打开场景(异步)
          */
         async runSceneAsync(sceneConfig) {
-          console.log("ScreenRouter: Leave", director.getScene()?.name ?? "");
+          var _director$getScene;
+          console.log("ScreenRouter: Leave", ((_director$getScene = director.getScene()) == null ? void 0 : _director$getScene.name) ?? "");
           const sceneAsset = await this.loadSceneAsync(sceneConfig);
           if (sceneAsset) {
             director.runScene(sceneAsset);
@@ -2320,7 +1924,7 @@ System.register("chunks:///_virtual/SceneRouter.ts", ['cc'], function (exports) 
 });
 
 System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Sprite, Enum, _decorator, Component, screen, Widget, UITransform;
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Sprite, Enum, _decorator, Component, Widget, UITransform;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -2331,7 +1935,6 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
       Enum = module.Enum;
       _decorator = module._decorator;
       Component = module.Component;
-      screen = module.screen;
       Widget = module.Widget;
       UITransform = module.UITransform;
     }],
@@ -2412,21 +2015,23 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
         }
         onEnable() {
           this.updateSprite();
-          screen.on("window-resize", this.updateSprite.bind(this));
-          screen.on("orientation-change", this.updateSprite.bind(this));
+          // screen.on("window-resize", this.updateSprite.bind(this));
+          // screen.on("orientation-change", this.updateSprite.bind(this));
         }
+
         onDisable() {
-          screen.off("window-resize", this.updateSprite.bind(this));
-          screen.off("orientation-change", this.updateSprite.bind(this));
+          // screen.off("window-resize", this.updateSprite.bind(this));
+          // screen.off("orientation-change", this.updateSprite.bind(this));
         }
         updateSprite(scaleType, alignType) {
+          var _this$node$parent, _this$node$parent2;
           if (!this.node) {
             return;
           }
           if (!this._sprite || !this._sprite.enabled || !this._sprite.spriteFrame) {
             return;
           }
-          let widget = this.node.parent?.getComponent(Widget);
+          let widget = (_this$node$parent = this.node.parent) == null ? void 0 : _this$node$parent.getComponent(Widget);
           if (widget) {
             widget.updateAlignment();
           }
@@ -2434,7 +2039,7 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
           if (!nodeUITransform) {
             return;
           }
-          const nodeParentUITransform = this.node.parent?.getComponent(UITransform);
+          const nodeParentUITransform = (_this$node$parent2 = this.node.parent) == null ? void 0 : _this$node$parent2.getComponent(UITransform);
           if (!nodeParentUITransform) {
             return;
           }
@@ -2499,22 +2104,26 @@ System.register("chunks:///_virtual/Sprite2DScaleAdapterComponent.ts", ['./rollu
   };
 });
 
-System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './SubGameListItem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, ScrollView, Node, _decorator, Component, NodePool, instantiate, assetManager, SpriteFrame, SubGameListItem;
+System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './UILoading.ts', './SubGameListItem.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Node, _decorator, Component, NodePool, instantiate, Layout, UITransform, size, assetManager, SpriteFrame, UILoading, SubGameListItem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
       _initializerDefineProperty = module.initializerDefineProperty;
     }, function (module) {
       cclegacy = module.cclegacy;
-      ScrollView = module.ScrollView;
       Node = module.Node;
       _decorator = module._decorator;
       Component = module.Component;
       NodePool = module.NodePool;
       instantiate = module.instantiate;
+      Layout = module.Layout;
+      UITransform = module.UITransform;
+      size = module.size;
       assetManager = module.assetManager;
       SpriteFrame = module.SpriteFrame;
+    }, function (module) {
+      UILoading = module.UILoading;
     }, function (module) {
       SubGameListItem = module.SubGameListItem;
     }],
@@ -2525,10 +2134,10 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
         ccclass,
         property
       } = _decorator;
-      let SubGameListCtrl = exports('SubGameListCtrl', (_dec = property(ScrollView), _dec2 = property(Node), _dec3 = property(Node), ccclass(_class = (_class2 = class SubGameListCtrl extends Component {
+      let SubGameListCtrl = exports('SubGameListCtrl', (_dec = property(UILoading), _dec2 = property(Node), _dec3 = property(Node), ccclass(_class = (_class2 = class SubGameListCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "scrollView", _descriptor, this);
+          _initializerDefineProperty(this, "uiLoading", _descriptor, this);
           _initializerDefineProperty(this, "itemParentNode", _descriptor2, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3, this);
           _initializerDefineProperty(this, "bundleName", _descriptor4, this);
@@ -2556,13 +2165,22 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
           this._nodePool.clear();
         }
         start() {
+          // 根据实际屏幕大小，决定示例图的大小，以实现两列的效果
+          const gridLayout = this.itemParentNode.getComponent(Layout);
+          const gridLayoutWidth = this.itemParentNode.getComponent(UITransform).width;
+          const itemWidth = (gridLayoutWidth - gridLayout.paddingLeft - gridLayout.paddingRight - gridLayout.spacingX) / 2;
+          gridLayout.cellSize = size(itemWidth, itemWidth);
+          this.uiLoading.playShowAnim();
+          // 加载并显示 子Bundle 的纹理资源
           assetManager.loadBundle(this.bundleName, (error, bundle) => {
             if (error) {
               console.error(`load bundle failed: ${this.bundleName}`);
               console.error(error);
+              this.uiLoading.playHideAnim();
               return;
             }
             bundle.loadDir("textures", SpriteFrame, (error, assets) => {
+              this.uiLoading.playHideAnim();
               if (error) {
                 console.error(`load bundle textures failed: ${this.bundleName}`);
                 console.error(error);
@@ -2570,15 +2188,16 @@ System.register("chunks:///_virtual/SubGameListCtrl.ts", ['./rollupPluginModLoBa
               }
               assets.sort((a, b) => {
                 return parseInt(a.name) - parseInt(b.name);
-              }).forEach(asset => {
-                const itemNode = instantiate(this.itemNode);
+              }).forEach(spriteFrame => {
+                const itemNode = this._getNode();
                 itemNode.parent = this.itemParentNode;
-                itemNode.getComponent(SubGameListItem).setSpriteFrame(asset);
+                const itemComp = itemNode.getComponent(SubGameListItem);
+                itemComp.setSpriteFrame(spriteFrame);
               });
             });
           });
         }
-      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "scrollView", [_dec], {
+      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "uiLoading", [_dec], {
         configurable: true,
         enumerable: true,
         writable: true,
@@ -2650,6 +2269,259 @@ System.register("chunks:///_virtual/SubGameListItem.ts", ['./rollupPluginModLoBa
           return null;
         }
       }), _class2)) || _class));
+      cclegacy._RF.pop();
+    }
+  };
+});
+
+System.register("chunks:///_virtual/UIHotUpdateProgress.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateType.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, ProgressBar, _decorator, Component, GGHotUpdateInstanceState;
+  return {
+    setters: [function (module) {
+      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
+      _initializerDefineProperty = module.initializerDefineProperty;
+    }, function (module) {
+      cclegacy = module.cclegacy;
+      Label = module.Label;
+      ProgressBar = module.ProgressBar;
+      _decorator = module._decorator;
+      Component = module.Component;
+    }, function (module) {
+      GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
+    }],
+    execute: function () {
+      var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _class, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6;
+      cclegacy._RF.push({}, "b3353974bdAT6Ov0eFqEdVI", "UIHotUpdateProgress", undefined);
+      const {
+        ccclass,
+        property
+      } = _decorator;
+
+      /**
+       * 热更新进度组件
+       *
+       * @author caizhitao
+       * @created 2024-09-04 10:43:52
+       */
+      let UIHotUpdateProgress = exports('UIHotUpdateProgress', (_dec = property(Label), _dec2 = property(ProgressBar), _dec3 = property(Label), _dec4 = property(Label), _dec5 = property(Label), _dec6 = property(Label), ccclass(_class = (_class2 = class UIHotUpdateProgress extends Component {
+        constructor(...args) {
+          super(...args);
+          _initializerDefineProperty(this, "messageLabel", _descriptor, this);
+          _initializerDefineProperty(this, "progressBar", _descriptor2, this);
+          _initializerDefineProperty(this, "progressLabel", _descriptor3, this);
+          _initializerDefineProperty(this, "downloadSpeedLabel", _descriptor4, this);
+          _initializerDefineProperty(this, "downloadSizeLabel", _descriptor5, this);
+          _initializerDefineProperty(this, "downloadRemainTimeLabel", _descriptor6, this);
+        }
+        /**
+         * 设置下载进度可见性
+         */
+        _setUpdateProgressVisability(visable) {
+          this.progressBar.node.active = visable;
+          this.progressLabel.node.active = visable;
+          this.downloadSpeedLabel.node.active = visable;
+          this.downloadSizeLabel.node.active = visable;
+          this.downloadRemainTimeLabel.node.active = visable;
+        }
+
+        /**
+         * 根据不同状态，更新UI
+         *
+         * @param state 状态
+         */
+        updateState(state) {
+          switch (state) {
+            case GGHotUpdateInstanceState.Idle:
+              this.messageLabel.string = "";
+              this._setUpdateProgressVisability(false);
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateInProgress:
+              this.messageLabel.string = "Checking for Updates";
+              this._setUpdateProgressVisability(false);
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
+              this.messageLabel.string = "Check for Updates Failed";
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound:
+              this.messageLabel.string = "New version found";
+              break;
+            case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
+              this.messageLabel.string = "Already up to date";
+              break;
+            case GGHotUpdateInstanceState.HotUpdateInProgress:
+              this.messageLabel.string = "Updating Resources";
+              this._setUpdateProgressVisability(true);
+              break;
+            case GGHotUpdateInstanceState.HotUpdateSuc:
+              this.messageLabel.string = "Resources update successful";
+              break;
+            case GGHotUpdateInstanceState.HotUpdateFailed:
+              this.messageLabel.string = "Resources update failed";
+              break;
+          }
+        }
+
+        /**
+         * 更新下载进度
+         *
+         * @param totalBytes 总下载字节数
+         * @param downloadedBytes 已下载字节数
+         * @param byteSpeedInSecond 下载速度（Bytes/s)
+         * @param remainTimeInScond 下载剩余时间(s)
+         */
+        updateProgress(totalBytes, downloadedBytes, byteSpeedInSecond, remainTimeInScond) {
+          let percent = 0;
+          if (totalBytes > 0) {
+            percent = downloadedBytes / totalBytes;
+          }
+          this.progressBar.progress = percent;
+          this.progressLabel.string = (percent * 100).toFixed(2) + "%";
+          this.downloadSizeLabel.string = `Size: ${this._byte2MB(downloadedBytes).toFixed(2)}MB/${this._byte2MB(totalBytes).toFixed(2)}MB`;
+          this.downloadSpeedLabel.string = `Speed: ${this._byte2MB(byteSpeedInSecond).toFixed(2)}MB/s`;
+          if (remainTimeInScond >= 0) {
+            this.downloadRemainTimeLabel.string = `Remaining Time: ${remainTimeInScond}s`;
+          } else {
+            this.downloadRemainTimeLabel.string = `Remaining Time: -- s`;
+          }
+        }
+        _byte2MB(bytes) {
+          return bytes / 1024 / 1024;
+        }
+      }, (_descriptor = _applyDecoratedDescriptor(_class2.prototype, "messageLabel", [_dec], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, "progressBar", [_dec2], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, "progressLabel", [_dec3], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, "downloadSpeedLabel", [_dec4], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _descriptor5 = _applyDecoratedDescriptor(_class2.prototype, "downloadSizeLabel", [_dec5], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _descriptor6 = _applyDecoratedDescriptor(_class2.prototype, "downloadRemainTimeLabel", [_dec6], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      })), _class2)) || _class));
+      cclegacy._RF.pop();
+    }
+  };
+});
+
+System.register("chunks:///_virtual/UILoading.ts", ['cc'], function (exports) {
+  var cclegacy, Component, UIOpacity, Tween, tween, _decorator;
+  return {
+    setters: [function (module) {
+      cclegacy = module.cclegacy;
+      Component = module.Component;
+      UIOpacity = module.UIOpacity;
+      Tween = module.Tween;
+      tween = module.tween;
+      _decorator = module._decorator;
+    }],
+    execute: function () {
+      var _class;
+      cclegacy._RF.push({}, "be280Atpj1M6I+qcKFDEH6O", "UILoading", undefined);
+      const {
+        ccclass,
+        property
+      } = _decorator;
+
+      /**
+       * 通用 Loading 组件
+       *
+       * @author caizhitao
+       * @created 2025-01-22 11:35:04
+       */
+      let UILoading = exports('UILoading', ccclass(_class = class UILoading extends Component {
+        constructor(...args) {
+          super(...args);
+          this._circleNode = null;
+          this._circleNodeUIOpacity = null;
+        }
+        onLoad() {
+          this._circleNode = this.node;
+          this._circleNodeUIOpacity = this._circleNode.getComponent(UIOpacity);
+          this._circleNodeUIOpacity.opacity = 0;
+        }
+        onDisable() {
+          this.reset();
+        }
+
+        /**
+         * 停止当前动画并恢复到默认状态
+         */
+        reset() {
+          Tween.stopAllByTarget(this._circleNode);
+          Tween.stopAllByTarget(this._circleNodeUIOpacity);
+          this._circleNodeUIOpacity.opacity = 0;
+          this._circleNode.angle = 0;
+        }
+
+        /**
+         * 播放出现动画
+         *
+         * @param duration 渐现动画持续时间（s）
+         * @param delayTime 渐现动画执行延迟时间（s)
+         */
+        playShowAnim(duration = 0.24, delayTime = 0) {
+          // Loading 圈
+          Tween.stopAllByTarget(this._circleNodeUIOpacity);
+          this._circleNodeUIOpacity.opacity = 0;
+          tween(this._circleNodeUIOpacity).delay(delayTime).to(duration, {
+            opacity: 255
+          }).start();
+          Tween.stopAllByTarget(this._circleNode);
+          this._circleNode.angle = 0;
+          tween(this._circleNode).repeatForever(tween().by(0.7, {
+            angle: 360
+          })).start();
+        }
+
+        /**
+         * 播放消息动画
+         *
+         * @param duration 渐隐动画持续时间（s）
+         * @param delayTime 渐隐动画执行延迟时间（s)
+         */
+        playHideAnim(duration = 0.24, delayTime = 0) {
+          Tween.stopAllByTarget(this._circleNode);
+          Tween.stopAllByTarget(this._circleNodeUIOpacity);
+          tween(this._circleNodeUIOpacity).delay(delayTime).to(duration, {
+            opacity: 0
+          }).start();
+        }
+      }) || _class);
       cclegacy._RF.pop();
     }
   };

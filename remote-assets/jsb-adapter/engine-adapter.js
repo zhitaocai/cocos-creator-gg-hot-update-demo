@@ -149,6 +149,7 @@ const cacheManager = {
     this.updateLastTime(url);
     return this.cachedFiles.has(url) ? `${this.cacheDir}/${this.cachedFiles.get(url).url}` : '';
   },
+  // eslint-disable-next-line no-unused-vars
   getTemp(url) {
     return '';
   },
@@ -219,7 +220,10 @@ const cacheManager = {
     });
     caches.sort((a, b) => a.lastTime - b.lastTime);
     caches.length = Math.floor(caches.length / 3);
-    if (caches.length === 0) return;
+    if (caches.length === 0) {
+      cleaning = false;
+      return;
+    }
     for (let i = 0, l = caches.length; i < l; i++) {
       this.cachedFiles.remove(caches[i].originUrl);
     }
@@ -1073,8 +1077,8 @@ const cacheManager = require('./jsb-cache-manager');
     }
     _getRect() {
       const node = this._delegate.node;
-      let viewScaleX = cc.view._scaleX;
-      let viewScaleY = cc.view._scaleY;
+      let viewScaleX = cc.view.getScaleX();
+      let viewScaleY = cc.view.getScaleY();
       const dpr = jsb.device.getDevicePixelRatio() || 1;
       node.getWorldMatrix(worldMat);
       const transform = node._uiProps.uiTransformComp;
@@ -1096,7 +1100,7 @@ const cacheManager = require('./jsb-cache-manager');
       viewScaleY /= dpr;
       const finalScaleX = worldMat.m00 * viewScaleX;
       const finaleScaleY = worldMat.m05 * viewScaleY;
-      const viewportRect = cc.view._viewportRect;
+      const viewportRect = cc.view.getViewportRect();
       const offsetX = viewportRect.x / dpr;
       const offsetY = viewportRect.y / dpr;
       return {
@@ -1370,20 +1374,20 @@ const fsUtils = {
       cc.warn(`Write file failed: path: ${path}`);
       return new Error(`Write file failed: path: ${path}`);
     }
+    return null;
   },
   readFile(filePath, encoding, onComplete) {
-    let content = null;
-    let err = null;
     if (encoding === 'utf-8' || encoding === 'utf8') {
-      content = fs.getStringFromFile(filePath);
+      fs.readTextFile(filePath, (err, content) => {
+        if (err) err = new Error(err);
+        onComplete && onComplete(err, content);
+      });
     } else {
-      content = fs.getDataFromFile(filePath);
+      fs.readDataFile(filePath, (err, content) => {
+        if (err) err = new Error(err);
+        onComplete && onComplete(err, content);
+      });
     }
-    if (!content) {
-      err = new Error(`Read file failed: path: ${filePath}`);
-      cc.warn(err.message);
-    }
-    onComplete && onComplete(err, content);
   },
   readDir(filePath, onComplete) {
     let files = null;
@@ -1403,18 +1407,28 @@ const fsUtils = {
     fsUtils.readFile(filePath, '', onComplete);
   },
   readJson(filePath, onComplete) {
-    fsUtils.readFile(filePath, 'utf8', (err, text) => {
-      let out = null;
-      if (!err) {
-        try {
-          out = JSON.parse(text);
-        } catch (e) {
-          cc.warn(`Read json failed: path: ${filePath} message: ${e.message}`);
-          err = new Error(e.message);
+    if (window.oh && window.scriptEngineType === 'napi') {
+      fsUtils.readFile(filePath, 'utf8', (err, text) => {
+        let out = null;
+        if (!err) {
+          try {
+            out = JSON.parse(text);
+          } catch (e) {
+            cc.warn(`Read json failed: path: ${filePath} message: ${e.message}`);
+            err = new Error(e.message);
+          }
         }
-      }
-      onComplete && onComplete(err, out);
-    });
+        onComplete && onComplete(err, out);
+      });
+    } else {
+      fs.readJsonFile(filePath, (err, jsonObj) => {
+        if (err) {
+          cc.warn(`Read json failed: path: ${filePath} message: ${err}`);
+          err = new Error(err);
+        }
+        onComplete && onComplete(err, jsonObj);
+      });
+    }
   },
   readJsonSync(path) {
     try {
@@ -1431,6 +1445,7 @@ const fsUtils = {
       cc.warn(`Make directory failed: path: ${path}`);
       return new Error(`Make directory failed: path: ${path}`);
     }
+    return null;
   },
   rmdirSync(dirPath, recursive) {
     const result = fs.removeDirectory(dirPath);
@@ -1438,6 +1453,7 @@ const fsUtils = {
       cc.warn(`rm directory failed: path: ${dirPath}`);
       return new Error(`rm directory failed: path: ${dirPath}`);
     }
+    return null;
   },
   exists(filePath, onComplete) {
     const result = fs.isFileExist(filePath);
@@ -1681,6 +1697,8 @@ Object.defineProperty(deviceProto, 'uboOffsetAlignment', {
  THE SOFTWARE.
  ****************************************************************************/
 
+/* eslint-disable no-undef */
+
 const jsbWindow = require('../jsbWindow');
 const cacheManager = require('./jsb-cache-manager');
 const {
@@ -1712,7 +1730,10 @@ function downloadScript(url, options, onComplete) {
     onComplete = options;
     options = null;
   }
-  if (loadedScripts[url]) return onComplete && onComplete();
+  if (loadedScripts[url]) {
+    onComplete && onComplete();
+    return;
+  }
   download(url, (src, options, onComplete) => {
     if (window.oh && window.scriptEngineType === 'napi') {
       // TODO(qgh):OpenHarmony does not currently support dynamic require expressions
@@ -1856,7 +1877,8 @@ function downloadBundle(nameOrUrl, options, onComplete) {
   options.__cacheBundleRoot__ = bundleName;
   downloadJson(config, options, (err, response) => {
     if (err) {
-      return onComplete(err, null);
+      onComplete(err, null);
+      return;
     }
     const out = response;
     out && (out.base = `${url}/`);
@@ -1864,7 +1886,8 @@ function downloadBundle(nameOrUrl, options, onComplete) {
       const js = `${url}/index.${version ? `${version}.` : ''}${out.encrypted ? 'jsc' : `js`}`;
       downloadScript(js, options, err => {
         if (err) {
-          return onComplete(err, null);
+          onComplete(err, null);
+          return;
         }
         onComplete(null, out);
       });
@@ -1891,7 +1914,10 @@ function loadFont(url, options, onComplete) {
 const originParsePlist = parser.parsePlist;
 const parsePlist = function (url, options, onComplete) {
   readText(url, (err, file) => {
-    if (err) return onComplete(err);
+    if (err) {
+      onComplete(err);
+      return;
+    }
     originParsePlist(file, options, onComplete);
   });
 };
@@ -3525,10 +3551,8 @@ const cacheManager = require('./jsb-cache-manager');
       jsbTextures[textureNames[i]] = spTex;
     }
     this._jsbTextures = jsbTextures;
-    let filePath = null;
-    if (this.skeletonJsonStr) {
-      filePath = this.skeletonJsonStr;
-    } else {
+    let filePath = this.skeletonJsonStr;
+    if (!filePath) {
       filePath = cacheManager.getCache(this.nativeUrl) || this.nativeUrl;
     }
     this._skeletonCache = spine.initSkeletonData(uuid, filePath, atlasText, jsbTextures, this.scale);
@@ -3742,7 +3766,10 @@ const cacheManager = require('./jsb-cache-manager');
   };
   skeleton._updateColor = function () {
     if (this._nativeSkeleton) {
-      const compColor = this.color;
+      const compColor = this._color;
+      this.setEntityColorDirty(true);
+      this.setEntityColor(compColor);
+      this.setEntityOpacity(this.node._uiProps.localOpacity);
       this._nativeSkeleton.setColor(compColor.r, compColor.g, compColor.b, compColor.a);
       this.markForUpdateRenderData();
     }
@@ -4177,6 +4204,8 @@ const cacheManager = require('./jsb-cache-manager');
 })();
 
 },{"./jsb-cache-manager":3}],13:[function(require,module,exports){
+"use strict";
+
 /****************************************************************************
  Copyright (c) 2022 Xiamen Yaji Software Co., Ltd.
 
@@ -4202,19 +4231,17 @@ const cacheManager = require('./jsb-cache-manager');
  THE SOFTWARE.
  ****************************************************************************/
 
-'use strict';
-
 if (cc.internal.VideoPlayer) {
   const {
     EventType
   } = cc.internal.VideoPlayer;
-  let vec3 = cc.Vec3;
-  let mat4 = cc.Mat4;
-  let _mat4_temp = new mat4();
-  let _topLeft = new vec3();
-  let _bottomRight = new vec3();
-  let kWebViewTag = 0;
-  let videoPlayers = [];
+  const vec3 = cc.Vec3;
+  const mat4 = cc.Mat4;
+  const _mat4_temp = new mat4();
+  const _topLeft = new vec3();
+  const _bottomRight = new vec3();
+  let kVideoTag = 0;
+  const videoPlayers = [];
   const VideoEvent = {
     PLAYING: 0,
     PAUSED: 1,
@@ -4229,10 +4256,11 @@ if (cc.internal.VideoPlayer) {
   cc.internal.VideoPlayerImplManager.getImpl = function (componenet) {
     return new VideoPlayerImplOpenHarmony(componenet);
   };
-  window.oh.onVideoEvent = (tag, ev, args) => {
+  window.oh.onVideoEvent = args => {
+    const data = JSON.parse(args);
     videoPlayers.forEach(player => {
-      if (player.index == tag) {
-        player.dispatchEvent(ev, args);
+      if (player.index === data.videoTag) {
+        player.dispatchEvent(data.videoEvent, data.args);
       }
     });
   };
@@ -4241,61 +4269,80 @@ if (cc.internal.VideoPlayer) {
       this._events = {};
       this._currentTime = 0;
       this._duration = 0;
-      this._videoIndex = kWebViewTag++;
+      this._videoIndex = kVideoTag++;
       this._matViewProj_temp = new mat4();
-      window.oh.postMessage("createVideo", this._videoIndex);
+      window.oh.postMessage('createVideo', this._videoIndex);
       videoPlayers.push(this);
     }
     get index() {
       return this._videoIndex;
     }
     play() {
-      window.oh.postMessage("startVideo", this._videoIndex);
+      window.oh.postMessage('startVideo', this._videoIndex);
+    }
+
+    // private function
+    _isURL(url) {
+      const regexp = /((http|https):\/\/([\w\-]+\.)+[\w\-]+(\/[\w\u4e00-\u9fa5\-\.\/?\@\%\!\&=\+\~\:\#\;\,]*)?)/ig;
+      if (regexp.test(url)) {
+        return true;
+      } else {
+        return false;
+      }
     }
     setURL(url) {
-      window.oh.postMessage("setVideoUrl", {
-        tag: this._videoIndex,
-        url: url
-      });
+      if (this._isURL(url)) {
+        window.oh.postMessage('setVideoUrl', {
+          tag: this._videoIndex,
+          resourceType: 0,
+          url
+        });
+      } else {
+        window.oh.postMessage('setVideoUrl', {
+          tag: this._videoIndex,
+          resourceType: 1,
+          url
+        });
+      }
     }
     pause() {
-      window.oh.postMessage("pauseVideo", this._videoIndex);
+      window.oh.postMessage('pauseVideo', this._videoIndex);
     }
     setVisible(visible) {
-      window.oh.postMessage("setVideoVisible", {
+      window.oh.postMessage('setVideoVisible', {
         tag: this._videoIndex,
-        visible: visible
+        visible
       });
     }
     resume() {
-      window.oh.postMessage("resumeVideo", this._videoIndex);
+      window.oh.postMessage('resumeVideo', this._videoIndex);
     }
     currentTime() {
-      window.oh.postSyncMessage("currentTime", this._videoIndex).then(result => {
+      window.oh.postSyncMessage('currentTime', this._videoIndex).then(result => {
         this._currentTime = result;
       });
       return this._currentTime;
     }
     stop() {
-      window.oh.postMessage("stopVideo", this._videoIndex);
+      window.oh.postMessage('stopVideo', this._videoIndex);
     }
     seekTo(val) {
-      window.oh.postMessage("seekVideoTo", {
+      window.oh.postMessage('seekVideoTo', {
         tag: this._videoIndex,
         time: val
       });
     }
     duration() {
-      window.oh.postSyncMessage("getVideoDuration", this._videoIndex).then(result => {
+      window.oh.postSyncMessage('getVideoDuration', this._videoIndex).then(result => {
         this._duration = result;
       });
       return this._duration;
     }
     destroy() {
-      window.oh.postMessage("removeVideo", this._videoIndex);
+      window.oh.postMessage('removeVideo', this._videoIndex);
     }
     setFullScreenEnabled(enable) {
-      window.oh.postMessage("setFullScreenEnabled", {
+      window.oh.postMessage('setFullScreenEnabled', {
         tag: this._videoIndex,
         fullScreen: enable
       });
@@ -4304,52 +4351,52 @@ if (cc.internal.VideoPlayer) {
       cc.warn('The platform does not support');
     }
     setFrame(x, y, w, h) {
-      window.oh.postMessage("setVideoRect", {
+      window.oh.postMessage('setVideoRect', {
         tag: this._videoIndex,
-        x: x,
-        y: y,
-        w: w,
-        h: h
+        x,
+        y,
+        w,
+        h
       });
     }
     eventTypeToEventName(ev) {
       let evString;
       switch (ev) {
         case VideoEvent.PLAYING:
-          evString = "play";
+          evString = 'play';
           break;
         case VideoEvent.PAUSED:
-          evString = "pause";
+          evString = 'pause';
           break;
         case VideoEvent.STOPPED:
-          evString = "stoped";
+          evString = 'stoped';
           break;
         case VideoEvent.COMPLETED:
-          evString = "ended";
+          evString = 'ended';
           break;
         case VideoEvent.META_LOADED:
-          evString = "loadedmetadata";
+          evString = 'loadedmetadata';
           break;
         case VideoEvent.CLICKED:
-          evString = "click";
+          evString = 'click';
           break;
         case VideoEvent.READY_TO_PLAY:
-          evString = "suspend";
+          evString = 'suspend';
           break;
         case VideoEvent.UPDATE:
-          evString = "update";
+          evString = 'update';
           break;
         case VideoEvent.QUIT_FULLSCREEN:
-          evString = "suspend";
+          evString = 'suspend';
           break;
         default:
-          evString = "none";
+          evString = 'none';
           break;
       }
       return evString;
     }
     dispatchEvent(type, args) {
-      let eventName = this.eventTypeToEventName(type);
+      const eventName = this.eventTypeToEventName(type);
       const listeners = this._events[eventName];
       if (listeners) {
         for (let i = 0; i < listeners.length; i++) {
@@ -4379,6 +4426,7 @@ if (cc.internal.VideoPlayer) {
     constructor(componenet) {
       super(componenet);
       this._matViewProj_temp = new mat4();
+      this._loaded = false;
     }
     syncClip(clip) {
       this.removeVideoPlayer();
@@ -4394,14 +4442,21 @@ if (cc.internal.VideoPlayer) {
       }
       this.createVideoPlayer(url);
     }
-    onCanplay() {
+    onCanPlay(args = 0) {
       if (this._loaded) {
         return;
       }
+      this._video._duration = args;
       this._loaded = true;
       this.video.setVisible(this._visible);
       this.dispatchEvent(EventType.READY_TO_PLAY);
-      this.delayedPlay();
+      //this.delayedPlay();
+    }
+
+    onUpdate(args = 0) {
+      if (this.video) {
+        this.video._currentTime = args;
+      }
     }
     _bindEvent() {
       this.video.addEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
@@ -4411,6 +4466,17 @@ if (cc.internal.VideoPlayer) {
       this.video.addEventListener('stoped', this.onStoped.bind(this));
       this.video.addEventListener('click', this.onClick.bind(this));
       this.video.addEventListener('ended', this.onEnded.bind(this));
+      this.video.addEventListener('update', this.onUpdate.bind(this));
+    }
+    _unBindEvent() {
+      this.video.removeEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
+      this.video.removeEventListener('suspend', this.onCanPlay.bind(this));
+      this.video.removeEventListener('play', this.onPlay.bind(this));
+      this.video.removeEventListener('pause', this.onPause.bind(this));
+      this.video.removeEventListener('stoped', this.onStoped.bind(this));
+      this.video.removeEventListener('click', this.onClick.bind(this));
+      this.video.removeEventListener('ended', this.onEnded.bind(this));
+      this.video.removeEventListener('update', this.onUpdate.bind(this));
     }
     onLoadedMetadata() {
       this._loadedMeta = true;
@@ -4432,11 +4498,12 @@ if (cc.internal.VideoPlayer) {
       this._forceUpdate = true;
     }
     removeVideoPlayer() {
-      let video = this.video;
+      const video = this.video;
       if (video) {
         video.stop();
         video.setVisible(false);
         video.destroy();
+        this._unBindEvent();
         this._playing = false;
         this._loaded = false;
         this._loadedMeta = false;
@@ -4474,7 +4541,7 @@ if (cc.internal.VideoPlayer) {
       return -1;
     }
     seekTo(val) {
-      let video = this._video;
+      const video = this._video;
       if (!video) return;
       video.seekTo(val);
       this._cachedCurrentTime = val;
@@ -4513,7 +4580,7 @@ if (cc.internal.VideoPlayer) {
     }
     stop() {
       if (this.video) {
-        this._ignorePause = true;
+        //this._ignorePause = true;
         this.video.seekTo(0);
         this._cachedCurrentTime = 0;
         this.video.stop();
@@ -4553,9 +4620,9 @@ if (cc.internal.VideoPlayer) {
       this._m13 = _mat4_temp.m13;
       this._w = width;
       this._h = height;
-      let canvas_width = cc.game.canvas.width;
-      let canvas_height = cc.game.canvas.height;
-      let ap = this._uiTrans.anchorPoint;
+      const canvas_width = cc.game.canvas.width;
+      const canvas_height = cc.game.canvas.height;
+      const ap = this._uiTrans.anchorPoint;
       // Vectors in node space
       vec3.set(_topLeft, -ap.x * this._w, (1.0 - ap.y) * this._h, 0);
       vec3.set(_bottomRight, (1 - ap.x) * this._w, -ap.y * this._h, 0);
@@ -4567,8 +4634,8 @@ if (cc.internal.VideoPlayer) {
       // Convert to Screen space
       camera.worldToScreen(_topLeft, _topLeft);
       camera.worldToScreen(_bottomRight, _bottomRight);
-      let finalWidth = _bottomRight.x - _topLeft.x;
-      let finalHeight = _topLeft.y - _bottomRight.y;
+      const finalWidth = _bottomRight.x - _topLeft.x;
+      const finalHeight = _topLeft.y - _bottomRight.y;
       this._video.setFrame(_topLeft.x, canvas_height - _topLeft.y, finalWidth, finalHeight);
       this._forceUpdate = false;
     }

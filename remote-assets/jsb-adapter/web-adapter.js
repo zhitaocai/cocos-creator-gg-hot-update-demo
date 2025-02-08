@@ -572,15 +572,18 @@ function fireTimeout(nowMilliSeconds) {
     if (info && info.cb) {
       if (nowMilliSeconds - info.start >= info.delay) {
         // console.log(`fireTimeout: id ${id}, start: ${info.start}, delay: ${info.delay}, now: ${nowMilliSeconds}`);
+        if (info.isRepeat) {
+          info.start = nowMilliSeconds;
+        } else {
+          // The delete operation should be performed before the timeout callback.
+          // This is because if an error occurs during the timeout callback,
+          // it could be triggered indefinitely, leading to a game freeze.
+          delete _timeoutInfos[id];
+        }
         if (typeof info.cb === 'string') {
           Function(info.cb)();
         } else if (typeof info.cb === 'function') {
           info.cb.apply(info.target, info.args);
-        }
-        if (info.isRepeat) {
-          info.start = nowMilliSeconds;
-        } else {
-          delete _timeoutInfos[id];
         }
       }
     }
@@ -688,12 +691,6 @@ for (const key in jsbWindow) {
   if (globalThis[key] === undefined) {
     globalThis[key] = jsbWindow[key];
   }
-}
-
-// In the openharmony platform, XMLHttpRequest is not undefined, but there are problems to using it.
-// So the native implementation is forced to be used.
-if (window.oh && typeof globalThis.XMLHttpRequest !== 'undefined') {
-  globalThis.XMLHttpRequest = jsbWindow.XMLHttpRequest;
 }
 if (typeof globalThis.window === 'undefined') {
   globalThis.window = globalThis;
