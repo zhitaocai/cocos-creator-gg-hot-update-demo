@@ -399,7 +399,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "60cafqlu/RMSbYDF602AVb2", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "72ba4d/erRJgK7w7WGERAS7", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -615,6 +615,22 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._curConcurrentTaskCount = 0;
           this._state = GGHotUpdateInstanceState.Idle;
           this._resetDownloadInfo();
+        }
+
+        /**
+         * 递归创建所有父目录
+         *
+         * @param filePath 目标文件路径
+         */
+        _createParentDirs(filePath) {
+          // 获取目标路径的目录部分
+          const dirPath = path.dirname(filePath);
+          if (!native.fileUtils.isDirectoryExist(dirPath)) {
+            // 如果父目录不存在，递归创建所有父目录
+            this._createParentDirs(dirPath);
+            // 创建当前目录
+            native.fileUtils.createDirectory(dirPath);
+          }
         }
 
         /**
@@ -869,6 +885,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
                 this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
               }
             };
+            this._createParentDirs(this._projectManifestDownloadPath);
             this._downloader.createDownloadTask(this._projectManifesetRemoteUrl, this._projectManifestDownloadPath);
           }).catch(error => {
             {
@@ -1096,6 +1113,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           while (this._downloadTasks.length > 0 && this._curConcurrentTaskCount < this._option.downloadMaxConcurrentTask) {
             this._curConcurrentTaskCount++;
             const task = this._downloadTasks.shift();
+            this._createParentDirs(task.storagePath);
             this._downloader.createDownloadTask(task.requestURL, task.storagePath, task.identifier);
           }
         }
@@ -1198,7 +1216,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "0e940noKu5K+JnDCp7SLSm7", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "d6c6cyxGKNJCIohWAOoXIH/", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1356,7 +1374,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "d9a76Lu9d1A6r+rPZXS9iiN", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "bc74dYQNrtD0Ig3oXKDg8SS", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1408,7 +1426,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "8b867TT2UNCIa+QIacr9nRB", "GGLogger", undefined);
+      cclegacy._RF.push({}, "99806g1FH5MvLQ45S4pTNkn", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1475,7 +1493,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "709fcozolhHnrDIHKJ4BGnn", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "4f3aao4f/NGaqlRJw8ADKeO", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
