@@ -665,7 +665,7 @@
   },
   {
     "__type__": "cc.PrefabInstance",
-    "fileId": "fcZoHtIuNN3IKJGvZ6HhTj",
+    "fileId": "25NWR5sqZAAbgWD2b/FeYN",
     "prefabRootNode": null,
     "mountedChildren": [],
     "mountedComponents": [],
@@ -693,7 +693,7 @@
     "propertyPath": [
       "_name"
     ],
-    "value": "HotUpdateProgressComponent"
+    "value": "UIHotUpdateProgress"
   },
   {
     "__type__": "cc.TargetInfo",
