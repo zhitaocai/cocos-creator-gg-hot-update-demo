@@ -7,6 +7,7 @@
         "resources"
     ],
     "uuids": [
+        "0896e3716",
         "08d3b1e6-01b5-415d-9c5e-f6d598649faf",
         "3184b7d3-ec29-49a0-a9be-17c0665f7350",
         "6d7b0e33-8a32-401e-8f50-c7a3cbeb6d04",
@@ -49,7 +50,14 @@
         "db://assets/main/scenes/HotUpdateScene.scene": "08d3b1e6-01b5-415d-9c5e-f6d598649faf",
         "db://assets/main/scenes/LobbyScene.scene": "3184b7d3-ec29-49a0-a9be-17c0665f7350"
     },
-    "packs": {},
+    "packs": {
+        "0896e3716": [
+            "08d3b1e6-01b5-415d-9c5e-f6d598649faf",
+            "3184b7d3-ec29-49a0-a9be-17c0665f7350",
+            "b0b159ee-3162-4b4d-bf53-dc7a802860d0",
+            "fd8ec536-a354-4a17-9c74-4f3883c378c8"
+        ]
+    },
     "versions": {
         "import": [],
         "native": []

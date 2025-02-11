@@ -328,35 +328,6 @@ System.register("chunks:///_virtual/GameSceneConfig.ts", ['cc', './GameBundleCon
   };
 });
 
-System.register("chunks:///_virtual/GameVersionComponent.ts", ['cc', './GameVersionConfig.ts'], function (exports) {
-  var cclegacy, Label, Component, _decorator, GameVersionConfig;
-  return {
-    setters: [function (module) {
-      cclegacy = module.cclegacy;
-      Label = module.Label;
-      Component = module.Component;
-      _decorator = module._decorator;
-    }, function (module) {
-      GameVersionConfig = module.GameVersionConfig;
-    }],
-    execute: function () {
-      var _dec, _class;
-      cclegacy._RF.push({}, "848ceDJq4hAP74g61G6HAXz", "GameVersionComponent", undefined);
-      const {
-        ccclass,
-        property,
-        requireComponent
-      } = _decorator;
-      let GameVersionComponent = exports('GameVersionComponent', (_dec = requireComponent(Label), ccclass(_class = _dec(_class = class GameVersionComponent extends Component {
-        onLoad() {
-          this.getComponent(Label).string = "v" + GameVersionConfig.gameVersionName;
-        }
-      }) || _class) || _class));
-      cclegacy._RF.pop();
-    }
-  };
-});
-
 System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exports) {
   var cclegacy;
   return {
@@ -399,7 +370,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "72ba4d/erRJgK7w7WGERAS7", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "3c5cb/e9upIBJy5GhyYGxld", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -1216,7 +1187,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "d6c6cyxGKNJCIohWAOoXIH/", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "c8d1d9g3ZVC2JZfAM9IDoWB", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1374,7 +1345,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "bc74dYQNrtD0Ig3oXKDg8SS", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "3dc28gGBl9K4ZWk/1h+xXaM", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1426,7 +1397,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "99806g1FH5MvLQ45S4pTNkn", "GGLogger", undefined);
+      cclegacy._RF.push({}, "8aac0uRoctHabeHxeu0x0Ja", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1493,7 +1464,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "4f3aao4f/NGaqlRJw8ADKeO", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "545cc7oxohE97ciARUqB5SN", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
@@ -1853,7 +1824,7 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
   };
 });
 
-System.register("chunks:///_virtual/main", ['./GameVersionComponent.ts', './UIHotUpdateProgress.ts', './UILoading.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
+System.register("chunks:///_virtual/main", ['./UIGameVersionName.ts', './UIHotUpdateProgress.ts', './UILoading.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
   return {
     setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
     execute: function () {}
@@ -2287,6 +2258,35 @@ System.register("chunks:///_virtual/SubGameListItem.ts", ['./rollupPluginModLoBa
           return null;
         }
       }), _class2)) || _class));
+      cclegacy._RF.pop();
+    }
+  };
+});
+
+System.register("chunks:///_virtual/UIGameVersionName.ts", ['cc', './GameVersionConfig.ts'], function (exports) {
+  var cclegacy, Label, Component, _decorator, GameVersionConfig;
+  return {
+    setters: [function (module) {
+      cclegacy = module.cclegacy;
+      Label = module.Label;
+      Component = module.Component;
+      _decorator = module._decorator;
+    }, function (module) {
+      GameVersionConfig = module.GameVersionConfig;
+    }],
+    execute: function () {
+      var _dec, _class;
+      cclegacy._RF.push({}, "848ceDJq4hAP74g61G6HAXz", "UIGameVersionName", undefined);
+      const {
+        ccclass,
+        property,
+        requireComponent
+      } = _decorator;
+      let UIGameVersionName = exports('UIGameVersionName', (_dec = requireComponent(Label), ccclass(_class = _dec(_class = class UIGameVersionName extends Component {
+        onLoad() {
+          this.getComponent(Label).string = "v" + GameVersionConfig.gameVersionName;
+        }
+      }) || _class) || _class));
       cclegacy._RF.pop();
     }
   };
