@@ -70,7 +70,7 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
             this.hpProgressComp.node.active = true;
             ggHotUpdateManager.init({
               enableLog: DEBUG,
-              packageUrl: `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/main/remote-assets`
+              packageUrl: `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/remote-assets`
             });
           }
         }
@@ -370,7 +370,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "3c5cb/e9upIBJy5GhyYGxld", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "90fcf7U5ShGpqR8GaBTb7Fe", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -1138,6 +1138,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
                 if (dstPath[dstPath.length - 1] == "/") {
                   native.fileUtils.createDirectory(dstPath);
                 } else {
+                  this._createParentDirs(dstPath);
                   if (native.fileUtils.isFileExist(dstPath)) {
                     native.fileUtils.removeFile(dstPath);
                   }
@@ -1187,7 +1188,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "c8d1d9g3ZVC2JZfAM9IDoWB", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "36535dN0btNeKjt/sIx0dUg", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1345,7 +1346,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "3dc28gGBl9K4ZWk/1h+xXaM", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "9fa78mqN15CtL0GC7tE0iRj", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1397,7 +1398,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "8aac0uRoctHabeHxeu0x0Ja", "GGLogger", undefined);
+      cclegacy._RF.push({}, "27c6bBp22ROAbZScFSgMYHm", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1464,7 +1465,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "545cc7oxohE97ciARUqB5SN", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "e0f2bJe1d1BMJDsL0hQxcvw", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
