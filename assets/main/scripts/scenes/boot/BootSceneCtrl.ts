@@ -21,7 +21,7 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
             this.hpProgressComp.node.active = true;
             ggHotUpdateManager.init({
                 enableLog: DEBUG,
-                packageUrl: `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/main/remote-assets`,
+                packageUrl: `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/remote-assets`,
             });
         } else {
             this.hpProgressComp.node.active = false;
