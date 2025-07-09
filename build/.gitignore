@@ -1,0 +1,13 @@
+# Android
+**/android/assets
+**/android/data/
+**/android/proj/
+**/android/cocos.compile.config.json
+**/android/data-gg-hot-update.zip
+
+# iOS
+**/ios/assets
+**/ios/data/
+**/ios/proj/
+**/ios/cocos.compile.config.json
+**/ios/data-gg-hot-update.zip

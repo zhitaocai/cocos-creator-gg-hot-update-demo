@@ -1,4 +1,4 @@
-import { _decorator, Component } from "cc";
+import { _decorator, Component, sys } from "cc";
 import { DEBUG, JSB } from "cc/env";
 import { GGHotUpdateInstance, GGHotUpdateInstanceObserver } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateInstance";
 import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateManager";
@@ -19,9 +19,18 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
     protected onLoad(): void {
         if (JSB) {
             this.hpProgressComp.node.active = true;
+            let packageUrl = "";
+            switch (sys.os) {
+                case sys.OS.IOS:
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/android/data-gg-hot-update`;
+                    break;
+                case sys.OS.ANDROID:
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/ios/data-gg-hot-update`;
+                    break;
+            }
             ggHotUpdateManager.init({
                 enableLog: DEBUG,
-                packageUrl: `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/remote-assets`,
+                packageUrl: packageUrl,
             });
         } else {
             this.hpProgressComp.node.active = false;
