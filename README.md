@@ -1,7 +1,7 @@
 # cocos-creator-gg-hot-update-demo
 
 [![](https://img.shields.io/badge/更新日志/CHANGELOG-orange.svg)](./CHANGELOG.md)
-[![](https://img.shields.io/badge/Cocos%20Creator-3.8.5-green.svg)](http://www.cocos.com/creator)
+[![](https://img.shields.io/badge/Cocos%20Creator-3.8.6-green.svg)](http://www.cocos.com/creator)
 
 > -   查阅 [插件商店地址](https://store.cocos.com/app/detail/6756)
 > -   查阅 [插件官方文档](https://www.yuque.com/dhunterstudio/mydoid/qshphh)
