@@ -353,7 +353,7 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
         /**
          * 游戏版本名（每次发布都要更新）
          */
-        gameVersionName: "3.0.0"
+        gameVersionName: "3.1.3"
       });
       cclegacy._RF.pop();
     }
@@ -380,7 +380,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "11f61rDZP9KF5uTTO7VhLB6", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "3540aEo34pD76wsCpycBGQE", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -571,6 +571,22 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this.downloadFailedFiles = [];
           this._downloadSpeed = 0;
           this._downloadRemainTimeInSecond = -1;
+          /**
+           * 上次计算下载速度时的累计下载字节数(Bytes)
+           */
+          this._lastDownloadedBytes = 0;
+          /**
+           * 上次计算下载速度时的时间戳(ms)
+           */
+          this._lastSpeedUpdateTimeInMs = 0;
+          /**
+           * 上次回调下载进度的时间戳(ms)
+           */
+          this._lastCallBackUpdateTimeInMs = 0;
+          /**
+           * 实例是否已经销毁
+           */
+          this._destroyed = false;
           this.name = name;
           this._option = option;
           this._remoteRootUrl = remoteRootUrl;
@@ -592,9 +608,13 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._localProjectManifest = null;
           this._remoteProjectManifest = null;
           this._downloader = new native.Downloader();
+          this._downloader.onProgress = this._onProgress.bind(this);
+          this._downloader.onError = this._onError.bind(this);
+          this._downloader.onSuccess = this._onSuccess.bind(this);
           this._downloadTasks = [];
           this._curConcurrentTaskCount = 0;
           this._state = GGHotUpdateInstanceState.Idle;
+          this._destroyed = false;
           this._resetDownloadInfo();
         }
 
@@ -646,6 +666,164 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           });
         }
 
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 下载监听
+
+        _onProgress(task, bytesReceived, totalBytesReceived, totalBytesExpected) {
+          // 实例已经销毁，结束
+          if (this._destroyed) {
+            return;
+          }
+
+          // 处理 project.manifest 的下载进度
+          if (task.requestURL == this._projectManifesetRemoteUrl) {
+            return;
+          }
+
+          // 处理 热更新差异文件 的下载进度
+
+          // 更新下载进度
+          this._downloadedBytes += bytesReceived;
+          let curTime = Date.now();
+
+          // 计算下载速度（间隔一段时间在计算，避免短时间内多次计算，值波动范围过大，导致数据失真，失去参考意义）
+          if (curTime - this._lastSpeedUpdateTimeInMs >= this._option.downloadSpeedCalculationIntervalInMs) {
+            if (this._lastSpeedUpdateTimeInMs == 0) {
+              // 首次下载进度回调，是没有上次下载进度记录的，所以此时下载速度和剩余时间重置
+              this._downloadSpeed = 0;
+              this._downloadRemainTimeInSecond = -1;
+            } else {
+              // 二次或后续下载进度回调时，存在上次下载进度记录，所以可以比较计算此时下载速度和剩余时间
+              this._downloadSpeed = (this._downloadedBytes - this._lastDownloadedBytes) / ((curTime - this._lastSpeedUpdateTimeInMs) / 1000);
+              this._downloadRemainTimeInSecond = Math.round((this._totalBytes - this._downloadedBytes) / this._downloadSpeed);
+            }
+            this._lastDownloadedBytes = this._downloadedBytes;
+            this._lastSpeedUpdateTimeInMs = curTime;
+          }
+
+          // 外部下载进度回调（间隔一段时间之后在回调）
+          if (curTime - this._lastCallBackUpdateTimeInMs >= this._option.downloadProgressCallBackIntervalInMs) {
+            this._lastCallBackUpdateTimeInMs = curTime;
+            {
+              let info = "热更新：下载中";
+              info += ` 总字节数：${this._totalBytes}`;
+              info += ` 已下载字节数: ${this._downloadedBytes}`;
+              info += ` 总下载文件数：${this._totalFiles}`;
+              info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+              info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
+              info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
+              info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
+              info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
+              this._debug(info);
+            }
+            this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+          }
+        }
+        _onError(task, errorCode, errorCodeInternal, errorStr) {
+          // 实例已经销毁，结束
+          if (this._destroyed) {
+            return;
+          }
+
+          // 处理 project.manifest 的下载失败
+          if (task.requestURL == this._projectManifesetRemoteUrl) {
+            this._error(`检查更新：下载远程 project.manifest：失败`);
+            this._error(`检查更新：失败`);
+            this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError);
+            return;
+          }
+
+          // 处理 热更新差异文件 的下载失败
+
+          // 收集下载失败任务
+          this.downloadFailedFiles.push(task);
+
+          // 更新下载进度
+          this._debug(`热更新：文件下载失败：${task.requestURL} 下载失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr} 当前累计下载失败文件数量：${this.downloadFailedFiles.length}`);
+          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+
+          // 处理结果
+          this._handleDownloadResult();
+        }
+        _onSuccess(task) {
+          // 实例已经销毁，结束
+          if (this._destroyed) {
+            return;
+          }
+
+          // 处理 project.manifest 的下载成功
+          if (task.requestURL == this._projectManifesetRemoteUrl) {
+            this._debug(`检查更新：下载远程 project.manifest：成功`);
+
+            // 解析已经下载下来的 project.manifest
+            try {
+              if (native.fileUtils.isFileExist(task.storagePath)) {
+                this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(task.storagePath));
+              }
+            } catch (error) {
+              this._error(error);
+            }
+            if (this._remoteProjectManifest == null) {
+              this._error(`检查更新：解析远程 project.manifest 失败。下载地址： ${task.requestURL} 本地存储地址：${task.storagePath}`);
+              this._error(`检查更新：失败`);
+              this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError);
+              return;
+            }
+
+            // 对比本地最新 project.manifest 和远程 project.manifest，将需要下载的文件标记一下，并保存到本地（以方便后面断点续传）
+            let hasDiff = false;
+            Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
+              const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
+              const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
+              const assetNeed2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
+              if (assetNeed2Update) {
+                // 标记此文件需要下载
+                remoteAssetInfo.state = ProjectManifestAssetUpdateState.Idle;
+                hasDiff = true;
+              }
+            });
+            if (hasDiff) {
+              // 如果比较后，存在差异文件需要下载，那么
+              this._debug(`检查更新：成功，发现新版本`);
+
+              // 1. 将有待下载文件的信息写回到本地，方便后面恢复下载
+              native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), task.storagePath);
+
+              // 2. 重新计算下载信息
+              this._reCalculateDownloadInfo();
+
+              // 3. 返回新版本
+              this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
+            } else {
+              // 如果比较后，没有差异文件需要下载，那么返回已经更新到最新
+              this._debug(`检查更新：成功，发现不同远端版本，但和当前本地版本没有文件差异，因此当前已经是最新版本`);
+
+              // 释放文件json内存
+              this._localProjectManifest = null;
+              this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
+            }
+            return;
+          }
+          // 处理 热更新差异文件 的下载成功
+
+          // 收集下载成功任务
+          this.downloadSucFiles.push(task);
+
+          // 更新下载进度
+          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+
+          // 标记文件下载成功，并保存到本地，方便恢复任务
+          if (this._remoteProjectManifest) {
+            this._remoteProjectManifest.assets[task.identifier].state = ProjectManifestAssetUpdateState.Suc;
+            native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), this._projectManifestDownloadPath);
+          }
+
+          // 处理结果
+          this._handleDownloadResult();
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         /**
          * 销毁实例
          *
@@ -653,17 +831,15 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
          * 2. 实例销毁的一般应用场合为，主包已经完成了热更新，在重启游戏之前，进行销毁
          */
         destroy() {
+          // 标记实例已经被销毁
+          this._destroyed = true;
+
           // 移除所有外部观察者
           this.unregisterAll();
 
           // 重置属性
           this._remoteProjectManifest = null;
           this._localProjectManifest = null;
-
-          // 移除下载回调监听
-          this._downloader.onError = null;
-          this._downloader.onProgress = null;
-          this._downloader.onSuccess = null;
 
           // 重置状态信息
           this._state = GGHotUpdateInstanceState.Idle;
@@ -827,64 +1003,6 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
               native.fileUtils.removeFile(this._projectManifestDownloadPath);
             }
             this._debug(`检查更新：下载远程 project.manifest：开始，下载地址：${this._projectManifesetRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
-            this._downloader.onError = (task, errorCode, errorCodeInternal, errorStr) => {
-              // 处理下载失败
-              this._error(`检查更新：下载远程 project.manifest：失败`);
-              this._error(`检查更新：失败`);
-              this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError);
-            };
-            this._downloader.onSuccess = task => {
-              // 处理下载成功
-              this._debug(`检查更新：下载远程 project.manifest：成功`);
-
-              // 解析已经下载下来的 project.manifest
-              try {
-                if (native.fileUtils.isFileExist(task.storagePath)) {
-                  this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(task.storagePath));
-                }
-              } catch (error) {
-                this._error(error);
-              }
-              if (this._remoteProjectManifest == null) {
-                this._error(`检查更新：解析远程 project.manifest 失败。下载地址： ${task.requestURL} 本地存储地址：${task.storagePath}`);
-                this._error(`检查更新：失败`);
-                this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError);
-                return;
-              }
-
-              // 对比本地最新 project.manifest 和远程 project.manifest，将需要下载的文件标记一下，并保存到本地（以方便后面断点续传）
-              let hasDiff = false;
-              Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
-                const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
-                const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
-                const assetNeed2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
-                if (assetNeed2Update) {
-                  // 标记此文件需要下载
-                  remoteAssetInfo.state = ProjectManifestAssetUpdateState.Idle;
-                  hasDiff = true;
-                }
-              });
-              if (hasDiff) {
-                // 如果比较后，存在差异文件需要下载，那么
-                this._debug(`检查更新：成功，发现新版本`);
-
-                // 1. 将有待下载文件的信息写回到本地，方便后面恢复下载
-                native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), task.storagePath);
-
-                // 2. 重新计算下载信息
-                this._reCalculateDownloadInfo();
-
-                // 3. 返回新版本
-                this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
-              } else {
-                // 如果比较后，没有差异文件需要下载，那么返回已经更新到最新
-                this._debug(`检查更新：成功，发现不同远端版本，但和当前本地版本没有文件差异，因此当前已经是最新版本`);
-
-                // 释放文件json内存
-                this._localProjectManifest = null;
-                this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
-              }
-            };
             this._createParentDirs(this._projectManifestDownloadPath);
             this._downloader.createDownloadTask(this._projectManifesetRemoteUrl, this._projectManifestDownloadPath);
           }).catch(error => {
@@ -1000,78 +1118,10 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           }
           this._debug(`热更新：当前共计 ${this._downloadTasks.length} 个下载任务`);
 
-          // 上次计算下载速度时，累计下载字节数(Bytes)
-          let lastDownloadedBytes = 0;
-          // 上次计算下载速度时，时间戳(ms)
-          let lastSpeedUpdateTimeInMs = 0;
-          // 上次外部下载进度回调的时间戳(ms)
-          let lastCallBackUpdateTimeInMs = Date.now();
-          this._downloader.onProgress = (task, bytesReceived, totalBytesReceived, totalBytesExpected) => {
-            // 更新下载进度
-            this._downloadedBytes += bytesReceived;
-            let curTime = Date.now();
-
-            // 计算下载速度（间隔一段时间在计算，避免短时间内多次计算，值波动范围过大，导致数据失真，失去参考意义）
-            if (curTime - lastSpeedUpdateTimeInMs >= this._option.downloadSpeedCalculationIntervalInMs) {
-              if (lastSpeedUpdateTimeInMs == 0) {
-                // 首次下载进度回调，是没有上次下载进度记录的，所以此时下载速度和剩余时间重置
-                this._downloadSpeed = 0;
-                this._downloadRemainTimeInSecond = -1;
-              } else {
-                // 二次或后续下载进度回调时，存在上次下载进度记录，所以可以比较计算此时下载速度和剩余时间
-                this._downloadSpeed = (this._downloadedBytes - lastDownloadedBytes) / ((curTime - lastSpeedUpdateTimeInMs) / 1000);
-                this._downloadRemainTimeInSecond = Math.round((this._totalBytes - this._downloadedBytes) / this._downloadSpeed);
-              }
-              lastDownloadedBytes = this._downloadedBytes;
-              lastSpeedUpdateTimeInMs = curTime;
-            }
-
-            // 外部下载进度回调（间隔一段时间之后在回调）
-            if (curTime - lastCallBackUpdateTimeInMs >= this._option.downloadProgressCallBackIntervalInMs) {
-              lastCallBackUpdateTimeInMs = curTime;
-              {
-                let info = "热更新：下载中";
-                info += ` 总字节数：${this._totalBytes}`;
-                info += ` 已下载字节数: ${this._downloadedBytes}`;
-                info += ` 总下载文件数：${this._totalFiles}`;
-                info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-                info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-                info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
-                info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
-                info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
-                this._debug(info);
-              }
-              this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
-            }
-          };
-          this._downloader.onSuccess = task => {
-            // 收集下载成功任务
-            this.downloadSucFiles.push(task);
-
-            // 更新下载进度
-            this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
-
-            // 标记文件下载成功，并保存到本地，方便恢复任务
-            if (this._remoteProjectManifest) {
-              this._remoteProjectManifest.assets[task.identifier].state = ProjectManifestAssetUpdateState.Suc;
-              native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), this._projectManifestDownloadPath);
-            }
-
-            // 处理结果
-            this._handleDownloadResult();
-          };
-          this._downloader.onError = (task, errorCode, errorCodeInternal, errorStr) => {
-            // 收集下载失败任务
-            this.downloadFailedFiles.push(task);
-
-            // 更新下载进度
-            this._debug(`热更新：文件下载失败：${task.requestURL} 下载失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr} 当前累计下载失败文件数量：${this.downloadFailedFiles.length}`);
-            this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
-
-            // 处理结果
-            this._handleDownloadResult();
-          };
           // 启动下载
+          this._lastDownloadedBytes = 0;
+          this._lastSpeedUpdateTimeInMs = 0;
+          this._lastCallBackUpdateTimeInMs = Date.now();
           this._nextDownload();
         }
         _handleDownloadResult() {
@@ -1217,7 +1267,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "43040AqZvZDMK44cygT09MH", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "7f597L3B91L64bdL6wIX0Rc", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1375,7 +1425,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "708788l4DtK7Y/D+mM7Wags", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "b6418SvSClKv5WflGWvPMBS", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1427,7 +1477,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "93889DHdo9CiaHhm7xeEJp3", "GGLogger", undefined);
+      cclegacy._RF.push({}, "ea39b4vntdCkpvhUXjerpaA", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1494,7 +1544,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "0c876TMd11HlKM1gqLFQ7Jk", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "f8162Ke64xBNZ9YTuUHn90p", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *

@@ -1,0 +1,117 @@
+{
+  "name": "cocos-creator-gg-hot-update-demo",
+  "server": "",
+  "platform": "ios",
+  "buildPath": "project://build",
+  "debug": true,
+  "buildMode": "normal",
+  "mangleProperties": false,
+  "md5Cache": false,
+  "skipCompressTexture": false,
+  "sourceMaps": false,
+  "overwriteProjectSettings": {
+    "macroConfig": {
+      "cleanupImageCache": "inherit-project-setting"
+    },
+    "includeModules": {
+      "physics": "inherit-project-setting",
+      "physics-2d": "inherit-project-setting",
+      "gfx-webgl2": "off"
+    }
+  },
+  "nativeCodeBundleMode": "asmjs",
+  "polyfills": {
+    "asyncFunctions": false
+  },
+  "experimentalEraseModules": false,
+  "startSceneAssetBundle": false,
+  "bundleConfigs": [],
+  "inlineEnum": true,
+  "useBuiltinServer": false,
+  "md5CacheOptions": {
+    "excludes": [],
+    "includes": [],
+    "replaceOnly": [],
+    "handleTemplateMd5Link": true
+  },
+  "mainBundleIsRemote": false,
+  "mainBundleCompressionType": "merge_dep",
+  "useSplashScreen": true,
+  "bundleCommonChunk": false,
+  "packAutoAtlas": true,
+  "startScene": "b0b159ee-3162-4b4d-bf53-dc7a802860d0",
+  "outputName": "ios",
+  "taskName": "ios",
+  "scenes": [
+    {
+      "url": "db://assets/bundle-game-a/scenes/GameScene.scene",
+      "uuid": "51bd49e5-b4e4-4e2b-a3e8-c65211ee26b1",
+      "bundle": "db://assets/bundle-game-a"
+    },
+    {
+      "url": "db://assets/bundle-game-b/scenes/GameScene.scene",
+      "uuid": "35f1db78-fa27-4bca-9ea2-43335efb844e",
+      "bundle": "db://assets/bundle-game-b"
+    },
+    {
+      "url": "db://assets/bundle-game-c/scenes/GameScene.scene",
+      "uuid": "ff0ec409-9efa-43b9-a2ed-a10af49bad19",
+      "bundle": "db://assets/bundle-game-c"
+    },
+    {
+      "url": "db://assets/bundle-game-d/scenes/GameScene.scene",
+      "uuid": "eac29135-4457-465e-a966-10a8161d0c64",
+      "bundle": "db://assets/bundle-game-d"
+    },
+    {
+      "url": "db://assets/main/scenes/BootScene.scene",
+      "uuid": "b0b159ee-3162-4b4d-bf53-dc7a802860d0"
+    },
+    {
+      "url": "db://assets/main/scenes/HotUpdateScene.scene",
+      "uuid": "08d3b1e6-01b5-415d-9c5e-f6d598649faf"
+    },
+    {
+      "url": "db://assets/main/scenes/LobbyScene.scene",
+      "uuid": "3184b7d3-ec29-49a0-a9be-17c0665f7350"
+    }
+  ],
+  "wasmCompressionMode": false,
+  "packages": {
+    "ios": {
+      "executableName": "",
+      "packageName": "com.cocos.ios",
+      "renderBackEnd": {
+        "metal": true
+      },
+      "skipUpdateXcodeProject": true,
+      "orientation": {
+        "portrait": true,
+        "upsideDown": false,
+        "landscapeRight": false,
+        "landscapeLeft": false
+      },
+      "osTarget": {
+        "iphoneos": true,
+        "simulator": false
+      },
+      "targetVersion": "12.0",
+      "__version__": "1.0.1"
+    },
+    "native": {
+      "encrypted": false,
+      "xxteaKey": "56Caf/PQZKzqqeFw",
+      "compressZip": false,
+      "JobSystem": "none",
+      "__version__": "1.0.2"
+    },
+    "gg-hot-update": {
+      "enable": true,
+      "configPath": "gg-hot-update-config.json",
+      "__version__": "3.1.0"
+    }
+  },
+  "__version__": "1.3.9",
+  "logDest": "project://temp/builder/log/ios7-8-2025 16-04.log",
+  "engineModulesConfigKey": "migrationsConfig"
+}
