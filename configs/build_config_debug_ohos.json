@@ -79,6 +79,13 @@
   ],
   "wasmCompressionMode": false,
   "packages": {
+    "native": {
+      "encrypted": false,
+      "xxteaKey": "1dmIQGyZFC/439/e",
+      "compressZip": false,
+      "JobSystem": "none",
+      "__version__": "1.0.2"
+    },
     "ohos": {
       "packageName": "com.gg.hotupdate.demo",
       "apiLevel": "5",
@@ -90,12 +97,9 @@
       },
       "__version__": "1.0.0"
     },
-    "native": {
-      "encrypted": false,
-      "xxteaKey": "1dmIQGyZFC/439/e",
-      "compressZip": false,
-      "JobSystem": "none",
-      "__version__": "1.0.2"
+    "gg-hot-update": {
+      "enable": true,
+      "configPath": "gg-hot-update-config.json"
     }
   },
   "__version__": "1.3.9",

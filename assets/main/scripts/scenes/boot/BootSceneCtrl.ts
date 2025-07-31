@@ -27,6 +27,9 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                 case sys.OS.ANDROID:
                     packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/ios/data-gg-hot-update`;
                     break;
+                case sys.OS.OPENHARMONY:
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/harmonyos-next/data-gg-hot-update`;
+                    break;
             }
             ggHotUpdateManager.init({
                 enableLog: DEBUG,
