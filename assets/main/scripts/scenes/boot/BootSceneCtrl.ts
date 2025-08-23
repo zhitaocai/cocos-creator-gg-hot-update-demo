@@ -3,22 +3,22 @@ import { DEBUG, JSB } from "cc/env";
 import { GGHotUpdateInstance, GGHotUpdateInstanceObserver } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateInstance";
 import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateManager";
 import { GGHotUpdateInstanceEnum, GGHotUpdateInstanceState } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
-import { UIHotUpdateProgress } from "../../components/UIHotUpdateProgress";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { sceneRouter } from "../../framework/scene/SceneRouter";
 const { ccclass, property } = _decorator;
-
+/**
+ * 启动场景 热更新 主逻辑 控制
+ *
+ * @author caizhitao
+ * @created 2025-08-23 22:04:18
+ */
 @ccclass
 export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObserver {
-    @property({ type: UIHotUpdateProgress, tooltip: "热更新进度组件" })
-    hpProgressComp: UIHotUpdateProgress | null = null;
-
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 生命周期处理
 
     protected onLoad(): void {
         if (JSB) {
-            this.hpProgressComp.node.active = true;
             let packageUrl = "";
             switch (sys.os) {
                 case sys.OS.IOS:
@@ -32,14 +32,11 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                 enableLog: DEBUG,
                 packageUrl: packageUrl,
             });
-        } else {
-            this.hpProgressComp.node.active = false;
         }
     }
 
     protected onEnable(): void {
         if (JSB) {
-            this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
             ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).register(this);
             ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).checkUpdate();
         } else {
@@ -84,7 +81,6 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
     private _hotUpdateRetryIntervalInSecond = 5;
 
     onGGHotUpdateInstanceCallBack(instance: GGHotUpdateInstance): void {
-        this.hpProgressComp.updateState(instance.state);
         switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
                 break;
@@ -135,13 +131,8 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                 // 检查更新成功，但没有发现新版本，跳过热更新
                 this._enterLobbyScene();
                 break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress: {
-                // 热更新：下载中
-                if (this.hpProgressComp) {
-                    this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
-                }
+            case GGHotUpdateInstanceState.HotUpdateInProgress:
                 break;
-            }
             case GGHotUpdateInstanceState.HotUpdateSuc: {
                 // 热更新：成功，重启游戏
                 // 等一小段时间在重启
