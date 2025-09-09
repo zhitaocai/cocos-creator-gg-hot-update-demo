@@ -1,9 +1,15 @@
 {
-  /* Base configuration. Do not edit this field. */
-  "extends": "./temp/tsconfig.cocos.json",
+    /* Base configuration. Do not edit this field. */
+    "extends": "./temp/tsconfig.cocos.json",
 
-  /* Add your custom configuration here. */
-  "compilerOptions": {
-    "strict": false
-  }
+    /* Add your custom configuration here. */
+    "compilerOptions": {
+        "strict": false,
+        
+        /* 允许对不包含默认导出的模块使用默认导入。这个选项不会影响生成的代码，只会影响类型检查。 */
+        /* see https://ts.xcatliu.com/engineering/compiler-options.html */
+        "allowSyntheticDefaultImports": true,
+
+        "lib": ["es2015", "es2017", "dom"]
+    }
 }
