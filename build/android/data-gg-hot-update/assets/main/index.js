@@ -43,7 +43,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         /**
          * 游戏版本名（每次发布都要更新）
          */
-        gameVersionName: "4.0.0.xx"
+        gameVersionName: "4.0.0"
       };
       cclegacy._RF.pop();
       var _dec, _class;
@@ -1763,11 +1763,11 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             let packageUrl = "";
             switch (sys.os) {
               case sys.OS.IOS:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/android/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/ios/data-gg-hot-update`;
                 break;
               case sys.OS.ANDROID:
-                // packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/ios/data-gg-hot-update`;
-                packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/android/data-gg-hot-update`;
+                // packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                 break;
             }
             ggHotUpdateManager.init({
