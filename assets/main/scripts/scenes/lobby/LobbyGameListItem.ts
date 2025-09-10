@@ -2,6 +2,7 @@ import { _decorator, Component, Label } from "cc";
 import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateManager";
 import { GGHotUpdateInstanceState } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
+import { HotUpdateBundleConfig } from "../../configs/HotUpdateBundleConfig";
 import { SceneConfig, sceneRouter } from "../../framework/scene/SceneRouter";
 import { hotUpdateSystem } from "../hotupdate/HotUpdateSystem";
 const { ccclass, property } = _decorator;
@@ -20,9 +21,9 @@ export interface LobbyGameListItemModel {
 @ccclass
 export class LobbyGameListItem extends Component {
     @property(Label)
-    gameName: Label = null;
+    gameName: Label = null!;
 
-    private _data: LobbyGameListItemModel = null;
+    private _data: LobbyGameListItemModel | null = null;
 
     bindData(data: LobbyGameListItemModel) {
         this._data = data;
@@ -30,6 +31,9 @@ export class LobbyGameListItem extends Component {
     }
 
     onClick() {
+        if (!this._data) {
+            return;
+        }
         // 如果
         //
         // * 待打开的子游戏bundle是需要热更新的bundle
@@ -37,7 +41,7 @@ export class LobbyGameListItem extends Component {
         //
         // 那么，想进入热更新加载场景，热更游戏，热更新完毕后再进入游戏场景，否则直接进入游戏常见
         if (
-            ggHotUpdateManager.isHotUpdateBundle(this._data.sceneConfig.bundleName) &&
+            HotUpdateBundleConfig.isHotUpdateBundle(this._data.sceneConfig.bundleName) &&
             ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate &&
             ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.HotUpdateSuc
         ) {

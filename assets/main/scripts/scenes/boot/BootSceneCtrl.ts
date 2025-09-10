@@ -5,7 +5,9 @@ import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/asse
 import { GGHotUpdateInstanceEnum, GGHotUpdateInstanceState } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { sceneRouter } from "../../framework/scene/SceneRouter";
+
 const { ccclass, property } = _decorator;
+
 /**
  * 启动场景 热更新 主逻辑 控制
  *
@@ -22,10 +24,11 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
             let packageUrl = "";
             switch (sys.os) {
                 case sys.OS.IOS:
-                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/android/data-gg-hot-update`;
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/android/data-gg-hot-update`;
                     break;
                 case sys.OS.ANDROID:
-                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/ios/data-gg-hot-update`;
+                    // packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/ios/data-gg-hot-update`;
+                    packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                     break;
             }
             ggHotUpdateManager.init({

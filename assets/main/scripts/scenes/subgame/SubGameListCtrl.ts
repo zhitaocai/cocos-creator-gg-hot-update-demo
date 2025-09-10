@@ -45,7 +45,7 @@ export class SubGameListCtrl extends Component {
 
     protected start(): void {
         // 根据实际屏幕大小，决定示例图的大小，以实现两列的效果
-        const gridLayout = this.itemParentNode.getComponent(Layout);
+        const gridLayout = this.itemParentNode.getComponent(Layout)!;
         const gridLayoutWidth = this.itemParentNode.getComponent(UITransform)!.width;
         const itemWidth = (gridLayoutWidth - gridLayout.paddingLeft - gridLayout.paddingRight - gridLayout.spacingX) / 2;
         gridLayout.cellSize = size(itemWidth, itemWidth);
@@ -59,7 +59,7 @@ export class SubGameListCtrl extends Component {
                 this.uiLoading.playHideAnim();
                 return;
             }
-            bundle.loadDir("textures", SpriteFrame, (error: Error, assets: SpriteFrame[]) => {
+            bundle.loadDir("textures", SpriteFrame, (error: Error | null, assets: SpriteFrame[]) => {
                 this.uiLoading.playHideAnim();
                 if (error) {
                     console.error(`load bundle textures failed: ${this.bundleName}`);

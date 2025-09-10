@@ -11,28 +11,28 @@ const { ccclass, property } = _decorator;
 @ccclass
 export class HotUpdateSceneCtrl extends Component implements GGHotUpdateInstanceObserver {
     @property(Label)
-    bundleNameLabel: Label = null;
+    bundleNameLabel: Label = null!;
 
     @property({ type: UIHotUpdateProgress, tooltip: "热更新进度组件" })
-    hpProgressComp: UIHotUpdateProgress | null = null;
+    hpProgressComp: UIHotUpdateProgress = null!;
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 组件生命周期处理
 
     protected onEnable(): void {
-        this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig.bundleName;
+        this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig!.bundleName;
 
         // 显示 loading
         this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
 
         // 检查更新
-        const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName);
+        const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig!.bundleName);
         instance.register(this);
         instance.checkUpdate();
     }
 
     protected onDisable(): void {
-        const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName);
+        const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig!.bundleName);
         instance.unregister(this);
         this.unscheduleAllCallbacks();
     }

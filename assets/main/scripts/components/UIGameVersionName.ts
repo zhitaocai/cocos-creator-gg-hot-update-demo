@@ -6,6 +6,6 @@ const { ccclass, property, requireComponent } = _decorator;
 @requireComponent(Label)
 export class UIGameVersionName extends Component {
     protected onLoad(): void {
-        this.getComponent(Label).string = "v" + GameVersionConfig.gameVersionName;
+        this.getComponent(Label)!.string = "v" + GameVersionConfig.gameVersionName;
     }
 }

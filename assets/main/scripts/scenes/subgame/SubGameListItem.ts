@@ -5,10 +5,10 @@ const { ccclass, property } = _decorator;
 @ccclass
 export class SubGameListItem extends Component {
     @property(Sprite)
-    sprite: Sprite = null;
+    sprite: Sprite = null!;
 
     setSpriteFrame(spriteFrame: SpriteFrame) {
         this.sprite.spriteFrame = spriteFrame;
-        this.sprite.getComponent(Sprite2DScaleAdapterComponent).updateSprite();
+        this.sprite.getComponent(Sprite2DScaleAdapterComponent)!.updateSprite();
     }
 }

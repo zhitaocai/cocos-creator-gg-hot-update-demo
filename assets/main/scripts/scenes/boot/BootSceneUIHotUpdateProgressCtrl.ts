@@ -15,7 +15,7 @@ const { ccclass, property } = _decorator;
 @ccclass
 export class BootSceneUIHotUpdateProgressCtrl extends Component implements GGHotUpdateInstanceObserver {
     @property({ type: UIHotUpdateProgress, tooltip: "热更新进度组件" })
-    hpProgressComp: UIHotUpdateProgress | null = null;
+    hpProgressComp: UIHotUpdateProgress = null!;
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 生命周期处理
