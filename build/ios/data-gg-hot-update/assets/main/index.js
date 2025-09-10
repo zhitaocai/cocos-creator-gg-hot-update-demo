@@ -1,42 +1,40 @@
-System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './env', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './UIHotUpdateProgress.ts', './GameSceneConfig.ts', './SceneRouter.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, _decorator, Component, sys, DEBUG, ggHotUpdateManager, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, UIHotUpdateProgress, GameSceneConfig, sceneRouter;
+System.register("chunks:///_virtual/BootSceneCtrl.ts", ['cc', './env', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GameSceneConfig.ts', './SceneRouter.ts'], function (exports) {
+  var cclegacy, Component, sys, _decorator, DEBUG, ggHotUpdateManager, GGHotUpdateInstanceEnum, GGHotUpdateInstanceState, GameSceneConfig, sceneRouter;
   return {
     setters: [function (module) {
-      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
-      _initializerDefineProperty = module.initializerDefineProperty;
-    }, function (module) {
       cclegacy = module.cclegacy;
-      _decorator = module._decorator;
       Component = module.Component;
       sys = module.sys;
+      _decorator = module._decorator;
     }, function (module) {
       DEBUG = module.DEBUG;
     }, function (module) {
       ggHotUpdateManager = module.ggHotUpdateManager;
     }, function (module) {
-      GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
       GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
-    }, function (module) {
-      UIHotUpdateProgress = module.UIHotUpdateProgress;
+      GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
     }, function (module) {
       sceneRouter = module.sceneRouter;
     }],
     execute: function () {
-      var _dec, _class, _class2, _descriptor;
+      var _class;
       cclegacy._RF.push({}, "5517bNtGaNJrJzFRELgHPkd", "BootSceneCtrl", undefined);
       const {
         ccclass,
         property
       } = _decorator;
-      let BootSceneCtrl = exports('BootSceneCtrl', (_dec = property({
-        type: UIHotUpdateProgress,
-        tooltip: "热更新进度组件"
-      }), ccclass(_class = (_class2 = class BootSceneCtrl extends Component {
+
+      /**
+       * 启动场景 热更新 主逻辑 控制
+       *
+       * @author caizhitao
+       * @created 2025-08-23 22:04:18
+       */
+      let BootSceneCtrl = exports('BootSceneCtrl', ccclass(_class = class BootSceneCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "hpProgressComp", _descriptor, this);
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
           // 监听 GG 热更新回调
           /**
@@ -66,16 +64,17 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
         }
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 生命周期处理
+
         onLoad() {
           {
-            this.hpProgressComp.node.active = true;
             let packageUrl = "";
             switch (sys.os) {
               case sys.OS.IOS:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/android/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/ios/data-gg-hot-update`;
                 break;
               case sys.OS.ANDROID:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v3/build/ios/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/android/data-gg-hot-update`;
+                // packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                 break;
             }
             ggHotUpdateManager.init({
@@ -86,7 +85,6 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
         }
         onEnable() {
           {
-            this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
             ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).register(this);
             ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).checkUpdate();
           }
@@ -97,7 +95,6 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
           }
         }
         onGGHotUpdateInstanceCallBack(instance) {
-          this.hpProgressComp.updateState(instance.state);
           switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
               break;
@@ -146,13 +143,7 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
               this._enterLobbyScene();
               break;
             case GGHotUpdateInstanceState.HotUpdateInProgress:
-              {
-                // 热更新：下载中
-                if (this.hpProgressComp) {
-                  this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
-                }
-                break;
-              }
+              break;
             case GGHotUpdateInstanceState.HotUpdateSuc:
               {
                 // 热更新：成功，重启游戏
@@ -193,6 +184,98 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['./rollupPluginModLoBabe
         }
         _enterLobbyScene() {
           sceneRouter.runSceneAsync(GameSceneConfig.LobbyScene);
+        }
+      }) || _class);
+      cclegacy._RF.pop();
+    }
+  };
+});
+
+System.register("chunks:///_virtual/BootSceneUIHotUpdateProgressCtrl.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './UIHotUpdateProgress.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, _decorator, Component, ggHotUpdateManager, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, UIHotUpdateProgress;
+  return {
+    setters: [function (module) {
+      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
+      _initializerDefineProperty = module.initializerDefineProperty;
+    }, function (module) {
+      cclegacy = module.cclegacy;
+      _decorator = module._decorator;
+      Component = module.Component;
+    }, function (module) {
+      ggHotUpdateManager = module.ggHotUpdateManager;
+    }, function (module) {
+      GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
+      GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
+    }, function (module) {
+      UIHotUpdateProgress = module.UIHotUpdateProgress;
+    }],
+    execute: function () {
+      var _dec, _class, _class2, _descriptor;
+      cclegacy._RF.push({}, "925d89ykyNIrIyEuDljmIe2", "BootSceneUIHotUpdateProgressCtrl", undefined);
+      const {
+        ccclass,
+        property
+      } = _decorator;
+
+      /**
+       * 启动场景 热更新进度UI 控制
+       *
+       * @author caizhitao
+       * @created 2025-08-23 20:10:10
+       */
+      let BootSceneUIHotUpdateProgressCtrl = exports('BootSceneUIHotUpdateProgressCtrl', (_dec = property({
+        type: UIHotUpdateProgress,
+        tooltip: "热更新进度组件"
+      }), ccclass(_class = (_class2 = class BootSceneUIHotUpdateProgressCtrl extends Component {
+        constructor(...args) {
+          super(...args);
+          _initializerDefineProperty(this, "hpProgressComp", _descriptor, this);
+        }
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 生命周期处理
+        onLoad() {
+          // 只有原生平台下才有热更新
+          // 因此我们控制只有原生平台下，才显示
+          {
+            this.node.active = true;
+          }
+        }
+        onEnable() {
+          this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
+
+          // 注册主包热更新监听
+          ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).register(this);
+        }
+        onDisable() {
+          // 注销主包热更新监听
+          ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).unregister(this);
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 监听 GG 热更新回调
+
+        onGGHotUpdateInstanceCallBack(instance) {
+          this.hpProgressComp.updateState(instance.state);
+          switch (instance.state) {
+            case GGHotUpdateInstanceState.Idle:
+            case GGHotUpdateInstanceState.CheckUpdateInProgress:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
+            case GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound:
+            case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
+              break;
+            case GGHotUpdateInstanceState.HotUpdateInProgress:
+              {
+                // 热更新：下载中
+                this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
+                break;
+              }
+            case GGHotUpdateInstanceState.HotUpdateSuc:
+            case GGHotUpdateInstanceState.HotUpdateFailed:
+              break;
+          }
         }
       }, _descriptor = _applyDecoratedDescriptor(_class2.prototype, "hpProgressComp", [_dec], {
         configurable: true,
@@ -353,7 +436,7 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
         /**
          * 游戏版本名（每次发布都要更新）
          */
-        gameVersionName: "3.1.3"
+        gameVersionName: "4.0.0"
       });
       cclegacy._RF.pop();
     }
@@ -361,13 +444,12 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
 });
 
 System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
-  var cclegacy, path, native, sys, DEBUG, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
+  var cclegacy, path, native, DEBUG, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
       path = module.path;
       native = module.native;
-      sys = module.sys;
     }, function (module) {
       DEBUG = module.DEBUG;
     }, function (module) {
@@ -380,7 +462,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "3540aEo34pD76wsCpycBGQE", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "31550RrFfZOSJ0hhUy+rms5", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -488,7 +570,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            */
           this._downloadRootDirPath = void 0;
           /**
-           * 远程 version.manifest 地址
+           * version.manifest 的远程地址
            *
            * e.g.
            *
@@ -496,9 +578,19 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *      * 主包: ``http://192.168.0.1:8080/1.0.0/version.manifest``
            *      * 子包: ``http://192.168.0.1:8080/1.0.0/assets/${bundleName}/version.manifest``
            */
-          this._versionManifesetRemoteUrl = void 0;
+          this._versionManifestRemoteUrl = void 0;
           /**
-           * 远程 project.manifest 地址
+           * version.manifeset 的本地下载路径
+           *
+           * e.g.
+           *
+           * * Android:
+           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/version.manifest``
+           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/version.manifest``
+           */
+          this._versionManifestDownloadPath = void 0;
+          /**
+           * project.manifest 的远程地址
            *
            * e.g.
            *
@@ -506,7 +598,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *      * 主包: ``http://192.168.0.1:8080/1.0.0/project.manifest``
            *      * 子包: ``http://192.168.0.1:8080/1.0.0/assets/${bundleName}/project.manifest``
            */
-          this._projectManifesetRemoteUrl = void 0;
+          this._projectManifestRemoteUrl = void 0;
           /**
            * project.manifeset 的本地搜索路径
            *
@@ -514,17 +606,17 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * * Android:
            *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update/project.manifest``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update/assets/${bundleName}/project.manifst``
+           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update/assets/${bundleName}/project.manifest``
            */
-          this._projectManifestLocalSearchPath = void 0;
+          this._projectManifestSearchPath = void 0;
           /**
            * project.manifeset 的本地下载路径
            *
            * e.g.
            *
            * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifst``
+           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest.gg``
+           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifest``
            */
           this._projectManifestDownloadPath = void 0;
           /**
@@ -538,7 +630,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            */
           this._projectManifestBuildInPaths = void 0;
           /**
-           * 本地 project.manifest 配置
+           * 本地 project.manifest 配置（搜索目录下）
            */
           this._localProjectManifest = void 0;
           /**
@@ -593,15 +685,17 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._searchRootDirPath = searchRootDirPath;
           this._downloadRootDirPath = path.join(this._searchRootDirPath + "-temp", this.name);
           if (this.name == GGHotUpdateInstanceEnum.BuildIn) {
-            this._versionManifesetRemoteUrl = `${this._remoteRootUrl}/version.manifest`;
-            this._projectManifesetRemoteUrl = `${this._remoteRootUrl}/project.manifest`;
-            this._projectManifestLocalSearchPath = path.join(this._searchRootDirPath, "project.manifest");
-            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest");
+            this._versionManifestRemoteUrl = `${this._remoteRootUrl}/version.manifest`;
+            this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "version.manifest");
+            this._projectManifestRemoteUrl = `${this._remoteRootUrl}/project.manifest`;
+            this._projectManifestSearchPath = path.join(this._searchRootDirPath, "project.manifest");
+            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest.gg");
             this._projectManifestBuildInPaths = [`@assets/project.manifest`, path.join("data", "project.manifest")];
           } else {
-            this._versionManifesetRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/version.manifest`;
-            this._projectManifesetRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/project.manifest`;
-            this._projectManifestLocalSearchPath = path.join(this._searchRootDirPath, "assets", this.name, "project.manifest");
+            this._versionManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/version.manifest`;
+            this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "version.manifest");
+            this._projectManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/project.manifest`;
+            this._projectManifestSearchPath = path.join(this._searchRootDirPath, "assets", this.name, "project.manifest");
             this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "project.manifest");
             this._projectManifestBuildInPaths = [`@assets/assets/${this.name}/project.manifest`, path.join("data", "assets", this.name, "project.manifest")];
           }
@@ -675,12 +769,22 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             return;
           }
 
-          // 处理 project.manifest 的下载进度
-          if (task.requestURL == this._projectManifesetRemoteUrl) {
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 version.manifest 的下载进度
+
+          if (task.requestURL == this._versionManifestRemoteUrl) {
             return;
           }
 
-          // 处理 热更新差异文件 的下载进度
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 project.manifest 的下载进度
+
+          if (task.requestURL == this._projectManifestRemoteUrl) {
+            return;
+          }
+
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理热更新的差异文件的下载进度
 
           // 更新下载进度
           this._downloadedBytes += bytesReceived;
@@ -725,21 +829,40 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             return;
           }
 
-          // 处理 project.manifest 的下载失败
-          if (task.requestURL == this._projectManifesetRemoteUrl) {
-            this._error(`检查更新：下载远程 project.manifest：失败`);
-            this._error(`检查更新：失败`);
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 version.manifest 的下载失败
+
+          if (task.requestURL == this._versionManifestRemoteUrl) {
+            {
+              this._error(`检查更新：下载远程 version.manifest 失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
+              this._error(`检查更新：失败`);
+            }
+            this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
+            return;
+          }
+
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 project.manifest 的下载失败
+
+          if (task.requestURL == this._projectManifestRemoteUrl) {
+            {
+              this._error(`检查更新：下载远程 project.manifest 失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
+              this._error(`检查更新：失败`);
+            }
             this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError);
             return;
           }
 
-          // 处理 热更新差异文件 的下载失败
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理热更新的差异文件的下载失败
 
           // 收集下载失败任务
           this.downloadFailedFiles.push(task);
 
           // 更新下载进度
-          this._debug(`热更新：文件下载失败：${task.requestURL} 下载失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr} 当前累计下载失败文件数量：${this.downloadFailedFiles.length}`);
+          {
+            this._debug(`热更新：文件下载失败：${task.requestURL} 下载失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr} 当前累计下载失败文件数量：${this.downloadFailedFiles.length}`);
+          }
           this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
 
           // 处理结果
@@ -751,9 +874,89 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             return;
           }
 
-          // 处理 project.manifest 的下载成功
-          if (task.requestURL == this._projectManifesetRemoteUrl) {
-            this._debug(`检查更新：下载远程 project.manifest：成功`);
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 version.manifest 的下载成功
+
+          if (task.requestURL == this._versionManifestRemoteUrl) {
+            var _this$_localProjectMa;
+            this._debug(`检查更新：下载远程 version.manifest 成功`);
+
+            // 解析下载好的远程 version.manifest
+            let remoteVersionManifest = null;
+            try {
+              if (native.fileUtils.isFileExist(this._versionManifestDownloadPath)) {
+                remoteVersionManifest = JSON.parse(native.fileUtils.getStringFromFile(this._versionManifestDownloadPath));
+
+                // 如果下载好的远程 version.manifest 已经解析完毕了，那这个文件就没用了，删除它
+                native.fileUtils.removeFile(this._versionManifestDownloadPath);
+              }
+            } catch (error) {
+              {
+                this._error(error);
+              }
+            }
+            if (remoteVersionManifest == null) {
+              {
+                this._error(`检查更新：解析远程 version.manifest 失败`);
+                this._error(`检查更新：失败`);
+              }
+              this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
+              return;
+            }
+
+            // 从搜索目录下的 project.manifest 中获取版本
+            const localVersion = ((_this$_localProjectMa = this._localProjectManifest) == null ? void 0 : _this$_localProjectMa.version) ?? "";
+            const remoteVersion = remoteVersionManifest.version ?? "";
+            {
+              this._debug(`检查更新：解析远程 version.manifest 成功。版本信息: ${JSON.stringify(remoteVersionManifest)}`);
+              this._debug(`检查更新：当前本地版本: ${localVersion}`);
+              this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
+            }
+
+            // 本地版本和远程版本比较
+            const isNewVersionFound = remoteVersion != localVersion;
+
+            // 未发现新版本
+            if (!isNewVersionFound) {
+              this._debug(`检查更新：成功，当前已经是最新版本`);
+              // 释放文件json内存
+              this._localProjectManifest = null;
+              this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
+              return;
+            }
+
+            // 发现新版本
+            // 如果本地已经下载好新版本的远程 project.manifest ，那么解析文件，并获取差异文件记录
+            try {
+              if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+                this._reCalculateDownloadInfo();
+                // 如果还有文件未下载，那么返回新版本
+                if (this._totalFiles != this.downloadSucFiles.length) {
+                  this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
+                  return;
+                }
+              }
+            } catch (error) {
+              {
+                this._error(error);
+                this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+              }
+            }
+
+            // 到这里表示本地没有 project.manifest 文件，或者解析出错，总之不对劲了，此时删除这个文件，重新走一躺下载处理
+            if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+              native.fileUtils.removeFile(this._projectManifestDownloadPath);
+            }
+            this._debug(`检查更新：下载远程 project.manifest 开始，下载地址：${this._projectManifestRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
+            this._createParentDirs(this._projectManifestDownloadPath);
+            this._downloader.createDownloadTask(this._projectManifestRemoteUrl, this._projectManifestDownloadPath);
+          }
+
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理检查更新的 project.manifest 的下载成功
+
+          if (task.requestURL == this._projectManifestRemoteUrl) {
+            this._debug(`检查更新：下载远程 project.manifest 成功`);
 
             // 解析已经下载下来的 project.manifest
             try {
@@ -804,7 +1007,9 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             }
             return;
           }
-          // 处理 热更新差异文件 的下载成功
+
+          // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 处理热更新的差异文件的下载成功
 
           // 收集下载成功任务
           this.downloadSucFiles.push(task);
@@ -855,10 +1060,10 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
         }
 
         /**
-         * 清除下载缓存。
+         * 清除下载缓存
          *
          * 1. 清除下载缓存后，后续的检查更新、热更新都会重新下载所有文件
-         * 2. 在在多次检查更新失败或者多次热更新失败后，可以考虑调用此方法，清除所有下载临时文件
+         * 2. 在多次检查更新失败或者多次热更新失败后，可以考虑调用此方法，清除所有下载临时文件
          */
         clearDownloadCache() {
           // 部分状态下不可以删除下载缓存
@@ -870,13 +1075,15 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             this._warn("当前正在热更新中，删除本地缓存失败");
             return;
           }
-          // 清除下载缓存目录
+
+          // 清除本地的下载缓存目录
           if (native.fileUtils.isDirectoryExist(this._downloadRootDirPath)) {
             const suc = native.fileUtils.removeDirectory(this._downloadRootDirPath);
-            this._debug(`当前存在本地缓存目录，删除${suc ? "成功" : "失败"}`);
+            this._debug(`当前本地缓存目录(${this._downloadRootDirPath})：存在，${suc ? "已删除成功" : "删除失败"}`);
             return;
+          } else {
+            this._debug(`当前本地缓存目录(${this._downloadRootDirPath})：不存在，不用删除`);
           }
-          this._debug(`当前不存在本地缓存目录`);
         }
 
         /**
@@ -898,21 +1105,25 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._updateState(GGHotUpdateInstanceState.CheckUpdateInProgress);
 
           // 按照以下顺序，读取「此包」「本地最新版本」的 project.manifest 文件内容到内存中
+          //
           // 1. 本地搜索目录的 project.manifest
           // 2. 内置的 project.manifest
-          const localProjectManifestPaths = [this._projectManifestLocalSearchPath, ...this._projectManifestBuildInPaths];
-          let localProjectManifestJsonText = null;
-          this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(localProjectManifestPaths)}`);
+          const localProjectManifestPaths = [this._projectManifestSearchPath, ...this._projectManifestBuildInPaths];
+          {
+            this._debug(`检查更新：解析本地 project.manifest 开始`);
+            this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(localProjectManifestPaths)}`);
+          }
+          this._localProjectManifest = null;
           for (const localProjectManifestPath of localProjectManifestPaths) {
             this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：开始`);
             if (!native.fileUtils.isFileExist(localProjectManifestPath)) {
               this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：失败，文件不存在`);
               continue;
             }
-            localProjectManifestJsonText = native.fileUtils.getStringFromFile(localProjectManifestPath);
-            if (localProjectManifestJsonText) {
+            const localProjectManifestText = native.fileUtils.getStringFromFile(localProjectManifestPath);
+            if (localProjectManifestText) {
               try {
-                this._localProjectManifest = JSON.parse(localProjectManifestJsonText);
+                this._localProjectManifest = JSON.parse(localProjectManifestText);
                 DEBUG && this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：成功`);
               } catch (error) {
                 {
@@ -930,89 +1141,24 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           }
           // 如果没有读取本地到 project.manifest 配置，那么可能是包的首次更新，此时生成一个默认空白配置，那么就会全量将包下载下来
           if (!this._localProjectManifest) {
-            this._debug(`检查更新：没法解析到本地 project.manifest 配置，将初始化一个默认配置`);
+            this._debug(`检查更新：没法解析到本地 project.manifest 配置，将初始化一个空的 project.manifeset 配置`);
             this._localProjectManifest = {
               version: "",
               assets: {}
             };
           }
-          this._debug(`检查更新：解析本地 project.manifest：成功`);
+          this._debug(`检查更新：解析本地 project.manifest 成功`);
 
-          // fetch 获取远程包的 version.manifest 内容，然后和本地的 project.manifest 做版本比较
-          this._debug(`检查更新：请求远程 version.manifest 版本信息：开始。请求地址: ${this._versionManifesetRemoteUrl}`);
-          fetch(this._versionManifesetRemoteUrl).then(resp => {
-            this._debug(`检查更新：请求远程 version.manifest 版本信息：状态码: ${resp.status}`);
-            this._debug(`检查更新：请求远程 version.manifest 版本信息：状态码文本: ${resp.statusText}`);
-            return resp.text();
-          }).then(versionManifestText => {
-            var _this$_localProjectMa;
-            // 解析远端 version.manifest
-            this._debug(`检查更新：请求远程 version.manifest 版本信息：返回文本: ${versionManifestText}`);
-            let versionManifest = null;
-            if (versionManifestText != null) {
-              try {
-                versionManifest = JSON.parse(versionManifestText);
-              } catch (error) {
-                this._error(error);
-              }
-            }
-            if (versionManifest == null) {
-              this._error(`检查更新：解析远程 version.manifest 版本信息失败。`);
-              this._error(`检查更新：失败`);
-              this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
-              return;
-            }
-            const localVersion = ((_this$_localProjectMa = this._localProjectManifest) == null ? void 0 : _this$_localProjectMa.version) ?? "";
-            const remoteVersion = versionManifest.version ?? "";
-            this._debug(`检查更新：请求远程 version.manifest 版本信息：成功。版本信息: ${versionManifestText}`);
-            this._debug(`检查更新：当前本地版本: ${localVersion}`);
-            this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
+          // 检查更新前，先删除本地可能存在的 version.manifest
+          if (native.fileUtils.isFileExist(this._versionManifestDownloadPath)) {
+            native.fileUtils.removeFile(this._versionManifestDownloadPath);
+          }
 
-            // 本地版本和远程版本比较
-            const isNewVersionFound = remoteVersion != localVersion;
-
-            // 未发现新版本
-            if (!isNewVersionFound) {
-              this._debug(`检查更新：成功，当前已经是最新版本`);
-              // 释放文件json内存
-              this._localProjectManifest = null;
-              this._updateState(GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate);
-              return;
-            }
-
-            // 发现新版本
-            // 如果本地已经下载好新版本的远程 project.manifest ，那么解析文件，并获取差异文件记录
-            try {
-              if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-                this._reCalculateDownloadInfo();
-                // 如果还有文件未下载，那么返回新版本
-                if (this._totalFiles != this.downloadSucFiles.length) {
-                  this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
-                  return;
-                }
-              }
-            } catch (error) {
-              {
-                this._error(error);
-                this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
-              }
-            }
-
-            // 到这里表示本地没有 project.manifest 文件，或者解析出错，总之不对劲了，此时删除这个文件，重新走一躺下载处理
-            if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-              native.fileUtils.removeFile(this._projectManifestDownloadPath);
-            }
-            this._debug(`检查更新：下载远程 project.manifest：开始，下载地址：${this._projectManifesetRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
-            this._createParentDirs(this._projectManifestDownloadPath);
-            this._downloader.createDownloadTask(this._projectManifesetRemoteUrl, this._projectManifestDownloadPath);
-          }).catch(error => {
-            {
-              this._error(`检查更新：解析远程 version.manifest 版本信息失败。`);
-              this._error(`检查更新：失败`);
-              this._error(error);
-            }
-            this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
-          });
+          // 通过 fetch 请求远程 version.manifest 的内容，在部分引擎版本下可能存在异常（fetch 这个 api 在原生平台上的实现上存在差异）
+          // 因此，改用 downloader 去下载 version.manifest 并解析，完全替代 fetch
+          this._debug(`检查更新：下载远程 version.manifest 开始。地址: ${this._versionManifestRemoteUrl}`);
+          this._createParentDirs(this._versionManifestDownloadPath);
+          this._downloader.createDownloadTask(this._versionManifestRemoteUrl, this._versionManifestDownloadPath);
         }
 
         /**
@@ -1075,11 +1221,11 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           });
           {
             let info = `待下载信息：`;
-            info += ` 总字节数：${this._totalBytes}`;
-            info += ` 已下载字节数: ${this._downloadedBytes}`;
-            info += ` 总下载文件数：${this._totalFiles}`;
-            info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-            info += ` 未下载或下载失败文件数：${this.downloadFailedFiles.length}`;
+            info += `总字节数：${this._totalBytes} `;
+            info += `已下载字节数：${this._downloadedBytes} `;
+            info += `总下载文件数：${this._totalFiles} `;
+            info += `下载成功文件数：${this.downloadSucFiles.length} `;
+            info += `未下载或下载失败文件数：${this.downloadFailedFiles.length}`;
             this._debug(info);
           }
         }
@@ -1134,7 +1280,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             this._downloadRemainTimeInSecond = -1;
             const suc = this._totalFiles == this.downloadSucFiles.length;
             {
-              let info = suc ? "热更新：成功，" : "热更新：失败，";
+              let info = suc ? "热更新：成功" : "热更新：失败";
               info += ` 总字节数：${this._totalBytes}`;
               info += ` 已下载字节数: ${this._downloadedBytes}`;
               info += ` 总下载文件数：${this._totalFiles}`;
@@ -1198,15 +1344,33 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             searchPaths.unshift(newSearchPath);
           }
           this._debug(`最终搜索路径顺序：${JSON.stringify(searchPaths)}`);
-          if (this.name == GGHotUpdateInstanceEnum.BuildIn) ;else {
-            // 如果是子包，那么需要立即更新搜索路径，同时需要将下载缓存目录下的文件更新到搜索路径目录下
+          const downloadDirPath = this._downloadRootDirPath + "/";
+          if (this.name == GGHotUpdateInstanceEnum.BuildIn) {
+            // 如果是主包
+
+            // 不用更新搜索路径，在下次重启时，main.js 会自动更新搜索路径
+
+            // 将主包下载好的 project.manifest.gg 重命名为 project.manifest，以标识主包的这个版本已经热更新完毕
+            // 在下一次重启游戏后，main.js 检查到 project.manifest 存在后，才能确认主包是热更新成功（而不是热更新一半了），才会将热更新后的主包内容从下载目录移动到搜索目录
+            // e.g.
+            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest.gg ->
+            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest
+            const srcFilePath = this._projectManifestDownloadPath;
+            const dstFilePath = srcFilePath.substring(0, srcFilePath.lastIndexOf(".gg"));
+            this._debug(`主包热更新成功，将重命名下载目录的 project.manifest.gg 为 project.manifest 以标记主包热更新成功: ${srcFilePath} -> ${dstFilePath}`);
+            if (native.fileUtils.isFileExist(dstFilePath)) {
+              native.fileUtils.removeFile(dstFilePath);
+            }
+            this._createParentDirs(dstFilePath);
+            native.fileUtils.renameFile(srcFilePath, dstFilePath);
+          } else {
+            // 如果是子包
             this._debug(`将移动下载目录 ${this._downloadRootDirPath} 的资源到搜索目录 ${this._searchRootDirPath}`);
 
             // 更新搜索路径
             native.fileUtils.setSearchPaths(searchPaths);
 
             // 移动下载目录的内容到搜索路径下
-            const downloadDirPath = this._downloadRootDirPath + "/";
             const downloadDirPathLength = downloadDirPath.length;
             if (native.fileUtils.isDirectoryExist(downloadDirPath)) {
               const fileList = [];
@@ -1230,9 +1394,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             }
           }
 
-          // 同时缓存新的搜索路径数组，以便下次重启的时候，更新新的搜索路径
-          // eslint-disable-next-line no-restricted-properties
-          sys.localStorage.setItem("GGHotUpdateSearchPaths", JSON.stringify(searchPaths));
+          // 缓存新的搜索路径数组，以便下次重启的时候，更新新的搜索路径
+          localStorage.setItem("GGHotUpdateSearchPaths", JSON.stringify(searchPaths));
           this._debug(`保存最新搜索路径到 LocalStorage 中，方便下次重启游戏时更新搜索路径`);
         }
         _debug(...args) {
@@ -1251,8 +1414,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
   };
 });
 
-System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './GGHotUpdateInstance.ts', './GGLogger.ts'], function (exports) {
-  var cclegacy, path, native, game, DEBUG, GGHotUpdateInstance, ggLogger;
+System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdateInstance.ts', './GGLogger.ts'], function (exports) {
+  var cclegacy, path, native, game, GGHotUpdateInstance, ggLogger;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
@@ -1260,14 +1423,12 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
       native = module.native;
       game = module.game;
     }, function (module) {
-      DEBUG = module.DEBUG;
-    }, function (module) {
       GGHotUpdateInstance = module.GGHotUpdateInstance;
     }, function (module) {
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "7f597L3B91L64bdL6wIX0Rc", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "7c768M/iutHF5TRZnALfhHC", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1284,7 +1445,6 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
           this._enableLog = false;
           this._remoteRootUrl = "";
           this._localRootDirPath = "";
-          this._hotUpdateConfig = null;
         }
         /**
          * 是否打印调试日志
@@ -1309,12 +1469,6 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
           return this._localRootDirPath;
         }
         /**
-         * 当前版本，热更新包信息
-         */
-        get hotUpdateConfig() {
-          return this._hotUpdateConfig;
-        }
-        /**
          * 初始化热更新管理器配置
          *
          * @param config 配置
@@ -1326,43 +1480,6 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
 
           // 初始化日志输出
           ggLogger.enable = this._enableLog;
-
-          // 初始化当前版本下，热更包bundle信息配置，按照一下顺序获取配置：
-          // 1. 设备本地存储系统的 config.json
-          // 2. 包体内置 config.json
-          const bundleConfigPaths = [path.join(this.localRootDirPath, "gg.config.json"), "@assets/gg.config.json", path.join("data", "gg.config.json")];
-          let bundleJsonText = null;
-          ggLogger.debug(`初始化：当前热更包 Bundle 配置信息文件搜索路径如下：${JSON.stringify(bundleConfigPaths)}`);
-          for (const bundleConfigPath of bundleConfigPaths) {
-            ggLogger.debug(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：开始`);
-            if (!native.fileUtils.isFileExist(bundleConfigPath)) {
-              ggLogger.debug(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：失败，文件不存在`);
-              continue;
-            }
-            bundleJsonText = native.fileUtils.getStringFromFile(bundleConfigPath);
-            if (bundleJsonText) {
-              try {
-                this._hotUpdateConfig = JSON.parse(bundleJsonText);
-                DEBUG && ggLogger.debug(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：成功`);
-              } catch (error) {
-                {
-                  ggLogger.error(`初始化：尝试从路径 ${bundleConfigPath} 获取热更包Bundle配置信息：失败，文件内容解析失败`);
-                  ggLogger.error(error);
-                }
-              }
-            }
-            if (this._hotUpdateConfig) {
-              break;
-            }
-          }
-          // 容错机制：如果没有读取到热更包配置，则生成一个默认配置
-          if (!this._hotUpdateConfig) {
-            ggLogger.warn(`初始化：没法解析到本地从文件中读取当前热更包 Bundle 配置信息，将初始化一个默认配置`);
-            this._hotUpdateConfig = {
-              remote_bundles: []
-            };
-          }
-          ggLogger.debug(`初始化：当前热更包 Bundle 配置信息：${this._hotUpdateConfig ? JSON.stringify(this._hotUpdateConfig) : ""}`);
         }
 
         /**
@@ -1402,10 +1519,65 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './env', './G
         }
 
         /**
-         * 判断某个Bundle是否「为需要热更新的Bundle」
+         * 清空所有热更包的数据，包括：
+         *
+         * * 更新搜索路径：移除所有热更包的搜索路径
+         * * 删除插件用到的 LocalStorage 的值
+         * * 删除所有热更包的本地下载目录
+         * * 删除所有热更包的搜索路径目录
+         *
+         * 此API一般发生不兼容的升级后调用，然后重启游戏。比如
+         *
+         * * 在引擎升级后（比如从 3.8.4 升级到 3.8.5)，出现了不兼容的API，此时可能需要调用这个方法移除所有热更新信息，然后重启游戏
+         * * 在客户端移除了一些原生方法，导致 ts 不能调用对应的方法，出现了不兼容的API，此时可能需要调用这个方法移除所有热更新信息，然后重启游戏
+         * * ...
+         *
+         * @since 4.0.0
          */
-        isHotUpdateBundle(bundleName) {
-          return this._hotUpdateConfig != null && this._hotUpdateConfig.remote_bundles != null && this._hotUpdateConfig.remote_bundles.includes(bundleName);
+        clear() {
+          ggLogger.debug(`清空所有热更包的数据：开始`);
+          // 销毁所有热更新实例
+          if (this._instanceMap) {
+            this._instanceMap.forEach(instance => {
+              instance.destroy();
+            });
+          }
+
+          // 更新搜索路径：移除所有热更包的搜索路径
+          // e.g. ["/data/user/0/com.cocos.game/files/gg-hot-update", "@assets/data/","@assets/Resources/","@assets/"] -> ["@assets/data/","@assets/Resources/","@assets/"]
+          const searchPaths = native.fileUtils.getSearchPaths();
+          const searchRootDirPath = this._localRootDirPath + "/";
+          {
+            ggLogger.debug(`移除前的搜索路径：${JSON.stringify(searchPaths)}`);
+            ggLogger.debug(`待移除的搜索路径：${searchRootDirPath}`);
+          }
+          for (let i = searchPaths.length - 1; i >= 0; --i) {
+            if (searchPaths[i] == searchRootDirPath) {
+              searchPaths.splice(i, 1);
+            }
+          }
+          ggLogger.debug(`移除后的搜索路径：${JSON.stringify(searchPaths)}`);
+
+          // 删除插件用到的 LocalStorage 的值
+          localStorage.removeItem("GGHotUpdateSearchPaths");
+
+          // 删除所有热更包的本地下载目录
+          const doanloadRootDirPath = path.join(this._localRootDirPath + "-temp");
+          if (native.fileUtils.isDirectoryExist(doanloadRootDirPath)) {
+            const suc = native.fileUtils.removeDirectory(doanloadRootDirPath);
+            ggLogger.debug(`删除所有热更包的本地下载目录(${doanloadRootDirPath})：存在，${suc ? "已删除成功" : "删除失败"}`);
+          } else {
+            ggLogger.debug(`删除所有热更包的本地下载目录(${doanloadRootDirPath})：不存在，不用删除`);
+          }
+
+          // 删除所有热更包的搜索路径目录
+          if (native.fileUtils.isDirectoryExist(searchRootDirPath)) {
+            const suc = native.fileUtils.removeDirectory(searchRootDirPath);
+            ggLogger.debug(`删除所有热更包的搜索路径目录(${searchRootDirPath})：存在，${suc ? "已删除成功" : "删除失败"}`);
+          } else {
+            ggLogger.debug(`删除所有热更包的搜索路径目录(${searchRootDirPath})：不存在，不用删除`);
+          }
+          ggLogger.debug(`清空所有热更包的数据：结束`);
         }
       }
 
@@ -1425,7 +1597,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "b6418SvSClKv5WflGWvPMBS", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "f5c34GzzehCrIH/G0kaAbQ9", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1477,7 +1649,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "ea39b4vntdCkpvhUXjerpaA", "GGLogger", undefined);
+      cclegacy._RF.push({}, "f769axO7fNPc70dhd4CcRuV", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1544,7 +1716,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "f8162Ke64xBNZ9YTuUHn90p", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "31da95tffdJ74xi05kbrI21", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
@@ -1585,6 +1757,52 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
         }
       }
       exports('GGObserverSystem', GGObserverSystem);
+      cclegacy._RF.pop();
+    }
+  };
+});
+
+System.register("chunks:///_virtual/HotUpdateBundleConfig.ts", ['cc', './GameBundleConfig.ts'], function (exports) {
+  var cclegacy, GameBundleConfig;
+  return {
+    setters: [function (module) {
+      cclegacy = module.cclegacy;
+    }, function (module) {
+      GameBundleConfig = module.GameBundleConfig;
+    }],
+    execute: function () {
+      cclegacy._RF.push({}, "50dda8T431NE71huI9DtdUf", "HotUpdateBundleConfig", undefined);
+
+      /**
+       * 游戏 Bundle 配置
+       *
+       * 默认 Bundle 优先级如下
+       *
+       * | internam bundle                    | 优先级  |
+       * | -----------                        | ----- |
+       * | internal                           | 21    |
+       * | start-scene                        | 20    |
+       * | resources                          | 8     |
+       * | main                               | 7     |
+       */
+      class HotUpdateBundleConfig {
+        /**
+         * 需要热更新的 Bundle
+         */
+        static hotUpdateBundles() {
+          return this._hotUpdateBundles;
+        }
+
+        /**
+         * 判断某个bundle是否需要热更新
+         * @param bundleName 此bundle是否为需要热更新后才能加载的bundle
+         */
+        static isHotUpdateBundle(bundleName) {
+          return this._hotUpdateBundles.includes(bundleName);
+        }
+      }
+      exports('HotUpdateBundleConfig', HotUpdateBundleConfig);
+      HotUpdateBundleConfig._hotUpdateBundles = [GameBundleConfig.GameB, GameBundleConfig.GameC, GameBundleConfig.GameD];
       cclegacy._RF.pop();
     }
   };
@@ -1838,8 +2056,8 @@ System.register("chunks:///_virtual/LobbyGameListCtrl.ts", ['./rollupPluginModLo
   };
 });
 
-System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GameSceneConfig.ts', './SceneRouter.ts', './HotUpdateSystem.ts'], function (exports) {
-  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, _decorator, Component, ggHotUpdateManager, GGHotUpdateInstanceState, GameSceneConfig, sceneRouter, hotUpdateSystem;
+System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GameSceneConfig.ts', './HotUpdateBundleConfig.ts', './SceneRouter.ts', './HotUpdateSystem.ts'], function (exports) {
+  var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Label, _decorator, Component, ggHotUpdateManager, GGHotUpdateInstanceState, GameSceneConfig, HotUpdateBundleConfig, sceneRouter, hotUpdateSystem;
   return {
     setters: [function (module) {
       _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
@@ -1855,6 +2073,8 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
     }, function (module) {
       GameSceneConfig = module.GameSceneConfig;
+    }, function (module) {
+      HotUpdateBundleConfig = module.HotUpdateBundleConfig;
     }, function (module) {
       sceneRouter = module.sceneRouter;
     }, function (module) {
@@ -1878,13 +2098,16 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
           this.gameName.string = this._data.gameName;
         }
         onClick() {
+          if (!this._data) {
+            return;
+          }
           // 如果
           //
           // * 待打开的子游戏bundle是需要热更新的bundle
           // * 待打开的子游戏bundle还没有更新到最新版本
           //
           // 那么，想进入热更新加载场景，热更游戏，热更新完毕后再进入游戏场景，否则直接进入游戏常见
-          if (ggHotUpdateManager.isHotUpdateBundle(this._data.sceneConfig.bundleName) && ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate && ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.HotUpdateSuc) {
+          if (HotUpdateBundleConfig.isHotUpdateBundle(this._data.sceneConfig.bundleName) && ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate && ggHotUpdateManager.getInstance(this._data.sceneConfig.bundleName).state != GGHotUpdateInstanceState.HotUpdateSuc) {
             hotUpdateSystem.pendingSceneConfig = this._data.sceneConfig;
             sceneRouter.runSceneAsync(GameSceneConfig.HotUpdateScene);
           } else {
@@ -1904,9 +2127,9 @@ System.register("chunks:///_virtual/LobbyGameListItem.ts", ['./rollupPluginModLo
   };
 });
 
-System.register("chunks:///_virtual/main", ['./UIGameVersionName.ts', './UIHotUpdateProgress.ts', './UILoading.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
+System.register("chunks:///_virtual/main", ['./UIGameVersionName.ts', './UIHotUpdateProgress.ts', './UILoading.ts', './GameBundleConfig.ts', './GameSceneConfig.ts', './GameVersionConfig.ts', './HotUpdateBundleConfig.ts', './Sprite2DScaleAdapterComponent.ts', './SceneRouter.ts', './BootSceneCtrl.ts', './BootSceneUIHotUpdateProgressCtrl.ts', './HotUpdateSceneCtrl.ts', './HotUpdateSystem.ts', './LobbyGameListCtrl.ts', './LobbyGameListItem.ts', './SubGameListCtrl.ts', './SubGameListItem.ts', './GGHotUpdateInstance.ts', './GGHotUpdateManager.ts', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function () {
   return {
-    setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    setters: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
     execute: function () {}
   };
 });

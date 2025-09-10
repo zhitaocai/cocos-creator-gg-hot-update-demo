@@ -43,7 +43,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         /**
          * 游戏版本名（每次发布都要更新）
          */
-        gameVersionName: "4.0.0"
+        gameVersionName: "4.0.0.xx"
       };
       cclegacy._RF.pop();
       var _dec, _class;
@@ -59,7 +59,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }) || _class) || _class);
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "fa2f98vayRAN6vO713AgmGG", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "f5c34GzzehCrIH/G0kaAbQ9", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -510,7 +510,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }), _applyDecoratedDescriptor(_class2$1.prototype, "alignType", [_dec5$1], Object.getOwnPropertyDescriptor(_class2$1.prototype, "alignType"), _class2$1.prototype)), _class2$1)) || _class$3) || _class$3) || _class$3) || _class$3);
       cclegacy._RF.pop();
       const DEBUG = true;
-      cclegacy._RF.push({}, "3562epgBzBEKKkci8HnbNrL", "GGLogger", undefined);
+      cclegacy._RF.push({}, "f769axO7fNPc70dhd4CcRuV", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -566,7 +566,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggLogger = new GGLogger();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "d16a6xCSbBPvYBjXOUIA7Jh", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "31da95tffdJ74xi05kbrI21", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
@@ -607,7 +607,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "beec5AlYbFAQLf3M51J6IJo", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "31550RrFfZOSJ0hhUy+rms5", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -760,7 +760,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
            * e.g.
            *
            * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest``
+           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest.gg``
            *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifest``
            */
           this._projectManifestDownloadPath = void 0;
@@ -834,7 +834,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "version.manifest");
             this._projectManifestRemoteUrl = `${this._remoteRootUrl}/project.manifest`;
             this._projectManifestSearchPath = path.join(this._searchRootDirPath, "project.manifest");
-            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest");
+            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest.gg");
             this._projectManifestBuildInPaths = [`@assets/project.manifest`, path.join("data", "project.manifest")];
           } else {
             this._versionManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/version.manifest`;
@@ -915,21 +915,21 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 version.manifest 下载进度
+          // 处理检查更新的 version.manifest 的下载进度
 
           if (task.requestURL == this._versionManifestRemoteUrl) {
             return;
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 project.manifest 的下载进度
+          // 处理检查更新的 project.manifest 的下载进度
 
           if (task.requestURL == this._projectManifestRemoteUrl) {
             return;
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 热更新差异文件 的下载进度
+          // 处理热更新的差异文件的下载进度
 
           // 更新下载进度
           this._downloadedBytes += bytesReceived;
@@ -975,11 +975,11 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 version.manifest 下载失败
+          // 处理检查更新的 version.manifest 的下载失败
 
           if (task.requestURL == this._versionManifestRemoteUrl) {
             {
-              this._error(`检查更新：下载远程 version.manifest：失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
+              this._error(`检查更新：下载远程 version.manifest 失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
               this._error(`检查更新：失败`);
             }
             this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
@@ -987,11 +987,11 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 project.manifest 的下载失败
+          // 处理检查更新的 project.manifest 的下载失败
 
           if (task.requestURL == this._projectManifestRemoteUrl) {
             {
-              this._error(`检查更新：下载远程 project.manifest：失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
+              this._error(`检查更新：下载远程 project.manifest 失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr}`);
               this._error(`检查更新：失败`);
             }
             this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError);
@@ -999,7 +999,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 热更新差异文件 的下载失败
+          // 处理热更新的差异文件的下载失败
 
           // 收集下载失败任务
           this.downloadFailedFiles.push(task);
@@ -1020,17 +1020,20 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 version.manifest 的下载成功
+          // 处理检查更新的 version.manifest 的下载成功
 
           if (task.requestURL == this._versionManifestRemoteUrl) {
             var _this$_localProjectMa;
-            this._debug(`检查更新：下载远程 version.manifest：成功`);
+            this._debug(`检查更新：下载远程 version.manifest 成功`);
 
             // 解析下载好的远程 version.manifest
             let remoteVersionManifest = null;
             try {
               if (native.fileUtils.isFileExist(this._versionManifestDownloadPath)) {
                 remoteVersionManifest = JSON.parse(native.fileUtils.getStringFromFile(this._versionManifestDownloadPath));
+
+                // 如果下载好的远程 version.manifest 已经解析完毕了，那这个文件就没用了，删除它
+                native.fileUtils.removeFile(this._versionManifestDownloadPath);
               }
             } catch (error) {
               {
@@ -1039,7 +1042,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             }
             if (remoteVersionManifest == null) {
               {
-                this._error(`检查更新：解析远程 version.manifest 版本信息：失败。`);
+                this._error(`检查更新：解析远程 version.manifest 失败`);
                 this._error(`检查更新：失败`);
               }
               this._updateState(GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError);
@@ -1050,7 +1053,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             const localVersion = ((_this$_localProjectMa = this._localProjectManifest) == null ? void 0 : _this$_localProjectMa.version) ?? "";
             const remoteVersion = remoteVersionManifest.version ?? "";
             {
-              this._debug(`检查更新：解析远程 version.manifest 版本信息：成功。版本信息: ${JSON.stringify(remoteVersionManifest)}`);
+              this._debug(`检查更新：解析远程 version.manifest 成功。版本信息: ${JSON.stringify(remoteVersionManifest)}`);
               this._debug(`检查更新：当前本地版本: ${localVersion}`);
               this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
             }
@@ -1089,16 +1092,16 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
               native.fileUtils.removeFile(this._projectManifestDownloadPath);
             }
-            this._debug(`检查更新：下载远程 project.manifest：开始，下载地址：${this._projectManifestRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
+            this._debug(`检查更新：下载远程 project.manifest 开始，下载地址：${this._projectManifestRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
             this._createParentDirs(this._projectManifestDownloadPath);
             this._downloader.createDownloadTask(this._projectManifestRemoteUrl, this._projectManifestDownloadPath);
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 project.manifest 的下载成功
+          // 处理检查更新的 project.manifest 的下载成功
 
           if (task.requestURL == this._projectManifestRemoteUrl) {
-            this._debug(`检查更新：下载远程 project.manifest：成功`);
+            this._debug(`检查更新：下载远程 project.manifest 成功`);
 
             // 解析已经下载下来的 project.manifest
             try {
@@ -1151,7 +1154,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-          // 处理 热更新差异文件 的下载成功
+          // 处理热更新的差异文件的下载成功
 
           // 收集下载成功任务
           this.downloadSucFiles.push(task);
@@ -1251,18 +1254,21 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           // 1. 本地搜索目录的 project.manifest
           // 2. 内置的 project.manifest
           const localProjectManifestPaths = [this._projectManifestSearchPath, ...this._projectManifestBuildInPaths];
-          let localProjectManifestJsonText = null;
-          this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(localProjectManifestPaths)}`);
+          {
+            this._debug(`检查更新：解析本地 project.manifest 开始`);
+            this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(localProjectManifestPaths)}`);
+          }
+          this._localProjectManifest = null;
           for (const localProjectManifestPath of localProjectManifestPaths) {
             this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：开始`);
             if (!native.fileUtils.isFileExist(localProjectManifestPath)) {
               this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：失败，文件不存在`);
               continue;
             }
-            localProjectManifestJsonText = native.fileUtils.getStringFromFile(localProjectManifestPath);
-            if (localProjectManifestJsonText) {
+            const localProjectManifestText = native.fileUtils.getStringFromFile(localProjectManifestPath);
+            if (localProjectManifestText) {
               try {
-                this._localProjectManifest = JSON.parse(localProjectManifestJsonText);
+                this._localProjectManifest = JSON.parse(localProjectManifestText);
                 DEBUG && this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：成功`);
               } catch (error) {
                 {
@@ -1280,22 +1286,22 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           }
           // 如果没有读取本地到 project.manifest 配置，那么可能是包的首次更新，此时生成一个默认空白配置，那么就会全量将包下载下来
           if (!this._localProjectManifest) {
-            this._debug(`检查更新：没法解析到本地 project.manifest 配置，将初始化一个默认配置`);
+            this._debug(`检查更新：没法解析到本地 project.manifest 配置，将初始化一个空的 project.manifeset 配置`);
             this._localProjectManifest = {
               version: "",
               assets: {}
             };
           }
-          this._debug(`检查更新：解析本地 project.manifest：成功`);
+          this._debug(`检查更新：解析本地 project.manifest 成功`);
 
-          // 如果本地存在 version.manifest 那么删除
+          // 检查更新前，先删除本地可能存在的 version.manifest
           if (native.fileUtils.isFileExist(this._versionManifestDownloadPath)) {
             native.fileUtils.removeFile(this._versionManifestDownloadPath);
           }
 
           // 通过 fetch 请求远程 version.manifest 的内容，在部分引擎版本下可能存在异常（fetch 这个 api 在原生平台上的实现上存在差异）
           // 因此，改用 downloader 去下载 version.manifest 并解析，完全替代 fetch
-          this._debug(`检查更新：下载远程 version.manifest 版本信息：开始。地址: ${this._versionManifestRemoteUrl}`);
+          this._debug(`检查更新：下载远程 version.manifest 开始。地址: ${this._versionManifestRemoteUrl}`);
           this._createParentDirs(this._versionManifestDownloadPath);
           this._downloader.createDownloadTask(this._versionManifestRemoteUrl, this._versionManifestDownloadPath);
         }
@@ -1360,11 +1366,11 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           });
           {
             let info = `待下载信息：`;
-            info += ` 总字节数：${this._totalBytes}`;
-            info += ` 已下载字节数: ${this._downloadedBytes}`;
-            info += ` 总下载文件数：${this._totalFiles}`;
-            info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-            info += ` 未下载或下载失败文件数：${this.downloadFailedFiles.length}`;
+            info += `总字节数：${this._totalBytes} `;
+            info += `已下载字节数：${this._downloadedBytes} `;
+            info += `总下载文件数：${this._totalFiles} `;
+            info += `下载成功文件数：${this.downloadSucFiles.length} `;
+            info += `未下载或下载失败文件数：${this.downloadFailedFiles.length}`;
             this._debug(info);
           }
         }
@@ -1419,7 +1425,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             this._downloadRemainTimeInSecond = -1;
             const suc = this._totalFiles == this.downloadSucFiles.length;
             {
-              let info = suc ? "热更新：成功，" : "热更新：失败，";
+              let info = suc ? "热更新：成功" : "热更新：失败";
               info += ` 总字节数：${this._totalBytes}`;
               info += ` 已下载字节数: ${this._downloadedBytes}`;
               info += ` 总下载文件数：${this._totalFiles}`;
@@ -1485,19 +1491,25 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           this._debug(`最终搜索路径顺序：${JSON.stringify(searchPaths)}`);
           const downloadDirPath = this._downloadRootDirPath + "/";
           if (this.name == GGHotUpdateInstanceEnum.BuildIn) {
-            // 如果是主包，那么不用立即更新搜索路径，在下次重启时，main.js 会自动更新搜索路径
+            // 如果是主包
 
-            // 主包需要在下载目录中创建一个文件，用来标识这次的主包是已经热更新完毕了
-            // 在下一次重启游戏后，main.js 检查到这个文件存在后，才会将热更新后的主包内容从下载目录移动到搜索目录
-            const buildInHpSucFlagFilePath = path.join(downloadDirPath, "gg.suc");
-            this._debug(`主包热更新成功，将创建热更新成功表示文件: ${buildInHpSucFlagFilePath}`);
-            if (native.fileUtils.isFileExist(buildInHpSucFlagFilePath)) {
-              native.fileUtils.removeFile(buildInHpSucFlagFilePath);
+            // 不用更新搜索路径，在下次重启时，main.js 会自动更新搜索路径
+
+            // 将主包下载好的 project.manifest.gg 重命名为 project.manifest，以标识主包的这个版本已经热更新完毕
+            // 在下一次重启游戏后，main.js 检查到 project.manifest 存在后，才能确认主包是热更新成功（而不是热更新一半了），才会将热更新后的主包内容从下载目录移动到搜索目录
+            // e.g.
+            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest.gg ->
+            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest
+            const srcFilePath = this._projectManifestDownloadPath;
+            const dstFilePath = srcFilePath.substring(0, srcFilePath.lastIndexOf(".gg"));
+            this._debug(`主包热更新成功，将重命名下载目录的 project.manifest.gg 为 project.manifest 以标记主包热更新成功: ${srcFilePath} -> ${dstFilePath}`);
+            if (native.fileUtils.isFileExist(dstFilePath)) {
+              native.fileUtils.removeFile(dstFilePath);
             }
-            this._createParentDirs(buildInHpSucFlagFilePath);
-            native.fileUtils.writeStringToFile("", buildInHpSucFlagFilePath);
+            this._createParentDirs(dstFilePath);
+            native.fileUtils.renameFile(srcFilePath, dstFilePath);
           } else {
-            // 如果是子包，那么需要立即更新搜索路径，同时需要将下载缓存目录下的文件更新到搜索路径目录下
+            // 如果是子包
             this._debug(`将移动下载目录 ${this._downloadRootDirPath} 的资源到搜索目录 ${this._searchRootDirPath}`);
 
             // 更新搜索路径
@@ -1542,7 +1554,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "94228km2ZhGYr3AQNMYsCdb", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "7c768M/iutHF5TRZnALfhHC", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器

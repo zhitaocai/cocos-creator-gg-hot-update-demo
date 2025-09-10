@@ -1,6 +1,7 @@
 {
   "name": "cocos-creator-gg-hot-update-demo",
   "server": "",
+  "engineModulesConfigKey": "defaultConfig",
   "platform": "ios",
   "buildPath": "project://build",
   "debug": true,
@@ -35,7 +36,7 @@
     "handleTemplateMd5Link": true
   },
   "mainBundleIsRemote": false,
-  "mainBundleCompressionType": "merge_dep",
+  "mainBundleCompressionType": "merge_all_json",
   "useSplashScreen": true,
   "bundleCommonChunk": false,
   "packAutoAtlas": true,
@@ -77,6 +78,10 @@
     }
   ],
   "wasmCompressionMode": false,
+  "binGroupConfig": {
+    "threshold": 16,
+    "enable": false
+  },
   "packages": {
     "ios": {
       "executableName": "",
@@ -98,20 +103,19 @@
       "targetVersion": "12.0",
       "__version__": "1.0.1"
     },
-    "native": {
-      "encrypted": false,
-      "xxteaKey": "56Caf/PQZKzqqeFw",
-      "compressZip": false,
-      "JobSystem": "none",
-      "__version__": "1.0.2"
-    },
     "gg-hot-update": {
       "enable": true,
       "configPath": "gg-hot-update-config.json",
-      "__version__": "3.1.0"
+      "__version__": "4.0.0"
+    },
+    "native": {
+      "encrypted": false,
+      "xxteaKey": "3fklXK+g1GBrBWIe",
+      "compressZip": false,
+      "JobSystem": "none",
+      "__version__": "1.0.2"
     }
   },
   "__version__": "1.3.9",
-  "logDest": "project://temp/builder/log/ios7-8-2025 16-04.log",
-  "engineModulesConfigKey": "migrationsConfig"
+  "logDest": "project://temp/builder/log/ios9-10-2025 15-16.log"
 }

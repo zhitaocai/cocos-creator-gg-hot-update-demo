@@ -1178,12 +1178,15 @@ const cacheManager = require('./jsb-cache-manager');
     // reset render order
     middleware.reset();
 
-    //const batcher2D = director.root.batcher2D;
-    if (globalThis.dragonBones) {
+    /**
+     * DragonBones is included in the compilation for the emulator platform, but the feature trimming module might be stripped.
+     * Therefore, it is necessary to check if the TypeScript object exists here.
+     */
+    if (cc.internal.ArmatureSystem && globalThis.dragonBones) {
       const armaSystem = cc.internal.ArmatureSystem.getInstance();
       armaSystem.prepareRenderData();
     }
-    if (globalThis.spine) {
+    if (cc.internal.SpineSkeletonSystem && globalThis.spine) {
       const skeletonSystem = cc.internal.SpineSkeletonSystem.getInstance();
       skeletonSystem.prepareRenderData();
     }
@@ -3771,7 +3774,6 @@ const cacheManager = require('./jsb-cache-manager');
       const compColor = this._color;
       this.setEntityColorDirty(true);
       this.setEntityColor(compColor);
-      this.setEntityOpacity(this.node._uiProps.localOpacity);
       this._nativeSkeleton.setColor(compColor.r, compColor.g, compColor.b, compColor.a);
       this.markForUpdateRenderData();
     }
@@ -4077,7 +4079,6 @@ const cacheManager = require('./jsb-cache-manager');
       this._nativeSkeleton._comp = null;
       this._nativeSkeleton = null;
     }
-    this._needUpdateSkeltonData = false;
   };
   const _onDestroy = skeleton.onDestroy;
   skeleton.onDestroy = function () {
@@ -4598,9 +4599,7 @@ if (cc.internal.VideoPlayer) {
     }
     stop() {
       if (this.video) {
-        //this._ignorePause = true;
-        this.video.seekTo(0);
-        this._cachedCurrentTime = 0;
+        this._ignorePause = true;
         this.video.stop();
       }
     }
