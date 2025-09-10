@@ -2,7 +2,7 @@
     "name": "cocos-creator-gg-hot-update-demo",
     "uuid": "f13d5217-a7cb-4be7-95d1-b2d4757c1074",
     "creator": {
-        "version": "3.8.6"
+        "version": "3.8.7"
     },
     "scripts": {
         "prepare": "husky install",
@@ -15,12 +15,12 @@
         ]
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^8.43.0",
-        "@typescript-eslint/parser": "^8.43.0",
-        "eslint": "^9.35.0",
-        "eslint-config-prettier": "^10.1.8",
-        "husky": "^9.1.7",
-        "lint-staged": "^16.1.6",
-        "prettier": "^3.6.2"
+        "@typescript-eslint/eslint-plugin": "^5.45.0",
+        "@typescript-eslint/parser": "^5.45.0",
+        "eslint": "^8.28.0",
+        "eslint-config-prettier": "^8.5.0",
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.7",
+        "prettier": "^2.8.0"
     }
 }
