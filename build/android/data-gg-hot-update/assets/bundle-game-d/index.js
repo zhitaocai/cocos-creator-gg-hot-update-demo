@@ -1,21 +1,13 @@
-System.register("chunks:///_virtual/bundle-game-d", ['./GameDSceneCtrl.ts'], function () {
-  return {
-    setters: [null],
-    execute: function () {}
-  };
-});
-
-System.register("chunks:///_virtual/GameDSceneCtrl.ts", ['cc', './GameSceneConfig.ts', './SceneRouter.ts'], function (exports) {
-  var cclegacy, Component, _decorator, GameSceneConfig, sceneRouter;
+System.register("chunks:///bundle-game-d.js", ['cc', './SceneRouter-79865703.js'], function () {
+  var cclegacy, Component, _decorator, sceneRouter, GameSceneConfig;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
       Component = module.Component;
       _decorator = module._decorator;
     }, function (module) {
-      GameSceneConfig = module.GameSceneConfig;
-    }, function (module) {
-      sceneRouter = module.sceneRouter;
+      sceneRouter = module.s;
+      GameSceneConfig = module.a;
     }],
     execute: function () {
       var _class;
@@ -24,18 +16,18 @@ System.register("chunks:///_virtual/GameDSceneCtrl.ts", ['cc', './GameSceneConfi
         ccclass,
         property
       } = _decorator;
-      let GameDSceneCtrl = exports('GameDSceneCtrl', ccclass(_class = class GameDSceneCtrl extends Component {
+      let GameDSceneCtrl = ccclass(_class = class GameDSceneCtrl extends Component {
         onBackBtnClick() {
           sceneRouter.runSceneAsync(GameSceneConfig.LobbyScene);
         }
-      }) || _class);
+      }) || _class;
       cclegacy._RF.pop();
     }
   };
 });
 
 (function(r) {
-  r('virtual:///prerequisite-imports/bundle-game-d', 'chunks:///_virtual/bundle-game-d'); 
+  r('virtual:///prerequisite-imports/bundle-game-d', 'chunks:///bundle-game-d.js'); 
 })(function(mid, cid) {
     System.register(mid, [cid], function (_export, _context) {
     return {

@@ -4,15 +4,12 @@
     "name": "internal",
     "deps": [],
     "uuids": [
-        "05ebfd70c",
         "081cab31-dccd-428e-8652-f2404cc81c47",
-        "0835f102-5471-47a3-9a76-01c07ac9cdb2",
-        "0ed97c56-390e-4dd1-96b7-e7f2d93a98ed",
+        "0b2bbb7a0",
         "14da1725-c4c2-42b4-ab08-ee0aeb6898b3",
         "17debcc3-0a6b-4b8a-b00b-dc58b885581e",
         "1c02ae6f-4492-4915-b8f8-7492a3b1e4cd",
         "1d08ef62-a503-4ce2-8b9a-46c90873f7d3",
-        "4bb480dd-8384-4bc9-987f-de67cc53052a",
         "50f4348b-c883-4e2f-8f11-ce233b859fa1",
         "511d2633-09a7-4bdd-ac42-f778032124b3",
         "5d45aa00-e064-4938-b314-4265f0c2258c",
@@ -26,8 +23,6 @@
         "970b0598-bcb0-4714-91fb-2e81440dccd8",
         "971bdb23-3ff6-43eb-b422-1c30165a3663",
         "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
-        "b23391b6-52eb-46a6-8da1-6244d9d315fb",
-        "b5475517-23b9-4873-bc1a-968d96616081",
         "b5d6115f-0370-4d7c-aad3-c194cc71cf98",
         "ba21476f-2866-4f81-9c4d-6e359316e448",
         "bcd64cc6-2dd9-43f6-abbe-66318d332032",
@@ -35,14 +30,12 @@
         "c27215d8-6835-4b68-bfbb-bdeac6100c04",
         "d1346436-ac96-4271-b863-1f4fdead95b0",
         "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
-        "d9937e59-61fe-4ec6-92ab-7ac5a19c89b0",
         "dd3a144d-ab7f-41f0-82b8-2e43a090d496",
         "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
         "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
         "f0416e68-0200-4b77-a926-4f9d16e494da",
         "f92806d7-1768-443f-afe8-12bcde84d0f0",
-        "fda095cb-831d-4601-ad94-846013963de8",
-        "ff9be190-20a4-4e48-b68c-76e3c7cff085"
+        "fda095cb-831d-4601-ad94-846013963de8"
     ],
     "paths": {
         "60f7195c-ec2a-45eb-ba94-8955f60e81d0": [
@@ -135,31 +128,6 @@
             "cc.EffectAsset",
             1
         ],
-        "ff9be190-20a4-4e48-b68c-76e3c7cff085": [
-            "db:/internal/effects/internal/builtin-debug-renderer",
-            "cc.EffectAsset",
-            1
-        ],
-        "0835f102-5471-47a3-9a76-01c07ac9cdb2": [
-            "db:/internal/default_fonts/builtin-freetype/OpenSans-Regular",
-            "cc.TTFFont",
-            1
-        ],
-        "b5475517-23b9-4873-bc1a-968d96616081": [
-            "db:/internal/default_fonts/builtin-freetype/OpenSans-Bold",
-            "cc.TTFFont",
-            1
-        ],
-        "0ed97c56-390e-4dd1-96b7-e7f2d93a98ed": [
-            "db:/internal/default_fonts/builtin-freetype/OpenSans-Italic",
-            "cc.TTFFont",
-            1
-        ],
-        "b23391b6-52eb-46a6-8da1-6244d9d315fb": [
-            "db:/internal/default_fonts/builtin-freetype/OpenSans-BoldItalic",
-            "cc.TTFFont",
-            1
-        ],
         "c27215d8-6835-4b68-bfbb-bdeac6100c04": [
             "db:/internal/effects/for2d/builtin-spine",
             "cc.EffectAsset",
@@ -168,16 +136,6 @@
         "b5d6115f-0370-4d7c-aad3-c194cc71cf98": [
             "db:/internal/default_materials/default-spine-material",
             "cc.Material",
-            1
-        ],
-        "4bb480dd-8384-4bc9-987f-de67cc53052a": [
-            "db:/internal/effects/internal/builtin-geometry-renderer",
-            "cc.EffectAsset",
-            1
-        ],
-        "d9937e59-61fe-4ec6-92ab-7ac5a19c89b0": [
-            "db:/internal/effects/internal/builtin-occlusion-query",
-            "cc.EffectAsset",
             1
         ],
         "d1346436-ac96-4271-b863-1f4fdead95b0": [
@@ -238,15 +196,12 @@
     },
     "scenes": {},
     "packs": {
-        "05ebfd70c": [
+        "0b2bbb7a0": [
             "081cab31-dccd-428e-8652-f2404cc81c47",
-            "0835f102-5471-47a3-9a76-01c07ac9cdb2",
-            "0ed97c56-390e-4dd1-96b7-e7f2d93a98ed",
             "14da1725-c4c2-42b4-ab08-ee0aeb6898b3",
             "17debcc3-0a6b-4b8a-b00b-dc58b885581e",
             "1c02ae6f-4492-4915-b8f8-7492a3b1e4cd",
             "1d08ef62-a503-4ce2-8b9a-46c90873f7d3",
-            "4bb480dd-8384-4bc9-987f-de67cc53052a",
             "50f4348b-c883-4e2f-8f11-ce233b859fa1",
             "511d2633-09a7-4bdd-ac42-f778032124b3",
             "5d45aa00-e064-4938-b314-4265f0c2258c",
@@ -260,8 +215,6 @@
             "970b0598-bcb0-4714-91fb-2e81440dccd8",
             "971bdb23-3ff6-43eb-b422-1c30165a3663",
             "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
-            "b23391b6-52eb-46a6-8da1-6244d9d315fb",
-            "b5475517-23b9-4873-bc1a-968d96616081",
             "b5d6115f-0370-4d7c-aad3-c194cc71cf98",
             "ba21476f-2866-4f81-9c4d-6e359316e448",
             "bcd64cc6-2dd9-43f6-abbe-66318d332032",
@@ -269,14 +222,12 @@
             "c27215d8-6835-4b68-bfbb-bdeac6100c04",
             "d1346436-ac96-4271-b863-1f4fdead95b0",
             "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
-            "d9937e59-61fe-4ec6-92ab-7ac5a19c89b0",
             "dd3a144d-ab7f-41f0-82b8-2e43a090d496",
             "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
             "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
             "f0416e68-0200-4b77-a926-4f9d16e494da",
             "f92806d7-1768-443f-afe8-12bcde84d0f0",
-            "fda095cb-831d-4601-ad94-846013963de8",
-            "ff9be190-20a4-4e48-b68c-76e3c7cff085"
+            "fda095cb-831d-4601-ad94-846013963de8"
         ]
     },
     "versions": {

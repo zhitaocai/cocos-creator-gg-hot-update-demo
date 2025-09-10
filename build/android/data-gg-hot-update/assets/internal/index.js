@@ -1,9 +1,9 @@
-System.register("chunks:///_virtual/debug-view-runtime-control.ts", ['./rollupPluginModLoBabelHelpers.js', 'cc'], function (exports) {
+System.register("chunks:///internal.js", ['./rollupPluginModLoBabelHelpers-9d38038d.js', 'cc'], function () {
   var _applyDecoratedDescriptor, _initializerDefineProperty, cclegacy, Node, _decorator, Component, Color, Canvas, UITransform, instantiate, Label, RichText, Toggle, Button, director;
   return {
     setters: [function (module) {
-      _applyDecoratedDescriptor = module.applyDecoratedDescriptor;
-      _initializerDefineProperty = module.initializerDefineProperty;
+      _applyDecoratedDescriptor = module._;
+      _initializerDefineProperty = module.a;
     }, function (module) {
       cclegacy = module.cclegacy;
       Node = module.Node;
@@ -26,7 +26,7 @@ System.register("chunks:///_virtual/debug-view-runtime-control.ts", ['./rollupPl
         ccclass,
         property
       } = _decorator;
-      let DebugViewRuntimeControl = exports('DebugViewRuntimeControl', (_dec = ccclass('internal.DebugViewRuntimeControl'), _dec2 = property(Node), _dec3 = property(Node), _dec4 = property(Node), _dec(_class = (_class2 = class DebugViewRuntimeControl extends Component {
+      let DebugViewRuntimeControl = (_dec = ccclass('internal.DebugViewRuntimeControl'), _dec2 = property(Node), _dec3 = property(Node), _dec4 = property(Node), _dec(_class = (_class2 = class DebugViewRuntimeControl extends Component {
         constructor(...args) {
           super(...args);
           _initializerDefineProperty(this, "compositeModeToggle", _descriptor, this);
@@ -256,21 +256,14 @@ System.register("chunks:///_virtual/debug-view-runtime-control.ts", ['./rollupPl
         initializer: function () {
           return null;
         }
-      })), _class2)) || _class));
+      })), _class2)) || _class);
       cclegacy._RF.pop();
     }
   };
 });
 
-System.register("chunks:///_virtual/internal", ['./debug-view-runtime-control.ts'], function () {
-  return {
-    setters: [null],
-    execute: function () {}
-  };
-});
-
 (function(r) {
-  r('virtual:///prerequisite-imports/internal', 'chunks:///_virtual/internal'); 
+  r('virtual:///prerequisite-imports/internal', 'chunks:///internal.js'); 
 })(function(mid, cid) {
     System.register(mid, [cid], function (_export, _context) {
     return {
