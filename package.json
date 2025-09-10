@@ -1,7 +1,26 @@
 {
-  "name": "cocos-creator-gg-hot-update-demo",
-  "uuid": "f13d5217-a7cb-4be7-95d1-b2d4757c1074",
-  "creator": {
-    "version": "3.8.6"
-  }
+    "name": "cocos-creator-gg-hot-update-demo",
+    "uuid": "f13d5217-a7cb-4be7-95d1-b2d4757c1074",
+    "creator": {
+        "version": "3.8.6"
+    },
+    "scripts": {
+        "prepare": "husky install",
+        "lint": "eslint \"assets/**/*.ts\"",
+        "lint-staged": "lint-staged"
+    },
+    "lint-staged": {
+        "assets/**/*.ts": [
+            "eslint"
+        ]
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^8.43.0",
+        "@typescript-eslint/parser": "^8.43.0",
+        "eslint": "^9.35.0",
+        "eslint-config-prettier": "^10.1.8",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.6",
+        "prettier": "^3.6.2"
+    }
 }

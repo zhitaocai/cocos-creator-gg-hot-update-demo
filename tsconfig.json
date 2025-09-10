@@ -4,7 +4,8 @@
 
     /* Add your custom configuration here. */
     "compilerOptions": {
-        "strict": false,
+        /* 开启严格模式 */
+        "strict": true,
         
         /* 允许对不包含默认导出的模块使用默认导入。这个选项不会影响生成的代码，只会影响类型检查。 */
         /* see https://ts.xcatliu.com/engineering/compiler-options.html */
