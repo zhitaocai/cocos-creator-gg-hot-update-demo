@@ -462,7 +462,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "31550RrFfZOSJ0hhUy+rms5", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "71903qb1UZAAbNFkerY/rD8", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -600,15 +600,21 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            */
           this._projectManifestRemoteUrl = void 0;
           /**
-           * project.manifeset 的本地搜索路径
+           * project.manifeset 的搜索路径顺序
            *
            * e.g.
            *
            * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update/project.manifest``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update/assets/${bundleName}/project.manifest``
+           *      * 主包:
+           *          * ``/data/user/0/${packageName}/files/gg-hot-update/project.manifest``
+           *          * ``@assets/project.manifest``
+           *          * ``data/project.manifest``
+           *      * 子包:
+           *          * ``/data/user/0/${packageName}/files/gg-hot-update/assets/${bundleName}/project.manifest``
+           *          * ``@assets/assets/${bundleName}/project.manifest``
+           *          * ``data/assets/${bundleName}/project.manifest"``
            */
-          this._projectManifestSearchPath = void 0;
+          this._projectManifestSearchPaths = void 0;
           /**
            * project.manifeset 的本地下载路径
            *
@@ -616,19 +622,9 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * * Android:
            *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest.gg``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifest``
+           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifest.gg``
            */
           this._projectManifestDownloadPath = void 0;
-          /**
-           * project.manifest 的包内路径
-           *
-           * e.g.
-           *
-           * * Android:
-           *      * 主包: ``@assets/project.manifest``
-           *      * 子包: ``@assets/assets/${bundleName}/project.manifest``
-           */
-          this._projectManifestBuildInPaths = void 0;
           /**
            * 本地 project.manifest 配置（搜索目录下）
            */
@@ -688,16 +684,14 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
             this._versionManifestRemoteUrl = `${this._remoteRootUrl}/version.manifest`;
             this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "version.manifest");
             this._projectManifestRemoteUrl = `${this._remoteRootUrl}/project.manifest`;
-            this._projectManifestSearchPath = path.join(this._searchRootDirPath, "project.manifest");
             this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest.gg");
-            this._projectManifestBuildInPaths = [`@assets/project.manifest`, path.join("data", "project.manifest")];
+            this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, "project.manifest"), `@assets/project.manifest`, path.join("data", "project.manifest")];
           } else {
             this._versionManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/version.manifest`;
             this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "version.manifest");
             this._projectManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/project.manifest`;
-            this._projectManifestSearchPath = path.join(this._searchRootDirPath, "assets", this.name, "project.manifest");
-            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "project.manifest");
-            this._projectManifestBuildInPaths = [`@assets/assets/${this.name}/project.manifest`, path.join("data", "assets", this.name, "project.manifest")];
+            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "project.manifest.gg");
+            this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, "assets", this.name, "project.manifest"), `@assets/assets/${this.name}/project.manifest`, path.join("data", "assets", this.name, "project.manifest")];
           }
           this._localProjectManifest = null;
           this._remoteProjectManifest = null;
@@ -1104,17 +1098,13 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._resetDownloadInfo();
           this._updateState(GGHotUpdateInstanceState.CheckUpdateInProgress);
 
-          // 按照以下顺序，读取「此包」「本地最新版本」的 project.manifest 文件内容到内存中
-          //
-          // 1. 本地搜索目录的 project.manifest
-          // 2. 内置的 project.manifest
-          const localProjectManifestPaths = [this._projectManifestSearchPath, ...this._projectManifestBuildInPaths];
+          // 按照搜索路径顺序，读取「此包」「本地最新版本」的 project.manifest 文件内容到内存中
           {
             this._debug(`检查更新：解析本地 project.manifest 开始`);
-            this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(localProjectManifestPaths)}`);
+            this._debug(`检查更新：本地 project.manifest 文件搜索路径如下：${JSON.stringify(this._projectManifestSearchPaths)}`);
           }
           this._localProjectManifest = null;
-          for (const localProjectManifestPath of localProjectManifestPaths) {
+          for (const localProjectManifestPath of this._projectManifestSearchPaths) {
             this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：开始`);
             if (!native.fileUtils.isFileExist(localProjectManifestPath)) {
               this._debug(`检查更新：尝试从路径 ${localProjectManifestPath} 获取 project.manifest 信息：失败，文件不存在`);
@@ -1343,29 +1333,30 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           if (!isNewPathExist) {
             searchPaths.unshift(newSearchPath);
           }
-          this._debug(`最终搜索路径顺序：${JSON.stringify(searchPaths)}`);
+          {
+            this._debug(`最终搜索路径顺序：${JSON.stringify(searchPaths)}`);
+          }
+
+          // 重命名下载目录的 project.manifest.gg 为 project.manifest，以标记更新完毕，同时方便后续移动到搜索目录时，读取 project.manifest
+          // e.g.
+          // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest.gg ->
+          // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest
+          const srcFilePath = this._projectManifestDownloadPath;
+          const dstFilePath = srcFilePath.substring(0, srcFilePath.lastIndexOf(".gg"));
+          if (native.fileUtils.isFileExist(dstFilePath)) {
+            native.fileUtils.removeFile(dstFilePath);
+          }
+          this._createParentDirs(dstFilePath);
+          const renameSuc = native.fileUtils.renameFile(srcFilePath, dstFilePath);
+          {
+            this._debug(`重命名下载目录的 project.manifest.gg 为 project.manifest：${renameSuc ? "成功" : "失败"}。 ${srcFilePath} -> ${dstFilePath}`);
+          }
           const downloadDirPath = this._downloadRootDirPath + "/";
-          if (this.name == GGHotUpdateInstanceEnum.BuildIn) {
-            // 如果是主包
-
-            // 不用更新搜索路径，在下次重启时，main.js 会自动更新搜索路径
-
-            // 将主包下载好的 project.manifest.gg 重命名为 project.manifest，以标识主包的这个版本已经热更新完毕
-            // 在下一次重启游戏后，main.js 检查到 project.manifest 存在后，才能确认主包是热更新成功（而不是热更新一半了），才会将热更新后的主包内容从下载目录移动到搜索目录
-            // e.g.
-            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest.gg ->
-            // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest
-            const srcFilePath = this._projectManifestDownloadPath;
-            const dstFilePath = srcFilePath.substring(0, srcFilePath.lastIndexOf(".gg"));
-            this._debug(`主包热更新成功，将重命名下载目录的 project.manifest.gg 为 project.manifest 以标记主包热更新成功: ${srcFilePath} -> ${dstFilePath}`);
-            if (native.fileUtils.isFileExist(dstFilePath)) {
-              native.fileUtils.removeFile(dstFilePath);
-            }
-            this._createParentDirs(dstFilePath);
-            native.fileUtils.renameFile(srcFilePath, dstFilePath);
-          } else {
+          if (this.name == GGHotUpdateInstanceEnum.BuildIn) ;else {
             // 如果是子包
-            this._debug(`将移动下载目录 ${this._downloadRootDirPath} 的资源到搜索目录 ${this._searchRootDirPath}`);
+            {
+              this._debug(`将移动下载目录 ${this._downloadRootDirPath} 的资源到搜索目录 ${this._searchRootDirPath}`);
+            }
 
             // 更新搜索路径
             native.fileUtils.setSearchPaths(searchPaths);
@@ -1396,7 +1387,9 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
 
           // 缓存新的搜索路径数组，以便下次重启的时候，更新新的搜索路径
           localStorage.setItem("GGHotUpdateSearchPaths", JSON.stringify(searchPaths));
-          this._debug(`保存最新搜索路径到 LocalStorage 中，方便下次重启游戏时更新搜索路径`);
+          {
+            this._debug(`保存最新搜索路径到 LocalStorage 中，方便下次重启游戏时更新搜索路径`);
+          }
         }
         _debug(...args) {
           ggLogger.debug(this.name, ...args);
@@ -1428,7 +1421,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "7c768M/iutHF5TRZnALfhHC", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "83b5dYeKBNBSaY5Ftx2La0E", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1597,7 +1590,7 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "f5c34GzzehCrIH/G0kaAbQ9", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "b0f2cZ267tEdLDxlsmC7tfH", "GGHotUpdateType", undefined);
       /**
        * @author caizhitao
        * @created 2024-08-30 10:40:53
@@ -1649,7 +1642,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
       error = module.error;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "f769axO7fNPc70dhd4CcRuV", "GGLogger", undefined);
+      cclegacy._RF.push({}, "16d8avgy/FK76/ymC8WvEEC", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1716,7 +1709,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "31da95tffdJ74xi05kbrI21", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "2be50EZHuBGdb+x0NFX8Key", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *
