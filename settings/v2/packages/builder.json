@@ -33,57 +33,9 @@
   },
   "textureCompressConfig": {
     "userPreset": {
-      "cfuH3x0dhCbKSk8nygX+XV": {
-        "name": "GG Opaque",
-        "options": {
-          "web": {
-            "webp": {
-              "quality": 80
-            }
-          },
-          "ios": {
-            "astc_6x6": {
-              "quality": "medium"
-            }
-          },
-          "android": {
-            "astc_6x6": {
-              "quality": "medium"
-            }
-          },
-          "miniGame": {
-            "jpg": {
-              "quality": 80
-            }
-          }
-        }
-      },
+      "cfuH3x0dhCbKSk8nygX+XV": null,
       "86dNunrYZM2o/IUx0lxRGO": null,
-      "d7h8eHd0RPqL+93NUWjn80": {
-        "name": "GG Transparent",
-        "options": {
-          "web": {
-            "webp": {
-              "quality": 80
-            }
-          },
-          "ios": {
-            "astc_6x6": {
-              "quality": "medium"
-            }
-          },
-          "miniGame": {
-            "png": {
-              "quality": 80
-            }
-          },
-          "android": {
-            "astc_6x6": {
-              "quality": "medium"
-            }
-          }
-        }
-      }
+      "d7h8eHd0RPqL+93NUWjn80": null
     }
   }
 }
