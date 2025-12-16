@@ -1,9 +1,14 @@
 # CHANGELOG
 
+## 5.0.0(2025.12.1160)
+
+-   适配 cocos engine 引擎 `3.8.5` 版本
+-   适配 gg-hot-update 插件 `v5` 版本
+
 ## 4.0.0(2025.09.10)
 
 -   适配 cocos engine 引擎 `3.8.7` 版本
--   适配 gg-hot-update 插件 `4.0.0` 版本
+-   适配 gg-hot-update 插件 `v4` 版本
 
 ## 3.1.3(2025.07.25)
 
