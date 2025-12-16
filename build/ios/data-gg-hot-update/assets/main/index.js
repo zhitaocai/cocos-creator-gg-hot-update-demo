@@ -70,10 +70,10 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['cc', './env', './GGHotU
             let packageUrl = "";
             switch (sys.os) {
               case sys.OS.IOS:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/ios/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/ios/data-gg-hot-update`;
                 break;
               case sys.OS.ANDROID:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v4/build/android/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/android/data-gg-hot-update`;
                 // packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                 break;
             }
@@ -444,7 +444,7 @@ System.register("chunks:///_virtual/GameVersionConfig.ts", ['cc'], function (exp
 });
 
 System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './GGHotUpdateType.ts', './GGLogger.ts', './GGObserverSystem.ts'], function (exports) {
-  var cclegacy, path, native, DEBUG, GGHotUpdateInstanceState, GGHotUpdateInstanceEnum, ProjectManifestAssetUpdateState, ggLogger, GGObserverSystem;
+  var cclegacy, path, native, DEBUG, GGHotUpdateInstanceState, ProjectManifestAssetUpdateState, GGHotUpdateInstanceEnum, ggLogger, GGObserverSystem;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
@@ -454,15 +454,15 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       DEBUG = module.DEBUG;
     }, function (module) {
       GGHotUpdateInstanceState = module.GGHotUpdateInstanceState;
-      GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
       ProjectManifestAssetUpdateState = module.ProjectManifestAssetUpdateState;
+      GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
     }, function (module) {
       ggLogger = module.ggLogger;
     }, function (module) {
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "71903qb1UZAAbNFkerY/rD8", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "ce4ddvfT+RPBYRsibnMNO+v", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -543,9 +543,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``http://192.168.0.1:8080/1.0.0``
-           *      * 子包: ``http://192.168.0.1:8080/1.0.0/assets/${bundleName}``
+           * ``http://192.168.0.1:8080/1.0.0``
            */
           this._remoteRootUrl = void 0;
           /**
@@ -559,14 +557,12 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           /**
            * 热更包的本地下载根目录
            *
-           * * 主包：如果确认热更新完毕，那么会在下次游戏启动时，将这个下载目录的内容移动到搜索目录
-           * * 子包：如果确认热更新完毕，那么会在更新搜索路径时（updateSearchPath）， 将这个下载目录的内容移动到搜索目录
+           * * 主包：如果热更新成功，那么会在下次游戏启动时，将下载目录的内容移动到搜索目录
+           * * 子包：如果热更新成功，那么会在此时， 将下载目录的内容移动到搜索目录
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}``
+           * * Android: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}``
            */
           this._downloadRootDirPath = void 0;
           /**
@@ -574,9 +570,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``http://192.168.0.1:8080/1.0.0/version.manifest``
-           *      * 子包: ``http://192.168.0.1:8080/1.0.0/assets/${bundleName}/version.manifest``
+           * ``http://192.168.0.1:8080/1.0.0/${bundleName}.version.manifest``
            */
           this._versionManifestRemoteUrl = void 0;
           /**
@@ -584,9 +578,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/version.manifest``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/version.manifest``
+           * * Android: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/${bundleName}.version.manifest``
            */
           this._versionManifestDownloadPath = void 0;
           /**
@@ -594,9 +586,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``http://192.168.0.1:8080/1.0.0/project.manifest``
-           *      * 子包: ``http://192.168.0.1:8080/1.0.0/assets/${bundleName}/project.manifest``
+           * ``http://192.168.0.1:8080/1.0.0/${bundleName}.project.manifest``
            */
           this._projectManifestRemoteUrl = void 0;
           /**
@@ -605,14 +595,9 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            * e.g.
            *
            * * Android:
-           *      * 主包:
-           *          * ``/data/user/0/${packageName}/files/gg-hot-update/project.manifest``
-           *          * ``@assets/project.manifest``
-           *          * ``data/project.manifest``
-           *      * 子包:
-           *          * ``/data/user/0/${packageName}/files/gg-hot-update/assets/${bundleName}/project.manifest``
-           *          * ``@assets/assets/${bundleName}/project.manifest``
-           *          * ``data/assets/${bundleName}/project.manifest"``
+           *      * ``/data/user/0/${packageName}/files/gg-hot-update/${bundleName}.project.manifest``
+           *      * ``@assets/${bundleName}.project.manifest``
+           *      * ``data/${bundleName}/project.manifest"``
            */
           this._projectManifestSearchPaths = void 0;
           /**
@@ -620,9 +605,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
            *
            * e.g.
            *
-           * * Android:
-           *      * 主包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/build-in/project.manifest.gg``
-           *      * 子包: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/project.manifest.gg``
+           * * Android: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}/${bundleName}.project.manifest.gg``
            */
           this._projectManifestDownloadPath = void 0;
           /**
@@ -680,19 +663,11 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
           this._remoteRootUrl = remoteRootUrl;
           this._searchRootDirPath = searchRootDirPath;
           this._downloadRootDirPath = path.join(this._searchRootDirPath + "-temp", this.name);
-          if (this.name == GGHotUpdateInstanceEnum.BuildIn) {
-            this._versionManifestRemoteUrl = `${this._remoteRootUrl}/version.manifest`;
-            this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "version.manifest");
-            this._projectManifestRemoteUrl = `${this._remoteRootUrl}/project.manifest`;
-            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "project.manifest.gg");
-            this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, "project.manifest"), `@assets/project.manifest`, path.join("data", "project.manifest")];
-          } else {
-            this._versionManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/version.manifest`;
-            this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "version.manifest");
-            this._projectManifestRemoteUrl = `${this._remoteRootUrl}/assets/${this.name}/project.manifest`;
-            this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, "assets", this.name, "project.manifest.gg");
-            this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, "assets", this.name, "project.manifest"), `@assets/assets/${this.name}/project.manifest`, path.join("data", "assets", this.name, "project.manifest")];
-          }
+          this._versionManifestRemoteUrl = `${this._remoteRootUrl}/${this.name}.version.manifest`;
+          this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, `${this.name}.version.manifest`);
+          this._projectManifestRemoteUrl = `${this._remoteRootUrl}/${this.name}.project.manifest`;
+          this._projectManifestDownloadPath = path.join(this._downloadRootDirPath, `${this.name}.project.manifest.gg`);
+          this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, `${this.name}.project.manifest`), `@assets/${this.name}.project.manifest`, path.join("data", `${this.name}.project.manifest`)];
           this._localProjectManifest = null;
           this._remoteProjectManifest = null;
           this._downloader = new native.Downloader();
@@ -1201,7 +1176,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
                 if (native.fileUtils.isFileExist(downloadTempFilePath)) {
                   let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
                   if (downloadFileSize > 0) {
-                    this._downloadedBytes += remoteAssetInfo.size;
+                    this._downloadedBytes += downloadFileSize;
                   }
                 }
                 // 未下载或下载失败的任务加入到失败列表
@@ -1339,8 +1314,8 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
 
           // 重命名下载目录的 project.manifest.gg 为 project.manifest，以标记更新完毕，同时方便后续移动到搜索目录时，读取 project.manifest
           // e.g.
-          // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest.gg ->
-          // /data/user/0/package/files/gg-hot-update-temp/build-in/project.manifest
+          // /data/user/0/package/files/gg-hot-update-temp/${bundleName}/${bundleName}.project.manifest.gg ->
+          // /data/user/0/package/files/gg-hot-update-temp/${bundleName}/${bundleName}.project.manifest
           const srcFilePath = this._projectManifestDownloadPath;
           const dstFilePath = srcFilePath.substring(0, srcFilePath.lastIndexOf(".gg"));
           if (native.fileUtils.isFileExist(dstFilePath)) {
@@ -1421,7 +1396,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "83b5dYeKBNBSaY5Ftx2La0E", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "626c4ENT/tHW4f+Vohy2+x2", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1590,11 +1565,9 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "b0f2cZ267tEdLDxlsmC7tfH", "GGHotUpdateType", undefined);
-      /**
-       * @author caizhitao
-       * @created 2024-08-30 10:40:53
-       */
+      cclegacy._RF.push({}, "d4413fzKERHfKqFv4TymJXv", "GGHotUpdateType", undefined);
+      const GGHotUpdateName = exports('GGHotUpdateName', "gg-hot-update");
+      const GGHotUpdateVersion = exports('GGHotUpdateVersion', "5.0.0");
       /**
        * 热更新实例类型
        */
@@ -1634,15 +1607,18 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
   };
 });
 
-System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
-  var cclegacy, error;
+System.register("chunks:///_virtual/GGLogger.ts", ['cc', './GGHotUpdateType.ts'], function (exports) {
+  var cclegacy, error, GGHotUpdateVersion, GGHotUpdateName;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
       error = module.error;
+    }, function (module) {
+      GGHotUpdateVersion = module.GGHotUpdateVersion;
+      GGHotUpdateName = module.GGHotUpdateName;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "16d8avgy/FK76/ymC8WvEEC", "GGLogger", undefined);
+      cclegacy._RF.push({}, "01183uinaZCZYHgO6+VUcZw", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -1692,7 +1668,8 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc'], function (exports) {
               error("打印日志异常，可以忽略，也可以排查");
             }
           }
-          args.unshift("gg-hot-update");
+          args.unshift(GGHotUpdateVersion);
+          args.unshift(GGHotUpdateName);
           return args;
         }
       }
@@ -1709,7 +1686,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc'], function (expo
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "2be50EZHuBGdb+x0NFX8Key", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "37930afalFAH4FbNMJfWeYM", "GGObserverSystem", undefined);
       /**
        * 观察者系统
        *

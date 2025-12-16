@@ -2,7 +2,7 @@
   "name": "cocos-creator-gg-hot-update-demo",
   "server": "",
   "engineModulesConfigKey": "defaultConfig",
-  "platform": "android",
+  "platform": "ios",
   "buildPath": "project://build",
   "debug": true,
   "buildMode": "normal",
@@ -20,11 +20,11 @@
       "gfx-webgl2": "off"
     }
   },
-  "nativeCodeBundleMode": "wasm",
+  "nativeCodeBundleMode": "asmjs",
   "polyfills": {
     "asyncFunctions": false
   },
-  "experimentalEraseModules": true,
+  "experimentalEraseModules": false,
   "startSceneAssetBundle": false,
   "bundleConfigs": [],
   "inlineEnum": true,
@@ -37,12 +37,12 @@
   },
   "mainBundleIsRemote": false,
   "mainBundleCompressionType": "merge_all_json",
-  "useSplashScreen": false,
+  "useSplashScreen": true,
   "bundleCommonChunk": false,
   "packAutoAtlas": true,
   "startScene": "b0b159ee-3162-4b4d-bf53-dc7a802860d0",
-  "outputName": "android",
-  "taskName": "android",
+  "outputName": "ios",
+  "taskName": "ios",
   "scenes": [
     {
       "url": "db://assets/bundle-game-a/scenes/GameScene.scene",
@@ -82,60 +82,40 @@
     "threshold": 16,
     "enable": false
   },
-  "buildStageGroup": {
-    "build": []
-  },
   "packages": {
-    "android": {
-      "packageName": "com.gg.hotupdate.demo",
-      "resizeableActivity": true,
-      "maxAspectRatio": "2.4",
+    "ios": {
+      "executableName": "",
+      "packageName": "com.cocos.ios",
+      "renderBackEnd": {
+        "metal": true
+      },
+      "skipUpdateXcodeProject": true,
       "orientation": {
         "portrait": true,
         "upsideDown": false,
         "landscapeRight": false,
         "landscapeLeft": false
       },
-      "apiLevel": 36,
-      "appABIs": [
-        "arm64-v8a",
-        "armeabi-v7a"
-      ],
-      "useDebugKeystore": true,
-      "keystorePath": "",
-      "keystorePassword": "",
-      "keystoreAlias": "",
-      "keystoreAliasPassword": "",
-      "appBundle": false,
-      "androidInstant": false,
-      "inputSDK": false,
-      "remoteUrl": "",
-      "sdkPath": "",
-      "ndkPath": "",
-      "javaHome": "",
-      "javaPath": "",
-      "renderBackEnd": {
-        "vulkan": false,
-        "gles3": true,
-        "gles2": true
+      "osTarget": {
+        "iphoneos": true,
+        "simulator": false
       },
-      "swappy": false,
+      "targetVersion": "12.0",
       "__version__": "1.0.1"
+    },
+    "native": {
+      "encrypted": false,
+      "xxteaKey": "3fklXK+g1GBrBWIe",
+      "compressZip": false,
+      "JobSystem": "none",
+      "__version__": "1.0.2"
     },
     "gg-hot-update": {
       "enable": true,
       "configPath": "gg-hot-update-config.json",
-      "__version__": "4.0.0",
-      "outputDirAbsPath": ""
-    },
-    "native": {
-      "encrypted": false,
-      "xxteaKey": "41WcLE0vBOzpG7pg",
-      "compressZip": false,
-      "JobSystem": "none",
-      "__version__": "1.0.2"
+      "__version__": "4.0.0"
     }
   },
   "__version__": "1.3.9",
-  "logDest": "project://temp/builder/log/android9-10-2025 12-00.log"
+  "logDest": "project://temp/builder/log/ios9-10-2025 15-16.log"
 }
