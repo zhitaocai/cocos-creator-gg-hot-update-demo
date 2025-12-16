@@ -185,7 +185,7 @@ System.register([], (function (exports, module) {
       });
       const legacyCC = cclegacy;
       cclegacy.internal = {};
-      const engineVersion = exports("aM", '3.8.7');
+      const engineVersion = exports("aM", '3.8.8');
       _global.CocosEngine = legacyCC.ENGINE_VERSION = engineVersion;
       _global.cc = legacyCC;
       const ccwindow$1 = typeof globalThis.jsb !== 'undefined' ? typeof jsb.window !== 'undefined' ? jsb.window : globalThis : globalThis;
@@ -22054,10 +22054,8 @@ System.register([], (function (exports, module) {
       };
       imageAssetProto.reset = function (data) {
         this._nativeData = data;
-        if (!(data instanceof jsbWindow$1.HTMLElement)) {
-          if (data.format !== undefined) {
-            this.format = data.format;
-          }
+        if (data.format !== undefined && !this.isFormatFixed()) {
+          this.format = data.format;
         }
         this._syncDataToNative();
       };
@@ -22155,7 +22153,7 @@ System.register([], (function (exports, module) {
         }
         if (ext) {
           this._setRawAsset(ext);
-          this.format = format;
+          this.setFixedFormat(format);
         } else {
           warnID(3121);
         }
@@ -30696,6 +30694,7 @@ if (prop) {
         if (prefabInfo && prefabInfo.nestedPrefabInstanceRoots) {
           prefabInfo.nestedPrefabInstanceRoots.forEach(instanceNode => {
             expandPrefabInstanceNode(instanceNode);
+            applyTargetOverrides(instanceNode);
           });
         }
       }
@@ -40284,7 +40283,12 @@ if (prop) {
           this._initIDataCount = iCount;
           this._attributes = attrs;
           this.floatsPerVertex = getAttributeStride(attrs) >> 2;
-          assertIsTrue(this._initVDataCount / this._floatsPerVertex < 65536, getError(9005));
+          var vDataCountLimit = 65536;
+          const glApi = device.gfxAPI;
+          if (glApi === 8 || glApi === 7 || glApi === 6 && device.hasFeature(0)) {
+            vDataCountLimit = 4294967295;
+          }
+          assertIsTrue(this._initVDataCount / this._floatsPerVertex < vDataCountLimit, getError(9005));
           if (!this.vData || !this.iData) {
             this.vData = new Float32Array(this._initVDataCount);
             this.iData = new Uint16Array(this._initIDataCount);
@@ -41169,6 +41173,10 @@ if (prop) {
             renderDrawInfo.setVBCount(this._vc);
             renderDrawInfo.setIBCount(this._ic);
           }
+        }
+        updateSize(vertexCount, indexCount) {
+          this._vc = vertexCount;
+          this._ic = indexCount;
         }
         setRenderDrawInfoAttributes() {
           {
@@ -42560,7 +42568,7 @@ if (prop) {
           this.node.off("anchor-changed", this._nodeStateChange, this);
           this.node.off("size-changed", this._nodeStateChange, this);
           this.node.off("parent-changed", this._colorDirty, this);
-          this._destroyData();
+          this.destroyRenderData();
           uiRendererManager.removeRenderer(this);
           this._renderFlag = false;
           this._renderEntity.enabled = false;
@@ -42642,8 +42650,7 @@ if (prop) {
           this._updateBlendFunc();
         }
         _updateColor() {
-          this.node._uiProps.colorDirty = true;
-          this.setEntityColorDirty(true);
+          this._colorDirty();
           this.setEntityColor(this._color);
           const assembler = this._assembler;
           if (assembler) {
@@ -43345,7 +43352,7 @@ if (prop) {
           if (!this.renderData) {
             if (this._assembler && this._assembler.createData) {
               this._renderData = this._assembler.createData(this);
-              this.renderData.material = this.material;
+              this.renderData.material = this.getRenderMaterial(0);
               this._updateColor();
             }
           }
@@ -43775,6 +43782,7 @@ if (prop) {
             }
             if (textureChanged) {
               if (self.renderData) self.renderData.textureDirty = true;
+              this._colorDirty();
               const oldIsRT = oldFrame ? oldFrame.texture instanceof RenderTexture : false;
               const newIsRT = spriteFrame.texture instanceof RenderTexture;
               if (oldIsRT !== newIsRT) {
@@ -48727,6 +48735,10 @@ if (prop) {
             return;
           }
           style.actualFontSize = style.fontSize * this._fontScale;
+          {
+            style.actualFontSize = Math.floor(style.actualFontSize);
+            this._fontScale = style.actualFontSize / style.fontSize;
+          }
           const paragraphedStrings = inputString.split('\n');
           const _splitStrings = outputLayoutData.parsedString = paragraphedStrings;
           const _fontDesc = this._getFontDesc(style.actualFontSize, style.fontFamily, style.isBold, style.isItalic);
@@ -58792,8 +58804,8 @@ if (prop) {
               let accessor = animationFunction.get(lastPropertyKey);
               if (!accessor) {
                 accessor = {
-                  setValue: Function('value', `this.target.${lastPropertyKey} = value;`),
-                  getValue: Function(`return this.target.${lastPropertyKey};`)
+                  setValue: Function('value', `this.target["${lastPropertyKey}"] = value;`),
+                  getValue: Function(`return this.target["${lastPropertyKey}"];`)
                 };
                 animationFunction.set(lastPropertyKey, accessor);
               }
@@ -82826,7 +82838,8 @@ if (prop) {
           const self = this;
           const startDelay = self.startDelay.evaluate(0, 1);
           if (self._time > startDelay) {
-            if (self._time > self.duration + startDelay) {
+            const timeLeft = self._time - (self.duration + startDelay);
+            if (timeLeft > dt) {
               if (!self.loop) {
                 self._isEmitting = false;
               }
@@ -82850,8 +82863,10 @@ if (prop) {
               self._emitRateDistanceCounter -= emitNum;
               self.emit(emitNum, dt);
             }
-            for (const burst of self.bursts) {
-              burst.update(self, dt);
+            if (timeLeft <= 0 || self.loop) {
+              for (const burst of self.bursts) {
+                burst.update(self, dt);
+              }
             }
           }
         }
@@ -86140,7 +86155,7 @@ if (prop) {
           }
           indexCount = vertexCount <= 2 ? 0 : (vertexCount - 2) * 3;
           renderData.resize(vertexCount, indexCount);
-          {
+          if (comp.texture) {
             const indexCount = renderData.indexCount;
             this.createQuadIndices(comp, indexCount);
             renderData.chunk.setIndexBuffer(QUAD_INDICES);
@@ -90700,7 +90715,7 @@ if (prop) {
       }
       function shouldUseWasmModule() {
         {
-          return false;
+          return true;
         }
       }
       function waitForAmmoInstantiation() {
@@ -90709,13 +90724,13 @@ if (prop) {
         };
         return ensureWasmModuleReady().then(() => {
           if (shouldUseWasmModule()) {
-            return Promise.all([module.import('./bullet.release.wasm-C41u1lVv.js'), module.import('./bullet.release.wasm-BhWLP6og.js')]).then(([{
+            return Promise.all([module.import('./bullet.release.wasm-3mSTTIrT.js').then(function (n) { return n.b; }), module.import('./bullet.release.wasm-DvHJ_B-D.js')]).then(([{
               default: bulletWasmFactory
             }, {
               default: bulletWasmUrl
             }]) => initWASM(bulletWasmFactory, bulletWasmUrl));
           } else {
-            return module.import('./bullet.release.asm-BWTIqF-Z.js').then(function (n) { return n.b; }).then(({
+            return module.import('./bullet.release.asm-CQb92-io.js').then(({
               default: bulletAsmFactory
             }) => initASM(bulletAsmFactory));
           }
@@ -91260,6 +91275,10 @@ if (prop) {
             Vec3.subtract(direction, toPoint, fromPoint);
             const stepLength = Vec3.len(direction);
             distance += stepLength;
+            const EPSILON = 1e-6;
+            if (Math.abs(stepLength) < EPSILON) {
+              continue;
+            }
             Vec3.multiplyScalar(direction, direction, 1.0 / stepLength);
             worldRay.d = direction;
             worldRay.o = fromPoint;
@@ -99748,6 +99767,8 @@ if (prop) {
             this.defaultAnimation = '';
             this._animationName = '';
             this._skinName = '';
+            this._animCache = null;
+            this._destroySkeletonInfo(this._skeletonCache);
             this._updateSkeletonData();
             this._updateUITransform();
           }
@@ -100905,13 +100926,17 @@ if (prop) {
         const rd = comp.renderData;
         if (!rd || vc < 1 || ic < 1) return;
         if (rd.vertexCount !== vc || rd.indexCount !== ic) {
-          if (rd.vertexCount < vc || rd.indexCount < ic) {
-            rd.resize(Math.ceil(vc * ADJUST_SIZE_RATE), Math.ceil(ic * ADJUST_SIZE_RATE));
-          }
-          rd.indices = new Uint16Array(ic);
           comp._vLength = vc * 4 * floatStride;
+          if (!rd.chunk || rd.chunk.vb.byteLength < comp._vLength || rd.chunk.indexCount < ic) {
+            rd.resize(Math.ceil(vc * ADJUST_SIZE_RATE), Math.ceil(ic * ADJUST_SIZE_RATE));
+          } else if (rd.chunk) {
+            rd.updateSize(vc, ic);
+          }
           comp._vBuffer = new Uint8Array(rd.chunk.vb.buffer, rd.chunk.vb.byteOffset, comp._vLength);
           comp._iLength = 2 * ic;
+        }
+        if (!rd.indices || rd.indices.length < ic) {
+          rd.indices = new Uint16Array(ic);
           comp._iBuffer = new Uint8Array(rd.indices.buffer);
         }
         const vbuf = rd.chunk.vb;
@@ -101009,9 +101034,13 @@ if (prop) {
         const rd = comp.renderData;
         if (!rd || vc < 1 || ic < 1) return;
         if (rd.vertexCount !== vc || rd.indexCount !== ic) {
-          if (rd.vertexCount < vc || rd.indexCount < ic) {
+          if (!rd.chunk || rd.chunk.vb.byteLength < vc * 4 * _byteStrideTwoColor || rd.chunk.indexCount < ic) {
             rd.resize(Math.ceil(vc * ADJUST_SIZE_RATE), Math.ceil(ic * ADJUST_SIZE_RATE));
+          } else if (rd.chunk) {
+            rd.updateSize(vc, ic);
           }
+        }
+        if (!rd.indices || rd.indices.length < ic) {
           rd.indices = new Uint16Array(ic);
         }
         const vbuf = rd.chunk.vb;
