@@ -4,6 +4,7 @@
 **/android/proj/
 **/android/cocos.compile.config.json
 **/android/data-gg-hot-update.zip
+**/android/**/*.apk
 
 # iOS
 **/ios/assets

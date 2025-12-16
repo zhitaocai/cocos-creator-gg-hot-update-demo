@@ -5,5 +5,5 @@ export const GameVersionConfig = {
     /**
      * 游戏版本名（每次发布都要更新）
      */
-    gameVersionName: "4.0.0",
+    gameVersionName: "5.0.0",
 };
