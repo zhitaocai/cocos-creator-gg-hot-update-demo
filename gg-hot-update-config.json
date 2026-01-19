@@ -6,15 +6,19 @@
     },
     "remote_bundles": {
         "build-in": {
+            "zip": true,
             "files": ["src/", "jsb-adapter/", "assets/internal/", "assets/main/", "assets/resources/", "assets/bundle-game-a/"]
         },
         "bundle-game-b": {
+            "zip": true,
             "files": ["assets/bundle-game-b/"]
         },
         "bundle-game-c": {
+            "zip": true,
             "files": ["assets/bundle-game-c/"]
         },
         "bundle-game-d": {
+            "zip": true,
             "files": ["assets/bundle-game-d/"]
         }
     }
