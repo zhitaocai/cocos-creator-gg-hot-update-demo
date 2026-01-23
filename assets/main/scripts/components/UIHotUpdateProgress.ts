@@ -1,4 +1,5 @@
 import { _decorator, Component, Label, ProgressBar } from "cc";
+import { GGHotUpdateInstance } from "../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateInstance";
 import { GGHotUpdateInstanceState } from "../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
 
 const { ccclass, property } = _decorator;
@@ -30,23 +31,18 @@ export class UIHotUpdateProgress extends Component {
     downloadRemainTimeLabel: Label = null!;
 
     /**
-     * 设置下载进度可见性
-     */
-    private _setUpdateProgressVisability(visable: boolean) {
-        this.progressBar.node.active = visable;
-        this.progressLabel.node.active = visable;
-        this.downloadSpeedLabel.node.active = visable;
-        this.downloadSizeLabel.node.active = visable;
-        this.downloadRemainTimeLabel.node.active = visable;
-    }
-
-    /**
-     * 根据不同状态，更新UI
+     * 更新UI状态
      *
-     * @param state 状态
+     * @param instance 热更新实例
      */
-    updateState(state: GGHotUpdateInstanceState) {
-        switch (state) {
+    updateUI(instance: GGHotUpdateInstance | null) {
+        if (instance == null) {
+            this.messageLabel.string = "";
+            this._setUpdateProgressVisability(false);
+            return;
+        }
+
+        switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
                 this.messageLabel.string = "";
                 this._setUpdateProgressVisability(false);
@@ -67,10 +63,20 @@ export class UIHotUpdateProgress extends Component {
             case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
                 this.messageLabel.string = "Already up to date";
                 break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
                 this.messageLabel.string = "Updating Resources";
                 this._setUpdateProgressVisability(true);
+                this._updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
                 break;
+            case GGHotUpdateInstanceState.HotUpdateExtracting: {
+                let percent = 0;
+                if (instance.zipExtractTotalBytes > 0) {
+                    percent = instance.zipExtractedBytes / instance.zipExtractTotalBytes;
+                }
+                this.messageLabel.string = `Extracting Resources: ${(percent * 100).toFixed(2)}%`;
+                this._setUpdateProgressVisability(false);
+                break;
+            }
             case GGHotUpdateInstanceState.HotUpdateSuc:
                 this.messageLabel.string = "Resources update successful";
                 break;
@@ -81,6 +87,17 @@ export class UIHotUpdateProgress extends Component {
     }
 
     /**
+     * 设置下载进度可见性
+     */
+    private _setUpdateProgressVisability(visable: boolean) {
+        this.progressBar.node.active = visable;
+        this.progressLabel.node.active = visable;
+        this.downloadSpeedLabel.node.active = visable;
+        this.downloadSizeLabel.node.active = visable;
+        this.downloadRemainTimeLabel.node.active = visable;
+    }
+
+    /**
      * 更新下载进度
      *
      * @param totalBytes 总下载字节数
@@ -88,7 +105,7 @@ export class UIHotUpdateProgress extends Component {
      * @param byteSpeedInSecond 下载速度（Bytes/s)
      * @param remainTimeInScond 下载剩余时间(s)
      */
-    updateProgress(totalBytes: number, downloadedBytes: number, byteSpeedInSecond: number, remainTimeInScond: number) {
+    private _updateProgress(totalBytes: number, downloadedBytes: number, byteSpeedInSecond: number, remainTimeInScond: number) {
         let percent = 0;
         if (totalBytes > 0) {
             percent = downloadedBytes / totalBytes;

@@ -5,6 +5,7 @@ import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { HotUpdateBundleConfig } from "../../configs/HotUpdateBundleConfig";
 import { SceneConfig, sceneRouter } from "../../framework/scene/SceneRouter";
 import { hotUpdateSystem } from "../hotupdate/HotUpdateSystem";
+import { JSB } from "cc/env";
 const { ccclass, property } = _decorator;
 
 export interface LobbyGameListItemModel {
@@ -32,6 +33,11 @@ export class LobbyGameListItem extends Component {
 
     onClick() {
         if (!this._data) {
+            return;
+        }
+        // 如果不是原生平台，直接进入子游戏
+        if (!JSB) {
+            sceneRouter.runSceneAsync(this._data.sceneConfig);
             return;
         }
         // 如果

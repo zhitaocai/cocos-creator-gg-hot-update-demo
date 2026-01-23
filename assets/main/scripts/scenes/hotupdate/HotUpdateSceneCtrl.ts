@@ -2,28 +2,27 @@ import { _decorator, Component, Label } from "cc";
 import { GGHotUpdateInstance, GGHotUpdateInstanceObserver } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateInstance";
 import { ggHotUpdateManager } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateManager";
 import { GGHotUpdateInstanceState } from "../../../../../extensions/gg-hot-update/assets/scripts/hotupdate/GGHotUpdateType";
-import { UIHotUpdateProgress } from "../../components/UIHotUpdateProgress";
 import { GameSceneConfig } from "../../configs/GameSceneConfig";
 import { sceneRouter } from "../../framework/scene/SceneRouter";
 import { hotUpdateSystem } from "./HotUpdateSystem";
 const { ccclass, property } = _decorator;
 
+/**
+ * 子包热更新场景 热更新逻辑 控制
+ *
+ * @author caizhitao
+ * @created 2025-02-08 18:33:34
+ */
 @ccclass
 export class HotUpdateSceneCtrl extends Component implements GGHotUpdateInstanceObserver {
     @property(Label)
     bundleNameLabel: Label = null!;
-
-    @property({ type: UIHotUpdateProgress, tooltip: "热更新进度组件" })
-    hpProgressComp: UIHotUpdateProgress = null!;
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 组件生命周期处理
 
     protected onEnable(): void {
         this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig!.bundleName;
-
-        // 显示 loading
-        this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
 
         // 检查更新
         const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig!.bundleName);
@@ -41,7 +40,6 @@ export class HotUpdateSceneCtrl extends Component implements GGHotUpdateInstance
     // 热更新回调
 
     onGGHotUpdateInstanceCallBack(instance: GGHotUpdateInstance): void {
-        this.hpProgressComp.updateState(instance.state);
         switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
                 break;
@@ -64,9 +62,11 @@ export class HotUpdateSceneCtrl extends Component implements GGHotUpdateInstance
                 // 检查更新成功：当前已经是最新版本，直接进入游戏场景
                 this._enterGameScene();
                 break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
-                // 热更新：进行中
-                this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
+                // 热更新：文件下载中
+                break;
+            case GGHotUpdateInstanceState.HotUpdateExtracting:
+                // 热更新：文件解压中
                 break;
             case GGHotUpdateInstanceState.HotUpdateSuc:
                 // 热更新：成功，进入游戏

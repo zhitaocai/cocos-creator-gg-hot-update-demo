@@ -9,7 +9,7 @@ import { sceneRouter } from "../../framework/scene/SceneRouter";
 const { ccclass, property } = _decorator;
 
 /**
- * 启动场景 热更新 主逻辑 控制
+ * 启动场景 热更新逻辑 控制
  *
  * @author caizhitao
  * @created 2025-08-23 22:04:18
@@ -23,12 +23,18 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
         if (JSB) {
             let packageUrl = "";
             switch (sys.os) {
+                case sys.OS.OPENHARMONY:
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/harmonyos-next/data-gg-hot-update`;
+                    break;
+                case sys.OS.OHOS:
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/ohos/data-gg-hot-update`;
+                    break;
                 case sys.OS.IOS:
-                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/ios/data-gg-hot-update`;
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/ios/data-gg-hot-update`;
                     break;
                 case sys.OS.ANDROID:
-                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/android/data-gg-hot-update`;
-                    // packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
+                    packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/android/data-gg-hot-update`;
+                    // packageUrl = `http://192.168.40.10:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                     break;
             }
             ggHotUpdateManager.init({
@@ -134,7 +140,8 @@ export class BootSceneCtrl extends Component implements GGHotUpdateInstanceObser
                 // 检查更新成功，但没有发现新版本，跳过热更新
                 this._enterLobbyScene();
                 break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
+            case GGHotUpdateInstanceState.HotUpdateExtracting:
                 break;
             case GGHotUpdateInstanceState.HotUpdateSuc: {
                 // 热更新：成功，重启游戏
