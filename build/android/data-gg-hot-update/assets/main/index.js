@@ -1048,8 +1048,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
               id: id,
               zip_file_abs_path: option.zip_file_abs_path,
               zip_dest_dir_abs_path: option.zip_dest_dir_abs_path,
-              zip_dest_dir_remove_first: option.zip_dest_dir_remove_first,
-              zip_uncompressed_bytes: option.zip_uncompressed_bytes
+              zip_uncompressed_bytes: option.zip_uncompressed_bytes,
+              remove_zip_dest_dir_before_extract: option.remove_zip_dest_dir_before_extract,
+              delete_zip_after_extract: option.delete_zip_after_extract
             }
           });
           return resp.code == GGJsbResponseCode.Suc ? id : null;
@@ -2213,8 +2214,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
                 this._zipTaskId = ggZip.createExtractTask({
                   zip_file_abs_path: this._zipDownloadPath,
                   zip_dest_dir_abs_path: this._downloadRootDirPath,
-                  zip_dest_dir_remove_first: true,
-                  zip_uncompressed_bytes: ((_this$_remoteVersionM3 = this._remoteVersionManifest) == null ? void 0 : _this$_remoteVersionM3.zip_uncompressed_bytes) ?? 0
+                  zip_uncompressed_bytes: ((_this$_remoteVersionM3 = this._remoteVersionManifest) == null ? void 0 : _this$_remoteVersionM3.zip_uncompressed_bytes) ?? 0,
+                  remove_zip_dest_dir_before_extract: true,
+                  delete_zip_after_extract: true
                 });
                 break;
               }
