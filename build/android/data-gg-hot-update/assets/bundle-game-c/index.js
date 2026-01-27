@@ -1,4 +1,4 @@
-System.register("chunks:///bundle-game-c.js", ['cc', './SceneRouter-79865703.js'], function () {
+System.register("chunks:///bundle-game-c.js", ['cc', './SceneRouter-28bb57e1.js'], function () {
   var cclegacy, Component, _decorator, sceneRouter, GameSceneConfig;
   return {
     setters: [function (module) {

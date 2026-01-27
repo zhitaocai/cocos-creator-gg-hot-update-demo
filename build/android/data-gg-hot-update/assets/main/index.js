@@ -1,5 +1,5 @@
-System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d38038d.js', './SceneRouter-79865703.js'], function () {
-  var cclegacy, Label, Component, _decorator, ProgressBar, UIOpacity, Tween, tween, Sprite, Enum, Widget, UITransform, error, path, native, game, sys, Node, NodePool, instantiate, Layout, size, assetManager, SpriteFrame, _applyDecoratedDescriptor, _initializerDefineProperty, GameBundleConfig, sceneRouter, GameSceneConfig;
+System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d38038d.js', './SceneRouter-28bb57e1.js'], function () {
+  var cclegacy, Label, Component, _decorator, ProgressBar, UIOpacity, Tween, tween, Sprite, Enum, Widget, UITransform, error, sys, native, path, game, Node, NodePool, instantiate, Layout, size, assetManager, SpriteFrame, _applyDecoratedDescriptor, _initializerDefineProperty, GameBundleConfig, sceneRouter, GameSceneConfig;
   return {
     setters: [function (module) {
       cclegacy = module.cclegacy;
@@ -15,10 +15,10 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       Widget = module.Widget;
       UITransform = module.UITransform;
       error = module.error;
-      path = module.path;
-      native = module.native;
-      game = module.game;
       sys = module.sys;
+      native = module.native;
+      path = module.path;
+      game = module.game;
       Node = module.Node;
       NodePool = module.NodePool;
       instantiate = module.instantiate;
@@ -59,9 +59,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }) || _class) || _class);
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "d4413fzKERHfKqFv4TymJXv", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "af410WxsfhNw5NATlmRy6O9", "GGHotUpdateType", undefined);
       const GGHotUpdateName = "gg-hot-update";
-      const GGHotUpdateVersion = "5.0.0";
+      const GGHotUpdateVersion = "6.0.0";
       /**
        * 热更新实例类型
        */
@@ -75,6 +75,15 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
        */
 
       /**
+       * 热更新方式
+       */
+      let GGHotUpdateType = /*#__PURE__*/function (GGHotUpdateType) {
+        GGHotUpdateType["Full"] = "Full";
+        GGHotUpdateType["Incremental"] = "Incremental";
+        return GGHotUpdateType;
+      }({});
+
+      /**
        * 热更新实例状态
        */
       let GGHotUpdateInstanceState = /*#__PURE__*/function (GGHotUpdateInstanceState) {
@@ -86,7 +95,8 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         GGHotUpdateInstanceState["CheckUpdateFailedParseRemoteProjectManifestError"] = "CheckUpdateFailedParseRemoteProjectManifestError";
         GGHotUpdateInstanceState["CheckUpdateSucNewVersionFound"] = "CheckUpdateSucNewVersionFound";
         GGHotUpdateInstanceState["CheckUpdateSucAlreadyUpToDate"] = "CheckUpdateSucAlreadyUpToDate";
-        GGHotUpdateInstanceState["HotUpdateInProgress"] = "HotUpdateInProgress";
+        GGHotUpdateInstanceState["HotUpdateDownloading"] = "HotUpdateDownloading";
+        GGHotUpdateInstanceState["HotUpdateExtracting"] = "HotUpdateExtracting";
         GGHotUpdateInstanceState["HotUpdateSuc"] = "HotUpdateSuc";
         GGHotUpdateInstanceState["HotUpdateFailed"] = "HotUpdateFailed";
         return GGHotUpdateInstanceState;
@@ -121,23 +131,17 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           _initializerDefineProperty(this, "downloadRemainTimeLabel", _descriptor6, this);
         }
         /**
-         * 设置下载进度可见性
-         */
-        _setUpdateProgressVisability(visable) {
-          this.progressBar.node.active = visable;
-          this.progressLabel.node.active = visable;
-          this.downloadSpeedLabel.node.active = visable;
-          this.downloadSizeLabel.node.active = visable;
-          this.downloadRemainTimeLabel.node.active = visable;
-        }
-
-        /**
-         * 根据不同状态，更新UI
+         * 更新UI状态
          *
-         * @param state 状态
+         * @param instance 热更新实例
          */
-        updateState(state) {
-          switch (state) {
+        updateUI(instance) {
+          if (instance == null) {
+            this.messageLabel.string = "";
+            this._setUpdateProgressVisability(false);
+            return;
+          }
+          switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
               this.messageLabel.string = "";
               this._setUpdateProgressVisability(false);
@@ -158,10 +162,21 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
               this.messageLabel.string = "Already up to date";
               break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
               this.messageLabel.string = "Updating Resources";
               this._setUpdateProgressVisability(true);
+              this._updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
               break;
+            case GGHotUpdateInstanceState.HotUpdateExtracting:
+              {
+                let percent = 0;
+                if (instance.zipExtractTotalBytes > 0) {
+                  percent = instance.zipExtractedBytes / instance.zipExtractTotalBytes;
+                }
+                this.messageLabel.string = `Extracting Resources: ${(percent * 100).toFixed(2)}%`;
+                this._setUpdateProgressVisability(false);
+                break;
+              }
             case GGHotUpdateInstanceState.HotUpdateSuc:
               this.messageLabel.string = "Resources update successful";
               break;
@@ -172,6 +187,17 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
 
         /**
+         * 设置下载进度可见性
+         */
+        _setUpdateProgressVisability(visable) {
+          this.progressBar.node.active = visable;
+          this.progressLabel.node.active = visable;
+          this.downloadSpeedLabel.node.active = visable;
+          this.downloadSizeLabel.node.active = visable;
+          this.downloadRemainTimeLabel.node.active = visable;
+        }
+
+        /**
          * 更新下载进度
          *
          * @param totalBytes 总下载字节数
@@ -179,7 +205,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
          * @param byteSpeedInSecond 下载速度（Bytes/s)
          * @param remainTimeInScond 下载剩余时间(s)
          */
-        updateProgress(totalBytes, downloadedBytes, byteSpeedInSecond, remainTimeInScond) {
+        _updateProgress(totalBytes, downloadedBytes, byteSpeedInSecond, remainTimeInScond) {
           let percent = 0;
           if (totalBytes > 0) {
             percent = downloadedBytes / totalBytes;
@@ -508,7 +534,269 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }), _applyDecoratedDescriptor(_class2$1.prototype, "alignType", [_dec5$1], Object.getOwnPropertyDescriptor(_class2$1.prototype, "alignType"), _class2$1.prototype)), _class2$1)) || _class$3) || _class$3) || _class$3) || _class$3);
       cclegacy._RF.pop();
       const DEBUG = true;
-      cclegacy._RF.push({}, "01183uinaZCZYHgO6+VUcZw", "GGLogger", undefined);
+      cclegacy._RF.push({}, "d2da7ACD5NOQZccaMwIsIqU", "GGEventManager", undefined);
+      /**
+       * 缓存事件
+       */
+      /**
+       * 默认事件管理器
+       *
+       * @author caizhitao
+       * @created 2026-01-19 16:51:55
+       */
+      class GGEventManager {
+        constructor() {
+          /**
+           * key: 事件名
+           * value: 缓存事件
+           */
+          this._eventCacheMap = new Map();
+        }
+        /**
+         * 广播事件
+         *
+         * @param eventName 事件名
+         * @param param 传递的剩余不定参数
+         */
+        emit(eventName, ...param) {
+          const eventCacheArray = this._eventCacheMap.get(eventName);
+          if (eventCacheArray) {
+            for (let i = eventCacheArray.length - 1; i >= 0; i--) {
+              const eventCache = eventCacheArray[i];
+              if (!eventCache) {
+                continue;
+              }
+              // call 方法的语法和作用与 apply() 方法类似
+              // 只有一个区别
+              // 就是 call() 方法接受的是一个参数列表，而 apply() 方法接受的是一个包含多个参数的数组。
+              eventCache.callback.apply(eventCache.target, param);
+
+              // 只接受一次回调的事件，在触发之后就移除掉该缓存事件
+              if (eventCache.once) {
+                eventCacheArray.splice(i, 1);
+
+                // 如果移除后，事件已经没有回调函数了，就删除这个事件
+                if (eventCacheArray.length == 0) {
+                  this._eventCacheMap.delete(eventName);
+                }
+              }
+            }
+          }
+        }
+
+        /**
+         * 注册事件
+         *
+         * @param eventName 事件名
+         * @param callback 事件处理函数
+         * @param target 事件处理函数的执行对象
+         */
+        on(eventName, callback, target) {
+          this._on(eventName, callback, target, false);
+        }
+
+        /**
+         * 注册事件（接受函数执行一次后会自动销毁，不用主动off）
+         *
+         * @param eventName 事件名
+         * @param callback 事件处理函数
+         * @param target 事件处理函数的执行对象
+         */
+        onOnce(eventName, callback, target) {
+          this._on(eventName, callback, target, true);
+        }
+
+        /**
+         * 注册事件
+         *
+         * @param eventName 事件名
+         * @param callback 事件处理函数
+         * @param target 事件处理函数的执行对象
+         * @param once 是否只回调一次
+         */
+        _on(eventName, callback, target, once) {
+          let eventCacheArray = this._eventCacheMap.get(eventName);
+          if (!eventCacheArray) {
+            eventCacheArray = [];
+          }
+          let index = eventCacheArray.findIndex(eventCache => {
+            return eventCache.target === target && eventCache.callback === callback;
+          });
+          if (index === -1) {
+            eventCacheArray.push({
+              target: target,
+              callback: callback,
+              once: once
+            });
+            this._eventCacheMap.set(eventName, eventCacheArray);
+          }
+        }
+
+        /**
+         * 注销事件
+         *
+         * @param eventName 事件名
+         * @param callback 事件处理函数
+         * @param target 事件处理函数的执行对象
+         */
+        off(eventName, callback, target) {
+          let eventCacheArray = this._eventCacheMap.get(eventName);
+          if (eventCacheArray) {
+            if (callback && target) {
+              let index = eventCacheArray.findIndex(eventCache => {
+                return eventCache.target === target && eventCache.callback === callback;
+              });
+              if (index !== -1) {
+                eventCacheArray.splice(index, 1);
+                // 如果移除后，事件已经没有回调函数了，就删除这个事件
+                if (eventCacheArray.length == 0) {
+                  this._eventCacheMap.delete(eventName);
+                }
+              }
+            } else {
+              eventCacheArray = undefined;
+              this._eventCacheMap.delete(eventName);
+            }
+          }
+        }
+
+        /**
+         * 注销某个已经注册的对象的所有事件
+         *
+         * @param target 事件函数处理的执行对象
+         */
+        offTarget(target) {
+          this._eventCacheMap.forEach((eventCacheArray, eventName) => {
+            if (eventCacheArray) {
+              for (let i = eventCacheArray.length - 1; i >= 0; i--) {
+                if (eventCacheArray[i].target === target) {
+                  eventCacheArray.splice(i, 1);
+                }
+              }
+              // 如果移除后，事件已经没有回调函数了，就删除这个事件
+              if (eventCacheArray.length == 0) {
+                this._eventCacheMap.delete(eventName);
+              }
+            }
+          });
+        }
+
+        /**
+         * 清空所有事件
+         */
+        destroy() {
+          this._eventCacheMap.clear();
+        }
+      }
+      cclegacy._RF.pop();
+      cclegacy._RF.push({}, "ce35aRP8DBFArfIztjCKTTO", "GGObserverSystem", undefined);
+
+      /**
+       * 观察者系统
+       *
+       * @author caizhitao
+       * @created 2024-08-30 10:40:53
+       */
+      class GGObserverSystem {
+        constructor() {
+          this._observers = null;
+          this._eventManager = null;
+        }
+        /**
+         * 观察者
+         */
+        get observers() {
+          if (this._observers == null) {
+            this._observers = new Set();
+          }
+          return this._observers;
+        }
+
+        /**
+         * 注册观察者
+         */
+        register(obserber) {
+          this.observers.add(obserber);
+        }
+        /**
+         * 注销观察者
+         */
+        unregister(observer) {
+          this.observers.delete(observer);
+        }
+        /**
+         * 注销所有观察者
+         */
+        unregisterAll() {
+          this.observers.clear();
+        }
+
+        // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 事件广播相关接口
+
+        /**
+         * 事件管理器
+         */
+        get eventManager() {
+          if (this._eventManager == null) {
+            this._eventManager = new GGEventManager();
+          }
+          return this._eventManager;
+        }
+        /**
+         * 监听消息
+         *
+         * @param msgId 消息id
+         * @param callback 回调函数
+         * @param target 回调函数执行对象
+         */
+        on(msgId, callback, target) {
+          this.eventManager.on(msgId, callback, target);
+        }
+
+        /**
+         * 监听消息（回调函数执行一次后会自动销毁，不用主动off）
+         *
+         * @param msgId 消息id
+         * @param callback 回调函数
+         * @param target 回调函数执行对象
+         */
+        onOnce(msgId, callback, target) {
+          this.eventManager.onOnce(msgId, callback, target);
+        }
+
+        /**
+         * 取消监听消息
+         *
+         * @param msgId 消息id
+         * @param callback 回调函数
+         * @param target 回调函数执行对象
+         */
+        off(msgId, callback, target) {
+          this.eventManager.off(msgId, callback, target);
+        }
+
+        /**
+         * 取消监听某个已经注册对象的所有消息
+         *
+         * @param target 回调函数的执行对象
+         */
+        offTarget(target) {
+          this.eventManager.offTarget(target);
+        }
+
+        /**
+         * 广播事件
+         *
+         * @param eventName 事件名
+         * @param param 传递的剩余不定参数
+         */
+        emit(eventName, ...param) {
+          this.eventManager.emit(eventName, ...param);
+        }
+      }
+      cclegacy._RF.pop();
+      cclegacy._RF.push({}, "31c08/weY9F76xiNAgd6+tO", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -565,48 +853,258 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggLogger = new GGLogger();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "37930afalFAH4FbNMJfWeYM", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "fb23eq9bWZNIZm+Mo8By4BI", "GGJsb", undefined);
+      let GGJsbResponseCode = /*#__PURE__*/function (GGJsbResponseCode) {
+        GGJsbResponseCode[GGJsbResponseCode["Suc"] = 1] = "Suc";
+        GGJsbResponseCode[GGJsbResponseCode["InvalidPlatform"] = 100] = "InvalidPlatform";
+        GGJsbResponseCode[GGJsbResponseCode["InvalidResp"] = 101] = "InvalidResp";
+        GGJsbResponseCode[GGJsbResponseCode["InvalidModule"] = 102] = "InvalidModule";
+        GGJsbResponseCode[GGJsbResponseCode["InvalidFunction"] = 103] = "InvalidFunction";
+        GGJsbResponseCode[GGJsbResponseCode["InvalidParams"] = 104] = "InvalidParams";
+        return GGJsbResponseCode;
+      }({});
+
       /**
-       * 观察者系统
+       * GGJSB
        *
        * @author caizhitao
-       * @created 2024-08-30 10:40:53
+       * @created 2026-01-19 16:28:29
        */
-      class GGObserverSystem {
-        constructor() {
-          this._observers = null;
+      class GGJsb extends GGObserverSystem {
+        constructor(...args) {
+          super(...args);
+          // private _iosClassName = "GGJsb";
+          // private _iosMethodNameSync = "sync:";
+          this._androidClassName = "com/gg/hp/Jsb";
+          this._androidMethodNameSync = "sync";
         }
         /**
-         * 观察者
+         * 由原生平台调用此方法。以告诉 TS 引擎触发事件回调
+         *
+         * @param eventName 回调事件名
+         * @param param 回调参数，没有，或者有一个参数，当有一个参数时，该参数为Json字符串，并且经过Base64Encode，
          */
-        get observers() {
-          if (this._observers == null) {
-            this._observers = new Set();
+        onNativeCallBack(eventName, ...param) {
+          let jsonObj = null;
+          if (param && param[0]) {
+            // 解码并反序列化 JSON 参数
+            jsonObj = JSON.parse(param[0]);
           }
-          return this._observers;
+          {
+            ggLogger.log(`GGJsb: native -> ts. event_name: ${eventName} event_params: ${JSON.stringify(jsonObj)}`);
+          }
+          this.emit(eventName, jsonObj);
         }
 
         /**
-         * 注册观察者
+         * 请求原生模块方法结果（同步）
+         *
+         * @param reqModel 请求参数对象
+         *
+         * @returns 返回结果对象
          */
-        register(obserber) {
-          this.observers.add(obserber);
-        }
-        /**
-         * 注销观察者
-         */
-        unregister(observer) {
-          this.observers.delete(observer);
-        }
-        /**
-         * 注销所有观察者
-         */
-        unregisterAll() {
-          this.observers.clear();
+        syncCall(reqModel) {
+          let respStr = null;
+
+          // 通过 jsb 调用原生方法
+          switch (sys.os) {
+            // case sys.OS.IOS:
+            //     respStr = native.reflection.callStaticMethod(this._iosClassName, this._iosMethodNameSync, JSON.stringify(requestModel));
+            //     break;
+            case sys.OS.ANDROID:
+              {
+                respStr = native.reflection.callStaticMethod(this._androidClassName, this._androidMethodNameSync, "(Ljava/lang/String;)Ljava/lang/String;", JSON.stringify(reqModel));
+                break;
+              }
+            default:
+              {
+                return {
+                  code: GGJsbResponseCode.InvalidPlatform,
+                  msg: "unsupported platform"
+                };
+              }
+          }
+
+          // 解析返回参数
+          let resp = null;
+          try {
+            resp = JSON.parse(respStr);
+          } catch (error) {
+            ggLogger.error(error);
+            resp = {
+              code: GGJsbResponseCode.InvalidResp,
+              msg: "parse json failed"
+            };
+          }
+          {
+            if (resp.code == GGJsbResponseCode.Suc) {
+              ggLogger.log(`GGJsb: ts -> native: suc: module: ${reqModel.module} function: ${reqModel.function} data: ${JSON.stringify(reqModel.data)} resp: ${JSON.stringify(resp)}`);
+            } else {
+              let msg = `GGJsb: ts -> native: err: failed to call native api.`;
+              msg += `\n\nrequest params:`;
+              msg += `\n  module: ${reqModel.module}`;
+              msg += `\n  function: ${reqModel.function}`;
+              msg += `\n  data: ${JSON.stringify(reqModel.data)}`;
+              msg += `\n\nresponse params:`;
+              msg += `\n  code: ${resp.code}`;
+              msg += `\n  msg: ${resp.msg ?? ""}`;
+              ggLogger.error(msg);
+            }
+          }
+          return resp;
         }
       }
+      const ggJsb = new GGJsb();
+      // 注册到全局对象，方便原生回调此类
+      globalThis["ggJsb"] = globalThis["ggJsb"] ?? ggJsb;
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "ce4ddvfT+RPBYRsibnMNO+v", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "e4664bEXylG9qOSzUODXsQq", "GGZipTypes", undefined);
+      /**
+       * Zip 解压任务观察者
+       */
+      /**
+       * Zip 解压任务事件
+       */
+      let GGZipExtractZipTaskEvent = /*#__PURE__*/function (GGZipExtractZipTaskEvent) {
+        GGZipExtractZipTaskEvent["onExtractUpdated"] = "onExtractUpdated";
+        return GGZipExtractZipTaskEvent;
+      }({});
+
+      /**
+       * Zip 解压任务信息
+       */
+
+      /**
+       * Zip 解压状态
+       */
+      let GGZipExtractZipStatus = /*#__PURE__*/function (GGZipExtractZipStatus) {
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Idle"] = 0] = "Idle";
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Start"] = 1] = "Start";
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Extracting"] = 2] = "Extracting";
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Suc"] = 3] = "Suc";
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Cancelled"] = 4] = "Cancelled";
+        GGZipExtractZipStatus[GGZipExtractZipStatus["Error"] = 5] = "Error";
+        return GGZipExtractZipStatus;
+      }({});
+      cclegacy._RF.pop();
+      cclegacy._RF.push({}, "c02bbFzcr5OLZ+aNkLqTv2A", "GGZip", undefined);
+      const ModelName = "zip";
+      const CallBackEventOnExtractUpdated = "zip.OnExtractUpdated";
+
+      /**
+       * Zip 操作相关类
+       *
+       * @author caizhitao
+       * @created 2026-01-21 10:59:41
+       */
+      class GGZip extends GGObserverSystem {
+        constructor() {
+          super();
+          this._idCounter = 0;
+          ggJsb.on(CallBackEventOnExtractUpdated, this._onExtractUpdated, this);
+        }
+
+        // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 回调
+
+        /**
+         * 接收原生平台回调的 Zip 解压状态更新事件
+         *
+         * @param task
+         */
+        _onExtractUpdated(task) {
+          // 将原生平台平台回调的事件转换分发
+          this.emit(GGZipExtractZipTaskEvent.onExtractUpdated, task);
+          this.observers.forEach(observer => {
+            observer.onExtractUpdated == null || observer.onExtractUpdated(task);
+          });
+        }
+
+        // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // API
+
+        /**
+         * 当前平台是否支持使用 GGZip 能力
+         */
+        get isAvailable() {
+          return sys.os == sys.OS.ANDROID;
+        }
+
+        /**
+         * 创建并执行一个异步解压任务
+         *
+         * * Android 平台上会额外启用一个线程来执行解压任务，不阻塞游戏主线程
+         *
+         * @param option 参数
+         *
+         * @returns 创建成功则返回解压任务id，否则返回空
+         */
+        createExtractTask(option) {
+          const id = "" + this._idCounter++;
+          const resp = ggJsb.syncCall({
+            module: ModelName,
+            function: "extract_async",
+            data: {
+              id: id,
+              zip_file_abs_path: option.zip_file_abs_path,
+              zip_dest_dir_abs_path: option.zip_dest_dir_abs_path,
+              zip_dest_dir_remove_first: option.zip_dest_dir_remove_first,
+              zip_uncompressed_bytes: option.zip_uncompressed_bytes
+            }
+          });
+          return resp.code == GGJsbResponseCode.Suc ? id : null;
+        }
+
+        /**
+         * 取消解压
+         *
+         * * 如果 zip 正在解压中，则取消解压
+         * * 如果 zip 解压已完成或解压任务不存在，则无任何效果
+         *
+         * @param id 解压任务id
+         */
+        cancel(id) {
+          return ggJsb.syncCall({
+            module: ModelName,
+            function: "cancel",
+            data: {
+              id: id
+            }
+          });
+        }
+
+        /**
+         * 释放解压任务
+         *
+         * * 如果存在任务，则会自动取消解压后，再释放
+         *
+         * @param id 解压任务id
+         */
+        release(id) {
+          return ggJsb.syncCall({
+            module: ModelName,
+            function: "release",
+            data: {
+              id: id
+            }
+          });
+        }
+
+        /**
+         * 释放所有解压任务
+         *
+         * * 如果存在任务，则会自动取消解压后，再释放
+         */
+        releaseAll() {
+          return ggJsb.syncCall({
+            module: ModelName,
+            function: "release_all"
+          });
+        }
+      }
+      const ggZip = new GGZip();
+      cclegacy._RF.pop();
+      cclegacy._RF.push({}, "486d8YNjh1BCqdj1QMPxecD", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -628,8 +1126,6 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         get state() {
           return this._state;
         }
-        // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // 下载信息
         /**
          * 待下载的总字节
          */
@@ -664,6 +1160,18 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           return this._downloadRemainTimeInSecond;
         }
         /**
+         * Zip 总解压字节数，注意值可能为0的情况
+         */
+        get zipExtractTotalBytes() {
+          return this._zipExtractTotalBytes;
+        }
+        /**
+         * Zip 已解压字节数，注意值可能为0的情况
+         */
+        get zipExtractedBytes() {
+          return this._zipExtractedBytes;
+        }
+        /**
          * @param name 热更新的包名字
          * @param remoteRootUrl 热更包的远程根地址 e.g. ``http://192.168.0.1:8080/1.0.0``
          * @param searchRootDirPath 热更包的本地搜索根目录 e.g. ``/data/user/0/${pacakgeName}/files/gg-hot-update``
@@ -673,9 +1181,6 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           super();
           /**
            * 热更新的包名字
-           *
-           * * 主包: `GGHotUpdateInstanceEnum.BuildIn`
-           * * 子包: 传 Bundle 名字
            */
           this.name = void 0;
           /**
@@ -709,6 +1214,22 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
            * * Android: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}``
            */
           this._downloadRootDirPath = void 0;
+          /**
+           * 热更包的 zip 远程地址
+           *
+           * e.g.
+           *
+           * ``http://192.168.0.1:8080/1.0.0/${bundleName}.zip``
+           */
+          this._zipRemoteUrl = void 0;
+          /**
+           * 热更包的 zip 的本地下载路径
+           *
+           * e.g.
+           *
+           * * Android: ``/data/user/0/${packageName}/files/gg-hot-update-temp/${bundleName}.zip``
+           */
+          this._zipDownloadPath = void 0;
           /**
            * version.manifest 的远程地址
            *
@@ -761,6 +1282,21 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
            */
           this._remoteProjectManifest = void 0;
           /**
+           * 远端 version.manifeset 配置
+           */
+          this._remoteVersionManifest = void 0;
+          /**
+           * 实例是否已经销毁
+           */
+          this._destroyed = false;
+          this._state = GGHotUpdateInstanceState.Idle;
+          /**
+           * 热更新方式
+           */
+          this._hotUpdateType = void 0;
+          // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 下载信息
+          /**
            * 下载任务管理器
            */
           this._downloader = void 0;
@@ -772,7 +1308,6 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
            * 当前并行下载任务数量
            */
           this._curConcurrentTaskCount = void 0;
-          this._state = GGHotUpdateInstanceState.Idle;
           this._totalBytes = 0;
           this._downloadedBytes = 0;
           this._totalFiles = 0;
@@ -798,15 +1333,21 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
            * 上次回调下载进度的时间戳(ms)
            */
           this._lastCallBackUpdateTimeInMs = 0;
+          // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // 解压信息
           /**
-           * 实例是否已经销毁
+           * 热更包的 zip 解压缩任务id
            */
-          this._destroyed = false;
+          this._zipTaskId = null;
+          this._zipExtractTotalBytes = 0;
+          this._zipExtractedBytes = 0;
           this.name = name;
           this._option = option;
           this._remoteRootUrl = remoteRootUrl;
           this._searchRootDirPath = searchRootDirPath;
           this._downloadRootDirPath = path.join(this._searchRootDirPath + "-temp", this.name);
+          this._zipRemoteUrl = `${this._remoteRootUrl}/${this.name}.zip`;
+          this._zipDownloadPath = path.join(this._searchRootDirPath + "-temp", `${this.name}.zip`);
           this._versionManifestRemoteUrl = `${this._remoteRootUrl}/${this.name}.version.manifest`;
           this._versionManifestDownloadPath = path.join(this._downloadRootDirPath, `${this.name}.version.manifest`);
           this._projectManifestRemoteUrl = `${this._remoteRootUrl}/${this.name}.project.manifest`;
@@ -814,15 +1355,22 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           this._projectManifestSearchPaths = [path.join(this._searchRootDirPath, `${this.name}.project.manifest`), `@assets/${this.name}.project.manifest`, path.join("data", `${this.name}.project.manifest`)];
           this._localProjectManifest = null;
           this._remoteProjectManifest = null;
+          this._remoteVersionManifest = null;
+          this._destroyed = false;
+          this._state = GGHotUpdateInstanceState.Idle;
+          this._hotUpdateType = null;
           this._downloader = new native.Downloader();
-          this._downloader.onProgress = this._onProgress.bind(this);
-          this._downloader.onError = this._onError.bind(this);
-          this._downloader.onSuccess = this._onSuccess.bind(this);
+          this._downloader.onProgress = this._onDownloadProgress.bind(this);
+          this._downloader.onError = this._onDownloadError.bind(this);
+          this._downloader.onSuccess = this._onDownloadSuccess.bind(this);
           this._downloadTasks = [];
           this._curConcurrentTaskCount = 0;
-          this._state = GGHotUpdateInstanceState.Idle;
-          this._destroyed = false;
           this._resetDownloadInfo();
+          this._zipTaskId = null;
+          this._resetExtractInfo();
+          if (ggZip.isAvailable) {
+            ggZip.on(GGZipExtractZipTaskEvent.onExtractUpdated, this._onExtractUpdated, this);
+          }
         }
 
         /**
@@ -864,6 +1412,26 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
 
         /**
+         * 重置解压进度信息
+         */
+        _resetExtractInfo() {
+          this._zipExtractTotalBytes = 0;
+          this._zipExtractedBytes = 0;
+        }
+
+        /**
+         * 如果存在 Zip 解压任务，则自动取消解压后，再释放资源
+         */
+        _releaseZipTask() {
+          if (ggZip.isAvailable) {
+            if (this._zipTaskId) {
+              ggZip.release(this._zipTaskId);
+              this._zipTaskId = null;
+            }
+          }
+        }
+
+        /**
          * 更新状态
          */
         _updateState(state) {
@@ -876,7 +1444,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 下载监听
 
-        _onProgress(task, bytesReceived, totalBytesReceived, totalBytesExpected) {
+        _onDownloadProgress(task, bytesReceived, totalBytesReceived, totalBytesExpected) {
           // 实例已经销毁，结束
           if (this._destroyed) {
             return;
@@ -933,10 +1501,10 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
               info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
               this._debug(info);
             }
-            this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+            this._updateState(GGHotUpdateInstanceState.HotUpdateDownloading);
           }
         }
-        _onError(task, errorCode, errorCodeInternal, errorStr) {
+        _onDownloadError(task, errorCode, errorCodeInternal, errorStr) {
           // 实例已经销毁，结束
           if (this._destroyed) {
             return;
@@ -976,12 +1544,12 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           {
             this._debug(`热更新：文件下载失败：${task.requestURL} 下载失败。错误代码：${errorCode} 内部错误代码：${errorCodeInternal} 错误信息：${errorStr} 当前累计下载失败文件数量：${this.downloadFailedFiles.length}`);
           }
-          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+          this._updateState(GGHotUpdateInstanceState.HotUpdateDownloading);
 
           // 处理结果
-          this._handleDownloadResult();
+          this._handleHotUpdateSingleDownloadTaskDone();
         }
-        _onSuccess(task) {
+        _onDownloadSuccess(task) {
           // 实例已经销毁，结束
           if (this._destroyed) {
             return;
@@ -991,14 +1559,14 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           // 处理检查更新的 version.manifest 的下载成功
 
           if (task.requestURL == this._versionManifestRemoteUrl) {
-            var _this$_localProjectMa;
+            var _this$_localProjectMa, _this$_remoteVersionM;
             this._debug(`检查更新：下载远程 version.manifest 成功`);
 
             // 解析下载好的远程 version.manifest
-            let remoteVersionManifest = null;
+            this._remoteVersionManifest = null;
             try {
               if (native.fileUtils.isFileExist(this._versionManifestDownloadPath)) {
-                remoteVersionManifest = JSON.parse(native.fileUtils.getStringFromFile(this._versionManifestDownloadPath));
+                this._remoteVersionManifest = JSON.parse(native.fileUtils.getStringFromFile(this._versionManifestDownloadPath));
 
                 // 如果下载好的远程 version.manifest 已经解析完毕了，那这个文件就没用了，删除它
                 native.fileUtils.removeFile(this._versionManifestDownloadPath);
@@ -1008,7 +1576,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
                 this._error(error);
               }
             }
-            if (remoteVersionManifest == null) {
+            if (this._remoteVersionManifest == null) {
               {
                 this._error(`检查更新：解析远程 version.manifest 失败`);
                 this._error(`检查更新：失败`);
@@ -1019,9 +1587,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
 
             // 从搜索目录下的 project.manifest 中获取版本
             const localVersion = ((_this$_localProjectMa = this._localProjectManifest) == null ? void 0 : _this$_localProjectMa.version) ?? "";
-            const remoteVersion = remoteVersionManifest.version ?? "";
+            const remoteVersion = ((_this$_remoteVersionM = this._remoteVersionManifest) == null ? void 0 : _this$_remoteVersionM.version) ?? "";
             {
-              this._debug(`检查更新：解析远程 version.manifest 成功。版本信息: ${JSON.stringify(remoteVersionManifest)}`);
+              this._debug(`检查更新：解析远程 version.manifest 成功。版本信息: ${JSON.stringify(this._remoteVersionManifest)}`);
               this._debug(`检查更新：当前本地版本: ${localVersion}`);
               this._debug(`检查更新：当前远端版本: ${remoteVersion}`);
             }
@@ -1039,30 +1607,49 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             }
 
             // 发现新版本
-            // 如果本地已经下载好新版本的远程 project.manifest ，那么解析文件，并获取差异文件记录
-            try {
-              if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-                this._reCalculateDownloadInfo();
-                // 如果还有文件未下载，那么返回新版本
-                if (this._totalFiles != this.downloadSucFiles.length) {
+            switch (this._hotUpdateType) {
+              case GGHotUpdateType.Full:
+                {
+                  // TODO 完善逻辑
+
+                  // 计算下载信息
+                  this._reCalculateDownloadInfo();
+                  this._debug(`检查更新：成功，发现新版本`);
+
+                  // 返回新版本
                   this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
                   return;
                 }
-              }
-            } catch (error) {
-              {
-                this._error(error);
-                this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
-              }
-            }
+              case GGHotUpdateType.Incremental:
+                {
+                  try {
+                    if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+                      this._reCalculateDownloadInfo();
+                      // 如果还有文件未下载，那么返回新版本
+                      if (this._totalFiles != this.downloadSucFiles.length) {
+                        this._updateState(GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound);
+                        return;
+                      }
+                    }
+                  } catch (error) {
+                    {
+                      this._error(error);
+                      this._error(`检查更新：解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+                    }
+                  }
 
-            // 到这里表示本地没有 project.manifest 文件，或者解析出错，总之不对劲了，此时删除这个文件，重新走一躺下载处理
-            if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-              native.fileUtils.removeFile(this._projectManifestDownloadPath);
+                  // 到这里表示本地没有 project.manifest 文件，或者解析出错，总之不对劲了，此时删除这个文件，重新走一躺下载处理
+                  if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+                    native.fileUtils.removeFile(this._projectManifestDownloadPath);
+                  }
+                  this._debug(`检查更新：下载远程 project.manifest 开始，下载地址：${this._projectManifestRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
+                  this._createParentDirs(this._projectManifestDownloadPath);
+                  this._downloader.createDownloadTask(this._projectManifestRemoteUrl, this._projectManifestDownloadPath);
+                  return;
+                }
+              default:
+                throw new Error(`不支持的热更新方式: ${this._hotUpdateType}`);
             }
-            this._debug(`检查更新：下载远程 project.manifest 开始，下载地址：${this._projectManifestRemoteUrl} 本地存储地址：${this._projectManifestDownloadPath}`);
-            this._createParentDirs(this._projectManifestDownloadPath);
-            this._downloader.createDownloadTask(this._projectManifestRemoteUrl, this._projectManifestDownloadPath);
           }
 
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1128,16 +1715,75 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           this.downloadSucFiles.push(task);
 
           // 更新下载进度
-          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+          this._updateState(GGHotUpdateInstanceState.HotUpdateDownloading);
 
-          // 标记文件下载成功，并保存到本地，方便恢复任务
-          if (this._remoteProjectManifest) {
-            this._remoteProjectManifest.assets[task.identifier].state = ProjectManifestAssetUpdateState.Suc;
-            native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), this._projectManifestDownloadPath);
+          // 如果热更新方式是增量更新，那么需要标记下载成功的文件，并持久化到本地，方便下次断点续传（如果有），跳过已经下载成功的文件
+          if (this._hotUpdateType == GGHotUpdateType.Incremental) {
+            var _this$_remoteProjectM;
+            const assetInfo = ((_this$_remoteProjectM = this._remoteProjectManifest) == null || (_this$_remoteProjectM = _this$_remoteProjectM.assets) == null ? void 0 : _this$_remoteProjectM[task.identifier]) ?? null;
+            if (assetInfo) {
+              assetInfo.state = ProjectManifestAssetUpdateState.Suc;
+              native.fileUtils.writeStringToFile(JSON.stringify(this._remoteProjectManifest), this._projectManifestDownloadPath);
+            } else {
+              this._warn(`id: ${task.identifier}, url: ${task.requestURL}, path:${task.storagePath}, 任务下载成功，但视乎没法找到其原始瞄点，跳过记录下载成功到本地文件的处理`);
+            }
           }
 
           // 处理结果
-          this._handleDownloadResult();
+          this._handleHotUpdateSingleDownloadTaskDone();
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 解压任务状态监听
+
+        _onExtractUpdated(task) {
+          // 实例已经销毁，结束
+          if (this._destroyed) {
+            return;
+          }
+          // 不是自己的任务，结束
+          if (task.id != this._zipTaskId) {
+            return;
+          }
+
+          // 处理解压任务状态
+          switch (task.status) {
+            case GGZipExtractZipStatus.Idle:
+            case GGZipExtractZipStatus.Start:
+            case GGZipExtractZipStatus.Extracting:
+              {
+                this._zipExtractTotalBytes = task.total_bytes ?? 0;
+                this._zipExtractedBytes = task.extracted_Bytes ?? 0;
+                this._debug(`热更新：解压中 Zip总解压字节数: ${this._zipExtractTotalBytes} Zip已解压字节数: ${this._zipExtractedBytes}`);
+                this._updateState(GGHotUpdateInstanceState.HotUpdateExtracting);
+                break;
+              }
+            case GGZipExtractZipStatus.Suc:
+              {
+                this._zipExtractTotalBytes = task.total_bytes ?? 0;
+                this._zipExtractedBytes = task.extracted_Bytes ?? 0;
+                this._debug(`热更新：解压成功 Zip总解压字节数: ${this._zipExtractTotalBytes} Zip已解压字节数: ${this._zipExtractedBytes}`);
+                this._releaseZipTask();
+                this._updateSearchPath();
+                this._debug(`热更新：成功`);
+                this._updateState(GGHotUpdateInstanceState.HotUpdateSuc);
+                break;
+              }
+            case GGZipExtractZipStatus.Cancelled:
+              {
+                this._debug(`热更新：解压取消`);
+                this._releaseZipTask();
+                this._updateState(GGHotUpdateInstanceState.HotUpdateFailed);
+                break;
+              }
+            case GGZipExtractZipStatus.Error:
+              {
+                this._debug(`热更新：解压失败 错误信息: ${task.err_msg}`);
+                this._releaseZipTask();
+                this._updateState(GGHotUpdateInstanceState.HotUpdateFailed);
+                break;
+              }
+          }
         }
 
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1156,11 +1802,13 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           this.unregisterAll();
 
           // 重置属性
-          this._remoteProjectManifest = null;
           this._localProjectManifest = null;
+          this._remoteProjectManifest = null;
+          this._remoteVersionManifest = null;
 
           // 重置状态信息
           this._state = GGHotUpdateInstanceState.Idle;
+          this._hotUpdateType = null;
 
           // 放弃进行中的下载任务
           if (this._downloadTasks.length > 0) {
@@ -1168,47 +1816,89 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
               this._downloader.abort(task);
             });
           }
+
           // 重置下载信息
           this._resetDownloadInfo();
+          if (ggZip.isAvailable) {
+            // 重置解压进度信息
+            this._resetExtractInfo();
+            // 移除解压缩状态监听
+            ggZip.offTarget(this);
+            // 取消可能正在解压缩的任务并释放资源
+            this._releaseZipTask();
+          }
         }
 
         /**
          * 清除下载缓存
          *
          * 1. 清除下载缓存后，后续的检查更新、热更新都会重新下载所有文件
-         * 2. 在多次检查更新失败或者多次热更新失败后，可以考虑调用此方法，清除所有下载临时文件
+         * 2. 在多次检查更新失败或者多次热更新失败后，可以考虑调用此方法，清除所有下载缓存文件
          */
         clearDownloadCache() {
+          this._debug(`清除热更包(${this.name})的本地缓存: 开始`);
+
           // 部分状态下不可以删除下载缓存
-          if (this._state == GGHotUpdateInstanceState.CheckUpdateInProgress) {
-            this._warn("当前正在检查更新中，删除本地缓存失败");
-            return;
-          }
-          if (this._state == GGHotUpdateInstanceState.HotUpdateInProgress) {
-            this._warn("当前正在热更新中，删除本地缓存失败");
+          if ([GGHotUpdateInstanceState.CheckUpdateInProgress, GGHotUpdateInstanceState.HotUpdateDownloading, GGHotUpdateInstanceState.HotUpdateExtracting].includes(this._state)) {
+            this._debug(`清除热更包(${this.name})的本地缓存: 失败. 当前状态不可以进行此操作: ${this._state}`);
             return;
           }
 
-          // 清除本地的下载缓存目录
-          if (native.fileUtils.isDirectoryExist(this._downloadRootDirPath)) {
-            const suc = native.fileUtils.removeDirectory(this._downloadRootDirPath);
-            this._debug(`当前本地缓存目录(${this._downloadRootDirPath})：存在，${suc ? "已删除成功" : "删除失败"}`);
-            return;
-          } else {
-            this._debug(`当前本地缓存目录(${this._downloadRootDirPath})：不存在，不用删除`);
-          }
+          // 收集需要清除的缓存文件/目录
+          const cacheFiles = [{
+            path: this._downloadRootDirPath,
+            isFile: false
+          }, {
+            path: this._zipDownloadPath,
+            isFile: true
+          }, {
+            path: this._zipDownloadPath + ".tmp",
+            isFile: true
+          }];
+
+          // 清除所有缓存
+          cacheFiles.forEach(cacheFile => {
+            if (cacheFile.isFile) {
+              if (native.fileUtils.isFileExist(cacheFile.path)) {
+                const suc = native.fileUtils.removeFile(cacheFile.path);
+                this._debug(`本地缓存文件(${cacheFile.path})：存在，${suc ? "删除成功" : "删除失败"}`);
+              } else {
+                this._debug(`本地缓存文件(${cacheFile.path})：不存在，不用删除`);
+              }
+            } else {
+              if (native.fileUtils.isDirectoryExist(cacheFile.path)) {
+                const suc = native.fileUtils.removeDirectory(cacheFile.path);
+                this._debug(`本地缓存目录(${cacheFile.path})：存在，${suc ? "删除成功" : "删除失败"}`);
+              } else {
+                this._debug(`本地缓存目录(${cacheFile.path})：不存在，不用删除`);
+              }
+            }
+          });
+          this._debug(`清除热更包(${this.name})的本地缓存: 结束`);
         }
-
         /**
          * 检查更新
+         *
+         * @param hotUpdateType 热更新方式
+         *
+         * | 决策条件 | 决策结果 |
+         * | :--- | ---: |
+         * | 原生平台支持zip解压 + 未传入参数 + 本地有历史版本 | 增量更新 |
+         * | 原生平台支持zip解压 + 未传入参数 + 本地无历史版本 | 全量更新 |
+         * | 原生平台支持zip解压 + 传入参数 | 使用传入的热更新方式 |
+         * | 原生平台不支持zip解压 | 增量更新 |
          */
-        checkUpdate() {
+        checkUpdate(hotUpdateType) {
           if (this._state == GGHotUpdateInstanceState.CheckUpdateInProgress) {
             this._warn("检查更新：当前已经在检查新版本中。请不要重复调用 `checkUpdate`.");
             return;
           }
-          if (this._state == GGHotUpdateInstanceState.HotUpdateInProgress) {
+          if (this._state == GGHotUpdateInstanceState.HotUpdateDownloading) {
             this._warn("检查更新：当前已经在热更新中。请不要在此时调用 `checkUpdate`.");
+            return;
+          }
+          if (this._state == GGHotUpdateInstanceState.HotUpdateExtracting) {
+            this._warn("检查更新：当前正在解压 zip 中。请不要在此时调用 `checkUpdate`.");
             return;
           }
 
@@ -1263,6 +1953,18 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             native.fileUtils.removeFile(this._versionManifestDownloadPath);
           }
 
+          // 决定热更新方式
+          if (!ggZip.isAvailable) {
+            this._hotUpdateType = GGHotUpdateType.Incremental;
+          } else {
+            if (hotUpdateType) {
+              this._hotUpdateType = hotUpdateType;
+            } else {
+              this._hotUpdateType = this._localProjectManifest.version == "" ? GGHotUpdateType.Full : GGHotUpdateType.Incremental;
+            }
+          }
+          this._debug(`检查更新：本次更新方式： ${this._hotUpdateType}`);
+
           // 通过 fetch 请求远程 version.manifest 的内容，在部分引擎版本下可能存在异常（fetch 这个 api 在原生平台上的实现上存在差异）
           // 因此，改用 downloader 去下载 version.manifest 并解析，完全替代 fetch
           this._debug(`检查更新：下载远程 version.manifest 开始。地址: ${this._versionManifestRemoteUrl}`);
@@ -1271,63 +1973,116 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
 
         /**
-         * 重新计算下载信息
+         * 重新计算热更新需要下载的信息
          */
         _reCalculateDownloadInfo() {
           // 重置所有下载信息
           this._resetDownloadInfo();
+          switch (this._hotUpdateType) {
+            case GGHotUpdateType.Full:
+              {
+                // 恢复下载任务
+                const downloadTask = {
+                  identifier: this._zipDownloadPath,
+                  requestURL: this._zipRemoteUrl,
+                  storagePath: this._zipDownloadPath
+                };
 
-          // 读取本地已经下载好的远程 project.manifest
-          try {
-            if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
-              this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(this._projectManifestDownloadPath));
-            }
-          } catch (error) {
-            {
-              this._error(error);
-            }
-          }
-          if (!this._remoteProjectManifest) {
-            this._error(`解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
-            return;
-          }
+                // zip 文件只会下载一个
+                this._totalFiles = 1;
+                if (native.fileUtils.isFileExist(this._zipDownloadPath)) {
+                  // 如果 zip 已经下载完毕
+                  this._totalBytes = native.fileUtils.getFileSize(this._zipDownloadPath);
+                  this._downloadedBytes = this._totalBytes;
 
-          // 计算下载信息
-          Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
-            const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
-            const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
-            const need2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
-            if (need2Update && remoteAssetInfo.state != null) {
-              // 更新需要下载的文件信息
-              this._totalFiles++;
-              this._totalBytes += remoteAssetInfo.size;
+                  // 下载成功的任务加入到成功列表
+                  this.downloadSucFiles.push(downloadTask);
+                } else {
+                  var _this$_remoteVersionM2;
+                  // 如果 zip 还没有下载完毕
 
-              // 恢复下载任务
-              const downloadTask = {
-                identifier: assetPath,
-                requestURL: `${this._remoteRootUrl}/${assetPath}`,
-                storagePath: path.join(this._downloadRootDirPath, assetPath)
-              };
-              if (remoteAssetInfo.state == ProjectManifestAssetUpdateState.Suc) {
-                // 更新累计下载字节数
-                this._downloadedBytes += remoteAssetInfo.size;
-                // 下载成功的任务加入到成功列表
-                this.downloadSucFiles.push(downloadTask);
-              } else {
-                // 更新累计下载字节数
-                // 如果之前已经有相当一部分文件未下载完成，那么这里的读取可能会比较耗时
-                const downloadTempFilePath = downloadTask.storagePath + ".tmp";
-                if (native.fileUtils.isFileExist(downloadTempFilePath)) {
-                  let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
-                  if (downloadFileSize > 0) {
-                    this._downloadedBytes += downloadFileSize;
+                  // 从远端 version.manifest 中获取 zip 文件的总大小
+                  this._totalBytes = ((_this$_remoteVersionM2 = this._remoteVersionManifest) == null ? void 0 : _this$_remoteVersionM2.zip_file_bytes) ?? 0;
+
+                  // 重置 zip 累计下载字节数为0
+                  this._downloadedBytes = 0;
+
+                  // 如果 zip 之前已经有下载过，但未完成，此时获取缓存文件的大小，作为更新累计下载字节数
+                  const downloadTempFilePath = this._zipDownloadPath + ".tmp";
+                  if (native.fileUtils.isFileExist(downloadTempFilePath)) {
+                    let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
+                    if (downloadFileSize > 0) {
+                      this._downloadedBytes += downloadFileSize;
+                    }
+                  }
+
+                  // 未下载或下载失败的任务加入到失败列表
+                  this.downloadFailedFiles.push(downloadTask);
+                }
+                break;
+              }
+            case GGHotUpdateType.Incremental:
+              {
+                // 读取本地已经下载好的远程 project.manifest
+                try {
+                  if (native.fileUtils.isFileExist(this._projectManifestDownloadPath)) {
+                    this._remoteProjectManifest = JSON.parse(native.fileUtils.getStringFromFile(this._projectManifestDownloadPath));
+                  }
+                } catch (error) {
+                  {
+                    this._error(error);
                   }
                 }
-                // 未下载或下载失败的任务加入到失败列表
-                this.downloadFailedFiles.push(downloadTask);
+                if (!this._remoteProjectManifest) {
+                  {
+                    this._error(`解析本地已存在的远程 project.manifest 失败。地址： ${this._projectManifestDownloadPath}`);
+                  }
+                  break;
+                }
+
+                // 计算下载信息
+                Object.keys(this._remoteProjectManifest.assets).forEach(assetPath => {
+                  const remoteAssetInfo = this._remoteProjectManifest.assets[assetPath];
+                  const localAssetInfo = this._localProjectManifest.assets[assetPath] ?? null;
+                  const need2Update = localAssetInfo == null || remoteAssetInfo.size != localAssetInfo.size || remoteAssetInfo.md5 != localAssetInfo.md5;
+                  if (need2Update && remoteAssetInfo.state != null) {
+                    // 更新需要下载的文件信息
+                    this._totalFiles++;
+                    this._totalBytes += remoteAssetInfo.size;
+
+                    // 恢复下载任务
+                    const downloadTask = {
+                      identifier: assetPath,
+                      requestURL: `${this._remoteRootUrl}/${assetPath}`,
+                      storagePath: path.join(this._downloadRootDirPath, assetPath)
+                    };
+                    if (remoteAssetInfo.state == ProjectManifestAssetUpdateState.Suc) {
+                      // 更新累计下载字节数
+                      this._downloadedBytes += remoteAssetInfo.size;
+                      // 下载成功的任务加入到成功列表
+                      this.downloadSucFiles.push(downloadTask);
+                    } else {
+                      // 更新累计下载字节数
+                      // 如果之前已经有相当一部分文件未下载完成，那么这里的读取可能会比较耗时
+                      const downloadTempFilePath = downloadTask.storagePath + ".tmp";
+                      if (native.fileUtils.isFileExist(downloadTempFilePath)) {
+                        let downloadFileSize = native.fileUtils.getFileSize(downloadTempFilePath);
+                        if (downloadFileSize > 0) {
+                          this._downloadedBytes += downloadFileSize;
+                        }
+                      }
+                      // 未下载或下载失败的任务加入到失败列表
+                      this.downloadFailedFiles.push(downloadTask);
+                    }
+                  }
+                });
+                break;
               }
-            }
-          });
+            default:
+              {
+                throw new Error(`不支持的热更新方式: ${this._hotUpdateType}`);
+              }
+          }
           {
             let info = `待下载信息：`;
             info += `总字节数：${this._totalBytes} `;
@@ -1347,14 +2102,18 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             this._warn("热更新：当前正在检查新版本中。请在发现新版本之后再调用 `hotUpdate`.");
             return;
           }
-          if (this._state == GGHotUpdateInstanceState.HotUpdateInProgress) {
+          if (this._state == GGHotUpdateInstanceState.HotUpdateDownloading) {
             this._warn("热更新：当前已经在热更新中。请不要重复调用 `hotUpdate`.");
             return;
           }
+          if (this._state == GGHotUpdateInstanceState.HotUpdateExtracting) {
+            this._warn("热更新：当前正在解压zip中。请不要重复调用 `hotUpdate`.");
+            return;
+          }
           this._debug(`热更新：开始`);
-          this._updateState(GGHotUpdateInstanceState.HotUpdateInProgress);
+          this._updateState(GGHotUpdateInstanceState.HotUpdateDownloading);
 
-          // 开始下载之前，重置下载信息
+          // 开始下载之前，重新计算下载信息
           this._reCalculateDownloadInfo();
 
           // 如果之前已经下载过，但存在下载未完成或者下载失败的文件，那么我们将失败的任务再次加入下载任务队列
@@ -1364,11 +2123,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             this.downloadFailedFiles.length = 0;
           }
 
-          // 如果没有发现差异文件，那么直接返回热更新成功
-          if (this._downloadTasks.length == 0) {
-            this._debug(`热更新：成功，当前没有资源需要下载`);
-            this._updateSearchPath();
-            this._updateState(GGHotUpdateInstanceState.HotUpdateSuc);
+          // 如果已经没有后续下载任务并且进行中的任务都已经结束了，那么检查热更新下载结果
+          if (this._downloadTasks.length == 0 && this._curConcurrentTaskCount == 0) {
+            this._handleHotUpdateAllDownloadTasksDone();
             return;
           }
           this._debug(`热更新：当前共计 ${this._downloadTasks.length} 个下载任务`);
@@ -1379,41 +2136,10 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           this._lastCallBackUpdateTimeInMs = Date.now();
           this._nextDownload();
         }
-        _handleDownloadResult() {
-          //  不管下载成功还是失败，并行任务数 -1;
-          this._curConcurrentTaskCount--;
 
-          // 如果已经没有后续下载任务并且进行中的任务都已经结束了，那么检查热更新结果
-          if (this._downloadTasks.length == 0 && this._curConcurrentTaskCount == 0) {
-            this._downloadSpeed = 0;
-            this._downloadRemainTimeInSecond = -1;
-            const suc = this._totalFiles == this.downloadSucFiles.length;
-            {
-              let info = suc ? "热更新：成功" : "热更新：失败";
-              info += ` 总字节数：${this._totalBytes}`;
-              info += ` 已下载字节数: ${this._downloadedBytes}`;
-              info += ` 总下载文件数：${this._totalFiles}`;
-              info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
-              info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
-              info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
-              info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
-              info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
-              suc ? this._debug(info) : this._error(info);
-            }
-            if (suc) {
-              this._updateSearchPath();
-              this._updateState(GGHotUpdateInstanceState.HotUpdateSuc);
-            } else {
-              this._updateState(GGHotUpdateInstanceState.HotUpdateFailed);
-            }
-            return;
-          }
-
-          // 如果还有后续其他下载任务，那么开启下个下载
-          if (this._downloadTasks.length > 0) {
-            this._nextDownload();
-          }
-        }
+        /**
+         * 启动下一个下载任务
+         */
         _nextDownload() {
           while (this._downloadTasks.length > 0 && this._curConcurrentTaskCount < this._option.downloadMaxConcurrentTask) {
             this._curConcurrentTaskCount++;
@@ -1422,6 +2148,90 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             this._downloader.createDownloadTask(task.requestURL, task.storagePath, task.identifier);
           }
         }
+
+        /**
+         * 处理热更新过程中，每个下载任务执行结束（不管下载成功还是失败）后的逻辑
+         */
+        _handleHotUpdateSingleDownloadTaskDone() {
+          //  不管下载成功还是失败，并行任务数 -1;
+          this._curConcurrentTaskCount--;
+
+          // 如果还有后续其他下载任务，那么开启下个下载
+          if (this._downloadTasks.length > 0) {
+            this._nextDownload();
+            return;
+          }
+
+          // 如果已经没有后续下载任务并且进行中的任务都已经结束了，那么检查热更新下载结果
+          if (this._downloadTasks.length == 0 && this._curConcurrentTaskCount == 0) {
+            this._handleHotUpdateAllDownloadTasksDone();
+          }
+        }
+
+        /**
+         * 处理热更新过程中，所有下载任务都执行结束（不管下载成功还是失败）后的逻辑
+         */
+        _handleHotUpdateAllDownloadTasksDone() {
+          this._downloadSpeed = 0;
+          this._downloadRemainTimeInSecond = -1;
+          const suc = this._totalFiles == this.downloadSucFiles.length;
+          {
+            let info = suc ? "热更新：下载成功" : "热更新：下载失败";
+            info += ` 总字节数：${this._totalBytes}`;
+            info += ` 已下载字节数: ${this._downloadedBytes}`;
+            info += ` 总下载文件数：${this._totalFiles}`;
+            info += ` 下载成功文件数：${this.downloadSucFiles.length}`;
+            info += ` 下载失败文件数：${this.downloadFailedFiles.length}`;
+            info += ` 当前并行下载任务数：${this._curConcurrentTaskCount}`;
+            info += ` 当前下载速度：${(this._downloadSpeed / 1024 / 1024).toFixed(2)} MB/s`;
+            info += ` 当前剩余时间：${this._downloadRemainTimeInSecond}s`;
+            suc ? this._debug(info) : this._error(info);
+          }
+
+          // 热更新下载失败，则回调失败状态
+          if (!suc) {
+            this._updateState(GGHotUpdateInstanceState.HotUpdateFailed);
+            return;
+          }
+
+          // 热更新下载成功，则需要根据类型进行处理
+          // * 如果是全量更新，那么需要对 zip 包进行解压
+          // * 如果是增量更新，那么直接更新搜索路径即可
+          switch (this._hotUpdateType) {
+            case GGHotUpdateType.Full:
+              {
+                var _this$_remoteVersionM3;
+                // 更新状态
+                this._resetExtractInfo();
+                this._debug(`热更新：解压中 Zip总解压字节数: ${this._zipExtractTotalBytes} Zip已解压字节数: ${this._zipExtractedBytes}`);
+                this._updateState(GGHotUpdateInstanceState.HotUpdateExtracting);
+
+                // 如果当前存在解压任务，那么释放它
+                this._releaseZipTask();
+
+                // 创建一个新的解压缩任务
+                this._zipTaskId = ggZip.createExtractTask({
+                  zip_file_abs_path: this._zipDownloadPath,
+                  zip_dest_dir_abs_path: this._downloadRootDirPath,
+                  zip_dest_dir_remove_first: true,
+                  zip_uncompressed_bytes: ((_this$_remoteVersionM3 = this._remoteVersionManifest) == null ? void 0 : _this$_remoteVersionM3.zip_uncompressed_bytes) ?? 0
+                });
+                break;
+              }
+            case GGHotUpdateType.Incremental:
+              {
+                this._updateSearchPath();
+                this._debug(`热更新：成功`);
+                this._updateState(GGHotUpdateInstanceState.HotUpdateSuc);
+                break;
+              }
+            default:
+              {
+                throw new Error(`不支持的热更新方式: ${this._hotUpdateType}`);
+              }
+          }
+        }
+
         /**
          * 更新搜索地址
          *
@@ -1506,9 +2316,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
 
           // 缓存新的搜索路径数组，以便下次重启的时候，更新新的搜索路径
           localStorage.setItem("GGHotUpdateSearchPaths", JSON.stringify(searchPaths));
-          {
-            this._debug(`保存最新搜索路径到 LocalStorage 中，方便下次重启游戏时更新搜索路径`);
-          }
+          this._debug(`保存最新搜索路径到 LocalStorage 中，方便下次重启游戏时更新搜索路径`);
         }
         _debug(...args) {
           ggLogger.debug(this.name, ...args);
@@ -1521,7 +2329,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "626c4ENT/tHW4f+Vohy2+x2", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "d7e416Zyv5EeJERlDypUsUK", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -1562,6 +2370,20 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           return this._localRootDirPath;
         }
         /**
+         * 销毁并释放所有热更新实例
+         */
+        _destroyAllInstances() {
+          ggLogger.debug(`销毁所有热更新实例`);
+          if (this._instanceMap != null) {
+            this._instanceMap.forEach(instance => {
+              instance.destroy();
+            });
+            this._instanceMap.clear();
+            this._instanceMap = null;
+          }
+        }
+
+        /**
          * 初始化热更新管理器配置
          *
          * @param config 配置
@@ -1573,6 +2395,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
 
           // 初始化日志输出
           ggLogger.enable = this._enableLog;
+          ggLogger.debug(`初始化完毕`);
         }
 
         /**
@@ -1602,12 +2425,10 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
          */
         restartGame() {
           // 销毁所有热更新实例
-          if (this._instanceMap) {
-            this._instanceMap.forEach(instance => {
-              instance.destroy();
-            });
-          }
+          this._destroyAllInstances();
+
           // 重启游戏
+          ggLogger.debug(`即将重启游戏`);
           game.restart();
         }
 
@@ -1629,12 +2450,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
          */
         clear() {
           ggLogger.debug(`清空所有热更包的数据：开始`);
+
           // 销毁所有热更新实例
-          if (this._instanceMap) {
-            this._instanceMap.forEach(instance => {
-              instance.destroy();
-            });
-          }
+          this._destroyAllInstances();
 
           // 更新搜索路径：移除所有热更包的搜索路径
           // e.g. ["/data/user/0/com.cocos.game/files/gg-hot-update", "@assets/data/","@assets/Resources/","@assets/"] -> ["@assets/data/","@assets/Resources/","@assets/"]
@@ -1687,7 +2505,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       } = _decorator;
 
       /**
-       * 启动场景 热更新 主逻辑 控制
+       * 启动场景 热更新逻辑 控制
        *
        * @author caizhitao
        * @created 2025-08-23 22:04:18
@@ -1729,12 +2547,18 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
           {
             let packageUrl = "";
             switch (sys.os) {
+              case sys.OS.OPENHARMONY:
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/harmonyos-next/data-gg-hot-update`;
+                break;
+              case sys.OS.OHOS:
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/ohos/data-gg-hot-update`;
+                break;
               case sys.OS.IOS:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/ios/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/ios/data-gg-hot-update`;
                 break;
               case sys.OS.ANDROID:
-                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v5/build/android/data-gg-hot-update`;
-                // packageUrl = `http://192.168.40.4:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
+                packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/android/data-gg-hot-update`;
+                // packageUrl = `http://192.168.40.10:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
                 break;
             }
             ggHotUpdateManager.init({
@@ -1802,7 +2626,8 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
               // 检查更新成功，但没有发现新版本，跳过热更新
               this._enterLobbyScene();
               break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
+            case GGHotUpdateInstanceState.HotUpdateExtracting:
               break;
             case GGHotUpdateInstanceState.HotUpdateSuc:
               {
@@ -1871,15 +2696,13 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 生命周期处理
         onLoad() {
-          // 只有原生平台下才有热更新
-          // 因此我们控制只有原生平台下，才显示
+          // 只有原生平台下才有热更新，因此我们控制只有原生平台下，才显示
           {
             this.node.active = true;
           }
         }
         onEnable() {
-          this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
-
+          this.hpProgressComp.updateUI(null);
           // 注册主包热更新监听
           ggHotUpdateManager.getInstance(GGHotUpdateInstanceEnum.BuildIn).register(this);
         }
@@ -1892,27 +2715,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         // 监听 GG 热更新回调
 
         onGGHotUpdateInstanceCallBack(instance) {
-          this.hpProgressComp.updateState(instance.state);
-          switch (instance.state) {
-            case GGHotUpdateInstanceState.Idle:
-            case GGHotUpdateInstanceState.CheckUpdateInProgress:
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseLocalProjectManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteVersionManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedDownloadRemoteProjectManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateFailedParseRemoteProjectManifestError:
-            case GGHotUpdateInstanceState.CheckUpdateSucNewVersionFound:
-            case GGHotUpdateInstanceState.CheckUpdateSucAlreadyUpToDate:
-              break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
-              {
-                // 热更新：下载中
-                this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
-                break;
-              }
-            case GGHotUpdateInstanceState.HotUpdateSuc:
-            case GGHotUpdateInstanceState.HotUpdateFailed:
-              break;
-          }
+          this.hpProgressComp.updateUI(instance);
         }
       }, _descriptor$2 = _applyDecoratedDescriptor(_class2$2.prototype, "hpProgressComp", [_dec$3], {
         configurable: true,
@@ -1934,28 +2737,28 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const hotUpdateSystem = new HotUpdateSystem();
       cclegacy._RF.pop();
-      var _dec$4, _dec2$2, _class$6, _class2$3, _descriptor$3, _descriptor2$2;
+      var _dec$4, _class$6, _class2$3, _descriptor$3;
       cclegacy._RF.push({}, "85fdbrbQFlPzKk1Mw0ymHXt", "HotUpdateSceneCtrl", undefined);
       const {
         ccclass: ccclass$6,
         property: property$6
       } = _decorator;
-      let HotUpdateSceneCtrl = (_dec$4 = property$6(Label), _dec2$2 = property$6({
-        type: UIHotUpdateProgress,
-        tooltip: "热更新进度组件"
-      }), ccclass$6(_class$6 = (_class2$3 = class HotUpdateSceneCtrl extends Component {
+
+      /**
+       * 子包热更新场景 热更新逻辑 控制
+       *
+       * @author caizhitao
+       * @created 2025-02-08 18:33:34
+       */
+      let HotUpdateSceneCtrl = (_dec$4 = property$6(Label), ccclass$6(_class$6 = (_class2$3 = class HotUpdateSceneCtrl extends Component {
         constructor(...args) {
           super(...args);
           _initializerDefineProperty(this, "bundleNameLabel", _descriptor$3, this);
-          _initializerDefineProperty(this, "hpProgressComp", _descriptor2$2, this);
         }
         // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 组件生命周期处理
         onEnable() {
           this.bundleNameLabel.string = hotUpdateSystem.pendingSceneConfig.bundleName;
-
-          // 显示 loading
-          this.hpProgressComp.updateState(GGHotUpdateInstanceState.Idle);
 
           // 检查更新
           const instance = ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName);
@@ -1972,7 +2775,6 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         // 热更新回调
 
         onGGHotUpdateInstanceCallBack(instance) {
-          this.hpProgressComp.updateState(instance.state);
           switch (instance.state) {
             case GGHotUpdateInstanceState.Idle:
               break;
@@ -1995,9 +2797,11 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
               // 检查更新成功：当前已经是最新版本，直接进入游戏场景
               this._enterGameScene();
               break;
-            case GGHotUpdateInstanceState.HotUpdateInProgress:
-              // 热更新：进行中
-              this.hpProgressComp.updateProgress(instance.totalBytes, instance.downloadedBytes, instance.downloadSpeedInSecond, instance.downloadRemainTimeInSecond);
+            case GGHotUpdateInstanceState.HotUpdateDownloading:
+              // 热更新：文件下载中
+              break;
+            case GGHotUpdateInstanceState.HotUpdateExtracting:
+              // 热更新：文件解压中
               break;
             case GGHotUpdateInstanceState.HotUpdateSuc:
               // 热更新：成功，进入游戏
@@ -2021,32 +2825,79 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         onBackBtnClick() {
           sceneRouter.runSceneAsync(GameSceneConfig.LobbyScene);
         }
-      }, (_descriptor$3 = _applyDecoratedDescriptor(_class2$3.prototype, "bundleNameLabel", [_dec$4], {
+      }, _descriptor$3 = _applyDecoratedDescriptor(_class2$3.prototype, "bundleNameLabel", [_dec$4], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor2$2 = _applyDecoratedDescriptor(_class2$3.prototype, "hpProgressComp", [_dec2$2], {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        initializer: function () {
-          return null;
-        }
-      })), _class2$3)) || _class$6);
+      }), _class2$3)) || _class$6);
       cclegacy._RF.pop();
       var _dec$5, _class$7, _class2$4, _descriptor$4;
-      cclegacy._RF.push({}, "2b5e2t73URPAKcyvYx9lwmk", "LobbyGameListItem", undefined);
+      cclegacy._RF.push({}, "23029qFRCJL6pMwg3ISvcQF", "HotUpdateSceneUIHotUpdateProgressCtrl", undefined);
       const {
         ccclass: ccclass$7,
         property: property$7
       } = _decorator;
-      let LobbyGameListItem = (_dec$5 = property$7(Label), ccclass$7(_class$7 = (_class2$4 = class LobbyGameListItem extends Component {
+
+      /**
+       * 子包热更新场景 热更新进度UI 控制
+       *
+       * @author caizhitao
+       * @created 2026-01-23 14:33:41
+       */
+      let HotUpdateSceneUIHotUpdateProgressCtrl = (_dec$5 = property$7({
+        type: UIHotUpdateProgress,
+        tooltip: "热更新进度组件"
+      }), ccclass$7(_class$7 = (_class2$4 = class HotUpdateSceneUIHotUpdateProgressCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "gameName", _descriptor$4, this);
+          _initializerDefineProperty(this, "hpProgressComp", _descriptor$4, this);
+        }
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 组件生命周期处理
+        onLoad() {
+          // 只有原生平台下才有热更新，因此我们控制只有原生平台下，才显示
+          {
+            this.node.active = true;
+          }
+        }
+        onEnable() {
+          this.hpProgressComp.updateUI(null);
+          // 注册子包热更新监听
+          ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName).register(this);
+        }
+        onDisable() {
+          // 注销子包热更新监听
+          ggHotUpdateManager.getInstance(hotUpdateSystem.pendingSceneConfig.bundleName).unregister(this);
+        }
+
+        // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // 热更新回调
+
+        onGGHotUpdateInstanceCallBack(instance) {
+          this.hpProgressComp.updateUI(instance);
+        }
+      }, _descriptor$4 = _applyDecoratedDescriptor(_class2$4.prototype, "hpProgressComp", [_dec$5], {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        initializer: function () {
+          return null;
+        }
+      }), _class2$4)) || _class$7);
+      cclegacy._RF.pop();
+      var _dec$6, _class$8, _class2$5, _descriptor$5;
+      cclegacy._RF.push({}, "2b5e2t73URPAKcyvYx9lwmk", "LobbyGameListItem", undefined);
+      const {
+        ccclass: ccclass$8,
+        property: property$8
+      } = _decorator;
+      let LobbyGameListItem = (_dec$6 = property$8(Label), ccclass$8(_class$8 = (_class2$5 = class LobbyGameListItem extends Component {
+        constructor(...args) {
+          super(...args);
+          _initializerDefineProperty(this, "gameName", _descriptor$5, this);
           this._data = null;
         }
         bindData(data) {
@@ -2070,26 +2921,26 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             sceneRouter.runSceneAsync(this._data.sceneConfig);
           }
         }
-      }, _descriptor$4 = _applyDecoratedDescriptor(_class2$4.prototype, "gameName", [_dec$5], {
+      }, _descriptor$5 = _applyDecoratedDescriptor(_class2$5.prototype, "gameName", [_dec$6], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _class2$4)) || _class$7);
+      }), _class2$5)) || _class$8);
       cclegacy._RF.pop();
-      var _dec$6, _dec2$3, _class$8, _class2$5, _descriptor$5, _descriptor2$3;
+      var _dec$7, _dec2$2, _class$9, _class2$6, _descriptor$6, _descriptor2$2;
       cclegacy._RF.push({}, "71774IsIUxDsaiupc0uyOdp", "LobbyGameListCtrl", undefined);
       const {
-        ccclass: ccclass$8,
-        property: property$8
+        ccclass: ccclass$9,
+        property: property$9
       } = _decorator;
-      let LobbyGameListCtrl = (_dec$6 = property$8(Node), _dec2$3 = property$8(Node), ccclass$8(_class$8 = (_class2$5 = class LobbyGameListCtrl extends Component {
+      let LobbyGameListCtrl = (_dec$7 = property$9(Node), _dec2$2 = property$9(Node), ccclass$9(_class$9 = (_class2$6 = class LobbyGameListCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "itemParentNode", _descriptor$5, this);
-          _initializerDefineProperty(this, "itemNode", _descriptor2$3, this);
+          _initializerDefineProperty(this, "itemParentNode", _descriptor$6, this);
+          _initializerDefineProperty(this, "itemNode", _descriptor2$2, this);
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////
           // 节点复用处理
           this._nodePool = new NodePool();
@@ -2134,57 +2985,57 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             itemComp.bindData(data);
           });
         }
-      }, (_descriptor$5 = _applyDecoratedDescriptor(_class2$5.prototype, "itemParentNode", [_dec$6], {
+      }, (_descriptor$6 = _applyDecoratedDescriptor(_class2$6.prototype, "itemParentNode", [_dec$7], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor2$3 = _applyDecoratedDescriptor(_class2$5.prototype, "itemNode", [_dec2$3], {
+      }), _descriptor2$2 = _applyDecoratedDescriptor(_class2$6.prototype, "itemNode", [_dec2$2], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      })), _class2$5)) || _class$8);
+      })), _class2$6)) || _class$9);
       cclegacy._RF.pop();
-      var _dec$7, _class$9, _class2$6, _descriptor$6;
+      var _dec$8, _class$a, _class2$7, _descriptor$7;
       cclegacy._RF.push({}, "434dembGBRCJpqvmUt5Kxj0", "SubGameListItem", undefined);
       const {
-        ccclass: ccclass$9,
-        property: property$9
+        ccclass: ccclass$a,
+        property: property$a
       } = _decorator;
-      let SubGameListItem = (_dec$7 = property$9(Sprite), ccclass$9(_class$9 = (_class2$6 = class SubGameListItem extends Component {
+      let SubGameListItem = (_dec$8 = property$a(Sprite), ccclass$a(_class$a = (_class2$7 = class SubGameListItem extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "sprite", _descriptor$6, this);
+          _initializerDefineProperty(this, "sprite", _descriptor$7, this);
         }
         setSpriteFrame(spriteFrame) {
           this.sprite.spriteFrame = spriteFrame;
           this.sprite.getComponent(Sprite2DScaleAdapterComponent).updateSprite();
         }
-      }, _descriptor$6 = _applyDecoratedDescriptor(_class2$6.prototype, "sprite", [_dec$7], {
+      }, _descriptor$7 = _applyDecoratedDescriptor(_class2$7.prototype, "sprite", [_dec$8], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _class2$6)) || _class$9);
+      }), _class2$7)) || _class$a);
       cclegacy._RF.pop();
-      var _dec$8, _dec2$4, _dec3$2, _class$a, _class2$7, _descriptor$7, _descriptor2$4, _descriptor3$1, _descriptor4$1;
+      var _dec$9, _dec2$3, _dec3$2, _class$b, _class2$8, _descriptor$8, _descriptor2$3, _descriptor3$1, _descriptor4$1;
       cclegacy._RF.push({}, "d33ebtLuqVBh7tZjjHz/ks4", "SubGameListCtrl", undefined);
       const {
-        ccclass: ccclass$a,
-        property: property$a
+        ccclass: ccclass$b,
+        property: property$b
       } = _decorator;
-      let SubGameListCtrl = (_dec$8 = property$a(UILoading), _dec2$4 = property$a(Node), _dec3$2 = property$a(Node), ccclass$a(_class$a = (_class2$7 = class SubGameListCtrl extends Component {
+      let SubGameListCtrl = (_dec$9 = property$b(UILoading), _dec2$3 = property$b(Node), _dec3$2 = property$b(Node), ccclass$b(_class$b = (_class2$8 = class SubGameListCtrl extends Component {
         constructor(...args) {
           super(...args);
-          _initializerDefineProperty(this, "uiLoading", _descriptor$7, this);
-          _initializerDefineProperty(this, "itemParentNode", _descriptor2$4, this);
+          _initializerDefineProperty(this, "uiLoading", _descriptor$8, this);
+          _initializerDefineProperty(this, "itemParentNode", _descriptor2$3, this);
           _initializerDefineProperty(this, "itemNode", _descriptor3$1, this);
           _initializerDefineProperty(this, "bundleName", _descriptor4$1, this);
           // ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2243,35 +3094,35 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
             });
           });
         }
-      }, (_descriptor$7 = _applyDecoratedDescriptor(_class2$7.prototype, "uiLoading", [_dec$8], {
+      }, (_descriptor$8 = _applyDecoratedDescriptor(_class2$8.prototype, "uiLoading", [_dec$9], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor2$4 = _applyDecoratedDescriptor(_class2$7.prototype, "itemParentNode", [_dec2$4], {
+      }), _descriptor2$3 = _applyDecoratedDescriptor(_class2$8.prototype, "itemParentNode", [_dec2$3], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor3$1 = _applyDecoratedDescriptor(_class2$7.prototype, "itemNode", [_dec3$2], {
+      }), _descriptor3$1 = _applyDecoratedDescriptor(_class2$8.prototype, "itemNode", [_dec3$2], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return null;
         }
-      }), _descriptor4$1 = _applyDecoratedDescriptor(_class2$7.prototype, "bundleName", [property$a], {
+      }), _descriptor4$1 = _applyDecoratedDescriptor(_class2$8.prototype, "bundleName", [property$b], {
         configurable: true,
         enumerable: true,
         writable: true,
         initializer: function () {
           return "";
         }
-      })), _class2$7)) || _class$a);
+      })), _class2$8)) || _class$b);
       cclegacy._RF.pop();
     }
   };
