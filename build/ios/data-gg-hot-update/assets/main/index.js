@@ -80,7 +80,7 @@ System.register("chunks:///_virtual/BootSceneCtrl.ts", ['cc', './env', './GGHotU
                 break;
               case sys.OS.ANDROID:
                 packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/android/data-gg-hot-update`;
-                // packageUrl = `http://192.168.40.10:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
+                // packageUrl = `http://192.168.3.17:8081/gg/gg-hot-update-demo/build/android/data-gg-hot-update/`;
                 break;
             }
             ggHotUpdateManager.init({
@@ -434,7 +434,7 @@ System.register("chunks:///_virtual/GGEventManager.ts", ['cc'], function (export
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "d2da7ACD5NOQZccaMwIsIqU", "GGEventManager", undefined);
+      cclegacy._RF.push({}, "d1368QeOPhOvIW04IciciR4", "GGEventManager", undefined);
       /**
        * 缓存事件
        */
@@ -619,7 +619,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
       GGHotUpdateInstanceEnum = module.GGHotUpdateInstanceEnum;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "486d8YNjh1BCqdj1QMPxecD", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "5974d00brpBKq8If7puU90g", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -1718,7 +1718,7 @@ System.register("chunks:///_virtual/GGHotUpdateInstance.ts", ['cc', './env', './
                 var _this$_remoteVersionM3;
                 // 更新状态
                 this._resetExtractInfo();
-                this._debug(`热更新：解压中 Zip总解压字节数: ${this._zipExtractTotalBytes} Zip已解压字节数: ${this._zipExtractedBytes}`);
+                this._debug(`热更新：解压中`);
                 this._updateState(GGHotUpdateInstanceState.HotUpdateExtracting);
 
                 // 如果当前存在解压任务，那么释放它
@@ -1864,7 +1864,7 @@ System.register("chunks:///_virtual/GGHotUpdateManager.ts", ['cc', './GGHotUpdat
       ggLogger = module.ggLogger;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "d7e416Zyv5EeJERlDypUsUK", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "f1848wviJRPVIXO1aMsMh1C", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -2043,9 +2043,9 @@ System.register("chunks:///_virtual/GGHotUpdateType.ts", ['cc'], function (expor
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "af410WxsfhNw5NATlmRy6O9", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "50f6b2IlpxFe5XBPFiitxk5", "GGHotUpdateType", undefined);
       const GGHotUpdateName = exports('GGHotUpdateName', "gg-hot-update");
-      const GGHotUpdateVersion = exports('GGHotUpdateVersion', "6.0.0");
+      const GGHotUpdateVersion = exports('GGHotUpdateVersion', "6.0.2");
       /**
        * 热更新实例类型
        */
@@ -2108,7 +2108,7 @@ System.register("chunks:///_virtual/GGJsb.ts", ['cc', './GGLogger.ts', './GGObse
       GGObserverSystem = module.GGObserverSystem;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "fb23eq9bWZNIZm+Mo8By4BI", "GGJsb", undefined);
+      cclegacy._RF.push({}, "36fb6/35nlBtYZIW8+VCbhY", "GGJsb", undefined);
       let GGJsbResponseCode = exports('GGJsbResponseCode', /*#__PURE__*/function (GGJsbResponseCode) {
         GGJsbResponseCode[GGJsbResponseCode["Suc"] = 1] = "Suc";
         GGJsbResponseCode[GGJsbResponseCode["InvalidPlatform"] = 100] = "InvalidPlatform";
@@ -2228,7 +2228,7 @@ System.register("chunks:///_virtual/GGLogger.ts", ['cc', './GGHotUpdateType.ts']
       GGHotUpdateName = module.GGHotUpdateName;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "31c08/weY9F76xiNAgd6+tO", "GGLogger", undefined);
+      cclegacy._RF.push({}, "12884FdlF1Dda77Kjf+Kzdn", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -2298,7 +2298,7 @@ System.register("chunks:///_virtual/GGObserverSystem.ts", ['cc', './GGEventManag
       GGEventManager = module.GGEventManager;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "ce35aRP8DBFArfIztjCKTTO", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "495f3nP3jpEGI9qh1IvfOHx", "GGObserverSystem", undefined);
 
       /**
        * 观察者系统
@@ -2425,7 +2425,7 @@ System.register("chunks:///_virtual/GGZip.ts", ['cc', './GGObserverSystem.ts', '
       GGZipExtractZipTaskEvent = module.GGZipExtractZipTaskEvent;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "c02bbFzcr5OLZ+aNkLqTv2A", "GGZip", undefined);
+      cclegacy._RF.push({}, "3a29bvMJltGh55psQDXxHp3", "GGZip", undefined);
       const ModelName = "zip";
       const CallBackEventOnExtractUpdated = "zip.OnExtractUpdated";
 
@@ -2554,7 +2554,7 @@ System.register("chunks:///_virtual/GGZipTypes.ts", ['cc'], function (exports) {
       cclegacy = module.cclegacy;
     }],
     execute: function () {
-      cclegacy._RF.push({}, "e4664bEXylG9qOSzUODXsQq", "GGZipTypes", undefined);
+      cclegacy._RF.push({}, "0ccc4dRElJJp77ySy9yG7H1", "GGZipTypes", undefined);
       /**
        * Zip 解压任务观察者
        */

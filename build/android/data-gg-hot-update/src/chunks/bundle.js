@@ -42,7 +42,7 @@ System.register("chunks:///rollupPluginModLoBabelHelpers-9d38038d.js", [], funct
   };
 });
 
-System.register("chunks:///SceneRouter-28bb57e1.js", ['cc'], function (exports) {
+System.register("chunks:///SceneRouter-89bbcede.js", ['cc'], function (exports) {
   var cclegacy, assetManager, director;
   return {
     setters: [function (module) {

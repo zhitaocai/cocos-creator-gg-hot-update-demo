@@ -1,4 +1,4 @@
-System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d38038d.js', './SceneRouter-28bb57e1.js'], function () {
+System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d38038d.js', './SceneRouter-89bbcede.js'], function () {
   var cclegacy, Label, Component, _decorator, ProgressBar, UIOpacity, Tween, tween, Sprite, Enum, Widget, UITransform, error, sys, native, path, game, Node, NodePool, instantiate, Layout, size, assetManager, SpriteFrame, _applyDecoratedDescriptor, _initializerDefineProperty, GameBundleConfig, sceneRouter, GameSceneConfig;
   return {
     setters: [function (module) {
@@ -59,9 +59,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }) || _class) || _class);
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "af410WxsfhNw5NATlmRy6O9", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "50f6b2IlpxFe5XBPFiitxk5", "GGHotUpdateType", undefined);
       const GGHotUpdateName = "gg-hot-update";
-      const GGHotUpdateVersion = "6.0.0";
+      const GGHotUpdateVersion = "6.0.2";
       /**
        * 热更新实例类型
        */
@@ -534,7 +534,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }), _applyDecoratedDescriptor(_class2$1.prototype, "alignType", [_dec5$1], Object.getOwnPropertyDescriptor(_class2$1.prototype, "alignType"), _class2$1.prototype)), _class2$1)) || _class$3) || _class$3) || _class$3) || _class$3);
       cclegacy._RF.pop();
       const DEBUG = true;
-      cclegacy._RF.push({}, "d2da7ACD5NOQZccaMwIsIqU", "GGEventManager", undefined);
+      cclegacy._RF.push({}, "d1368QeOPhOvIW04IciciR4", "GGEventManager", undefined);
       /**
        * 缓存事件
        */
@@ -689,7 +689,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "ce35aRP8DBFArfIztjCKTTO", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "495f3nP3jpEGI9qh1IvfOHx", "GGObserverSystem", undefined);
 
       /**
        * 观察者系统
@@ -796,7 +796,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "31c08/weY9F76xiNAgd6+tO", "GGLogger", undefined);
+      cclegacy._RF.push({}, "12884FdlF1Dda77Kjf+Kzdn", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -853,7 +853,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggLogger = new GGLogger();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "fb23eq9bWZNIZm+Mo8By4BI", "GGJsb", undefined);
+      cclegacy._RF.push({}, "36fb6/35nlBtYZIW8+VCbhY", "GGJsb", undefined);
       let GGJsbResponseCode = /*#__PURE__*/function (GGJsbResponseCode) {
         GGJsbResponseCode[GGJsbResponseCode["Suc"] = 1] = "Suc";
         GGJsbResponseCode[GGJsbResponseCode["InvalidPlatform"] = 100] = "InvalidPlatform";
@@ -958,7 +958,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       // 注册到全局对象，方便原生回调此类
       globalThis["ggJsb"] = globalThis["ggJsb"] ?? ggJsb;
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "e4664bEXylG9qOSzUODXsQq", "GGZipTypes", undefined);
+      cclegacy._RF.push({}, "0ccc4dRElJJp77ySy9yG7H1", "GGZipTypes", undefined);
       /**
        * Zip 解压任务观察者
        */
@@ -987,7 +987,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         return GGZipExtractZipStatus;
       }({});
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "c02bbFzcr5OLZ+aNkLqTv2A", "GGZip", undefined);
+      cclegacy._RF.push({}, "3a29bvMJltGh55psQDXxHp3", "GGZip", undefined);
       const ModelName = "zip";
       const CallBackEventOnExtractUpdated = "zip.OnExtractUpdated";
 
@@ -1105,7 +1105,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggZip = new GGZip();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "486d8YNjh1BCqdj1QMPxecD", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "5974d00brpBKq8If7puU90g", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -2204,7 +2204,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
                 var _this$_remoteVersionM3;
                 // 更新状态
                 this._resetExtractInfo();
-                this._debug(`热更新：解压中 Zip总解压字节数: ${this._zipExtractTotalBytes} Zip已解压字节数: ${this._zipExtractedBytes}`);
+                this._debug(`热更新：解压中`);
                 this._updateState(GGHotUpdateInstanceState.HotUpdateExtracting);
 
                 // 如果当前存在解压任务，那么释放它
@@ -2331,7 +2331,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "d7e416Zyv5EeJERlDypUsUK", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "f1848wviJRPVIXO1aMsMh1C", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
@@ -2560,7 +2560,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
                 break;
               case sys.OS.ANDROID:
                 packageUrl = `https://raw.githubusercontent.com/zhitaocai/cocos-creator-gg-hot-update-demo/v6/build/android/data-gg-hot-update`;
-                // packageUrl = `http://192.168.40.10:8082/gg-hot-update-demo/build/android/data-gg-hot-update`;
+                // packageUrl = `http://192.168.3.17:8081/gg/gg-hot-update-demo/build/android/data-gg-hot-update/`;
                 break;
             }
             ggHotUpdateManager.init({
