@@ -59,9 +59,9 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }) || _class) || _class);
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "50f6b2IlpxFe5XBPFiitxk5", "GGHotUpdateType", undefined);
+      cclegacy._RF.push({}, "e3398AKeytM0pebvd157SsC", "GGHotUpdateType", undefined);
       const GGHotUpdateName = "gg-hot-update";
-      const GGHotUpdateVersion = "6.0.2";
+      const GGHotUpdateVersion = "6.0.3";
       /**
        * 热更新实例类型
        */
@@ -534,7 +534,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }), _applyDecoratedDescriptor(_class2$1.prototype, "alignType", [_dec5$1], Object.getOwnPropertyDescriptor(_class2$1.prototype, "alignType"), _class2$1.prototype)), _class2$1)) || _class$3) || _class$3) || _class$3) || _class$3);
       cclegacy._RF.pop();
       const DEBUG = true;
-      cclegacy._RF.push({}, "d1368QeOPhOvIW04IciciR4", "GGEventManager", undefined);
+      cclegacy._RF.push({}, "7344ebd/K5CErNjMhZzXnE8", "GGEventManager", undefined);
       /**
        * 缓存事件
        */
@@ -689,7 +689,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "495f3nP3jpEGI9qh1IvfOHx", "GGObserverSystem", undefined);
+      cclegacy._RF.push({}, "00bffKf/llPvZnzB/QB1tX/", "GGObserverSystem", undefined);
 
       /**
        * 观察者系统
@@ -796,7 +796,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "12884FdlF1Dda77Kjf+Kzdn", "GGLogger", undefined);
+      cclegacy._RF.push({}, "a16b7XVtmROnIigeYXBXwnK", "GGLogger", undefined);
 
       /**
        * 默认日志
@@ -853,7 +853,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggLogger = new GGLogger();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "36fb6/35nlBtYZIW8+VCbhY", "GGJsb", undefined);
+      cclegacy._RF.push({}, "b218cXHnxtHLKVFKYmWeVTi", "GGJsb", undefined);
       let GGJsbResponseCode = /*#__PURE__*/function (GGJsbResponseCode) {
         GGJsbResponseCode[GGJsbResponseCode["Suc"] = 1] = "Suc";
         GGJsbResponseCode[GGJsbResponseCode["InvalidPlatform"] = 100] = "InvalidPlatform";
@@ -958,7 +958,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       // 注册到全局对象，方便原生回调此类
       globalThis["ggJsb"] = globalThis["ggJsb"] ?? ggJsb;
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "0ccc4dRElJJp77ySy9yG7H1", "GGZipTypes", undefined);
+      cclegacy._RF.push({}, "55dd0+1xg5AMqCk6JO20XH6", "GGZipTypes", undefined);
       /**
        * Zip 解压任务观察者
        */
@@ -987,7 +987,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         return GGZipExtractZipStatus;
       }({});
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "3a29bvMJltGh55psQDXxHp3", "GGZip", undefined);
+      cclegacy._RF.push({}, "65405x8t8pOBr723TutfzBD", "GGZip", undefined);
       const ModelName = "zip";
       const CallBackEventOnExtractUpdated = "zip.OnExtractUpdated";
 
@@ -1105,7 +1105,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
       }
       const ggZip = new GGZip();
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "5974d00brpBKq8If7puU90g", "GGHotUpdateInstance", undefined);
+      cclegacy._RF.push({}, "b78fcvaZcJC4Z1XIHlcg7fT", "GGHotUpdateInstance", undefined);
 
       /**
        * 热更新实例观察者方法
@@ -2331,7 +2331,7 @@ System.register("chunks:///main.js", ['cc', './rollupPluginModLoBabelHelpers-9d3
         }
       }
       cclegacy._RF.pop();
-      cclegacy._RF.push({}, "f1848wviJRPVIXO1aMsMh1C", "GGHotUpdateManager", undefined);
+      cclegacy._RF.push({}, "a777auqOJVO2YM1PjG8Txq4", "GGHotUpdateManager", undefined);
 
       /**
        * 热更新实例管理器
